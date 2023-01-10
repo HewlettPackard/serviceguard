@@ -1,0 +1,1469 @@
+{
+    "Cloud Deployments": [
+        {
+            "LatestProductVersion": "latest", 
+            "Notes": "SAP HANA scale-out is not supported./n To use Quarantine without relocatable/virtual IP, the HANA data access network must be configured as a hdb_replication_subnet in the package configuration. This prevents simultaneous usage of a cross-subnet configuration. /n Easy deployment of Microsoft SQL Server workloads in not supported.", 
+            "Notes2": "Cluster with Cloud Instances as nodes should be from within a Region of a cloud./n Nodes of a cluster when deployed in cloud should be from a single cloud vendor and cannot be mixed with instances from other cloud vendors or those that are situated on premise. /n Layer 4 Load Balancer provided by the cloud vendor is used to support Relocatable IP or Virtual IP in a Serviceguard package for clients to connect with the applications protected by Serviceguard. /n Supported only with Non-shared storage: /n Applications with in-built data replications - SAP HANA scale-up with HANA System Replication, Oracle with Oracle Data Guard, Microsoft SQL Server Always On Availability groups, Applications using Serviceguard for Linux Flex Storage Add-on that provides HPE Software based storage replication solution using DRBD for non-shared storages", 
+            "ProductVersion": "A.12.80.00", 
+            "QuorumMechanism": "QuorumServer", 
+            "Supported Cloud Vendor": "AmazonWebServices"
+        }, 
+        {
+            "LatestProductVersion": "latest", 
+            "Notes": "SAP HANA scale-out is not supported./n To use Quarantine without relocatable/virtual IP, the HANA data access network must be configured as a hdb_replication_subnet in the package configuration. This prevents simultaneous usage of a cross-subnet configuration. /n Easy deployment of Microsoft SQL Server workloads in not supported.", 
+            "Notes2": "Cluster with Cloud Instances as nodes should be from within a Region of a cloud./n Nodes of a cluster when deployed in cloud should be from a single cloud vendor and cannot be mixed with instances from other cloud vendors or those that are situated on premise. /n Layer 4 Load Balancer provided by the cloud vendor is used to support Relocatable IP or Virtual IP in a Serviceguard package for clients to connect with the applications protected by Serviceguard. /n Supported only with Non-shared storage: /n Applications with in-built data replications - SAP HANA scale-up with HANA System Replication, Oracle with Oracle Data Guard, Microsoft SQL Server Always On Availability groups, Applications using Serviceguard for Linux Flex Storage Add-on that provides HPE Software based storage replication solution using DRBD for non-shared storages", 
+            "ProductVersion": "A.12.80.00", 
+            "QuorumMechanism": "QuorumServer", 
+            "Supported Cloud Vendor": "MicrosoftAzure"
+        }
+    ], 
+    "OS": [
+        {
+            "OracleLinux": [
+                {
+                    "AdditionalChecks": "UEK5/nkernel-uek-v4.14.35-1902.6.1 (UEK R5U2) onwards /nUEK6/nkernel-uek-5.4.17-2011.6.2.el7uek onwards/n", 
+                    "Browser": "Firefox Version 30, 42, 45, 53, 56,/n60, 61, 65, 68, 72, 80,86.90/nChrome version 35 to 93", 
+                    "FileSystem": "[ext3, ext4 NFS, XFS]", 
+                    "Jetty": "Bundledwith product", 
+                    "Notes": "VxVM and VxFS supported only on physical cluster nodes./nServiceguard Manager requires minimum screen resolution of 1024 x 768 pixels for best experience", 
+                    "Notes2": "JavaRuntimeEnv: Open Java 8 update up to 302", 
+                    "ProductVersion": "[A.15.00.00]", 
+                    "Version": "7.9", 
+                    "VolumeManager": "LVM"
+                }, 
+                {
+                    "AdditionalChecks": "UEK 6/nkernel-uek-5.4.17-2011.7.4.el8 uek onwards", 
+                    "Browser": "Firefox Version 30, 42, 45, 53, 56,60, 61, 65, 68, 72, 80, 86, 90/nChrome version 35 to 93", 
+                    "FileSystem": "[ext3, ext4 NFS, XFS]", 
+                    "Jetty": "Bundled with product", 
+                    "Notes": "VxVM and VxFS supported only on physical cluster nodes./nServiceguard Manager requires minimum screen resolution of 1024 x 768 pixels for best experience", 
+                    "Notes2": "JavaRuntimeEnv: : Open Java8 update up to 302", 
+                    "ProductVersion": "[A.15.00.00]", 
+                    "Version": "8.3", 
+                    "VolumeManager": "LVM"
+                }, 
+                {
+                    "AdditionalChecks": "UEK 6/nkernel-5.4.17-2102.201.3.el8 uek onwards", 
+                    "Browser": "Firefox Version 30, 42, 45, 53, 56,/n60, 61, 65, 68, 72, 80, 86, 90/nChrome version 35 to 93", 
+                    "FileSystem": "[ext3, ext4 NFS, XFS]", 
+                    "Jetty": "Bundled with product", 
+                    "Notes": "VxVM and VxFS supported only on physical cluster nodes./nServiceguard Manager requires minimum screen resolution of 1024 x 768 pixels for best experience", 
+                    "Notes2": "JavaRuntimeEnv: : Open Java8 update up to 302", 
+                    "ProductVersion": "[A.15.00.00]", 
+                    "Version": "8.4", 
+                    "VolumeManager": "LVM"
+                }, 
+                {
+                    "AdditionalChecks": "UEK 6/nkernel-5.4.17-2136.304.4.1el8 uek onwards", 
+                    "Browser": "Firefox Version 30, 42, 45, 53, 56,/n60, 61, 65, 68, 72, 80, 86, 90/nChrome version 35 to 93", 
+                    "FileSystem": "[ext3, ext4 NFS, XFS]", 
+                    "Jetty": "Bundled with product", 
+                    "Notes": "VxVM and VxFS supported only on physical cluster nodes./nServiceguard Manager requires minimum screen resolution of 1024 x 768 pixels for best experience", 
+                    "Notes2": "JavaRuntimeEnv: : Open Java8 update up to 322", 
+                    "ProductVersion": "[A.15.00.00]", 
+                    "Version": "8.5", 
+                    "VolumeManager": "LVM"
+                }, 
+                {
+                    "AdditionalChecks": "UEK 6 kernel-5.4.17-2136.307.3.el8 uek onwards", 
+                    "Browser": "Firefox Version 30, 42, 45, 53, 56, 60, 61, 65, 68, 72, 80, 86, 90 Chrome version 35 to 93", 
+                    "FileSystem": "[ext3, ext4 NFS, XFS]", 
+                    "Jetty": "Bundled with product", 
+                    "Notes": "VxVM and VxFS supported only on physical cluster nodes. Serviceguard Manager requires minimum screen resolution of 1024 x 768 pixels for best experience", 
+                    "Notes2": "JavaRuntimeEnv: : Open Java8 update up to 332", 
+                    "ProductVersion": "[A.15.00.00]", 
+                    "Version": "8.6", 
+                    "VolumeManager": "LVM"
+                }, 
+                {
+                    "AdditionalChecks": "UEK 7 kernel-5.15.0-0.30.19el8 uek onwards", 
+                    "Browser": "Firefox Version 30, 42, 45, 53, 56, 60, 61, 65, 68, 72, 80, 86, 90 Chrome version 35 to 93", 
+                    "FileSystem": "[ext3, ext4 NFS, XFS]", 
+                    "Jetty": "Bundled with product", 
+                    "Notes": "VxVM and VxFS supported only on physical cluster nodes. Serviceguard Manager requires minimum screen resolution of 1024 x 768 pixels for best experience", 
+                    "Notes2": "JavaRuntimeEnv: : Open Java8 update up to 345", 
+                    "ProductVersion": "[A.15.00.00]", 
+                    "Version": "8.6", 
+                    "VolumeManager": "LVM"
+                }
+            ], 
+            "RHEL": [
+                {
+                    "AdditionalChecks": "VxVM and VxFS supported only on physical cluster nodes /n Serviceguard Manager requires minimum screen resolution of 1024 x 768 pixels for best experience", 
+                    "Browser": "Firefox Version 30, 42, 45, 53, 56, 60,.61, 65, 68, 80, 86, 90.Chrome Version 35 to 93", 
+                    "FileSystem": "[ext3, ext4 NFS, XFS, VxFS]", 
+                    "Jetty": "Bundled with product", 
+                    "Notes": "JavaRuntimeEnv: OpenJava8, Update upto 322", 
+                    "ProductVersion": "[A.15.00.00]", 
+                    "Version": "[9.0]", 
+                    "VolumeManager": "[LVM, VxVM]"
+                }, 
+                {
+                    "AdditionalChecks": "VxVM and VxFS supported only on physical cluster nodes /n Serviceguard Manager requires minimum screen resolution of 1024 x 768 pixels for best experience", 
+                    "Browser": "Firefox Version 30, 42, 45, 53, 56, 60,.61, 65, 68, 80, 86, 90.Chrome Version 35 to 93", 
+                    "FileSystem": "[ext3, ext4 NFS, XFS, VxFS]", 
+                    "Jetty": "Bundled with product", 
+                    "Notes": "JavaRuntimeEnv: OpenJava8, Update upto 265", 
+                    "ProductVersion": "[A.15.00.00]", 
+                    "Version": "[8.1, 8.2, 8.3, 8.4, 8.5, 8.6]", 
+                    "VolumeManager": "[LVM, VxVM]"
+                }
+            ], 
+            "SLES": [
+                {
+                    "AdditionalChecks": "VxVM and VxFS supported only on physical cluster nodes/nServiceguard Manager requires minimum screen resolution of 1024 x 768 pixels for best experience", 
+                    "Browser": "Firefox Version 30, 31 /nChrome version 35, 36", 
+                    "FileSystem": "[ext3,ext4,NFS, XFS, btrfs, VxFS]", 
+                    "Jetty": "Bundledwith product", 
+                    "Notes": "JavaRuntimeEnv: Open Java 8 Update up to 222", 
+                    "ProductVersion": "[A.15.00.00]", 
+                    "Version": "[12sp0, 12sp1, 12sp2, 12sp3, 12sp4, 12sp5]", 
+                    "VolumeManager": "[LVM, VxVM]"
+                }, 
+                {
+                    "AdditionalChecks": "VxVM and VxFS supported only on physical cluster nodes/nServiceguard Manager requires minimum screen resolution of 1024 x 768 pixels for best experience", 
+                    "Browser": "Firefox Version 30, 42, 45, 53,56,/n60, 61, 65, 68, 69, 80, 86, 90/nChrome version 35 to 93", 
+                    "FileSystem": "[ext3,ext4,NFS, XFS, btrfs, VxFS]", 
+                    "Jetty": "Bundledwith product", 
+                    "Notes": "JavaRuntimeEnv: Open Java 8 Update up to 322", 
+                    "ProductVersion": "A.15.00.00", 
+                    "Version": "[15sp0, 15sp1, 15sp2, 15sp3, 15sp4]", 
+                    "VolumeManager": "[LVM, VxVM]"
+                }
+            ]
+        }
+    ], 
+    "QuorumServer": [
+        {
+            "CompatibleBaseOS": "RHEL 8.x  /nRHEL 7.x /nRHEL 6.x /nSLES 12 (SP0 and later) /nSLES 15 (up to SP1) /n OL 7.4 and later", 
+            "Notes": "Smart Quorum is supported from A.12.00.30 and later./nSmart Quorum is supported with clusters running Serviceguard for Linux A.12.00.30 (Enterprise Edition only) and later./n Following are the compatible Serviceguard versions,/n - Serviceguard for Linux A.11.18 to A.12.00.xx /n - Serviceguard for HP-UX A.11.16 to A.11.20", 
+            "QS-Version": "A.12.50.00 or later"
+        }, 
+        {
+            "CompatibleBaseOS": "RHEL 7.x/nRHEL 6.x/nSLES 12 (SP0 and later)/nSLES 11 (SP2 and later)/nSLES 15 OL 7.4 and later", 
+            "Notes": "Smart Quorum is supported from A.12.00.30 and later./nSmart Quorum is supported with clusters running Serviceguard for Linux A.12.00.30 (Enterprise Edition only) and later./n Following are the compatible Serviceguard versions,/n - Serviceguard for Linux A.11.18 to A.12.00.xx /n - Serviceguard for HP-UX A.11.16 to A.11.20", 
+            "QS-Version": "A.12.40.00"
+        }, 
+        {
+            "CompatibleBaseOS": "RHEL 7.x/nRHEL 6.1 and later/nRHEL 5.7 and later/nSLES 12 (SP0 and later)/nSLES 11 (SP2 and later)", 
+            "Notes": "Smart Quorum is supported from A.12.00.30 and later./nSmart Quorum is supported with clusters running Serviceguard for Linux A.12.00.30 (Enterprise Edition only) and later./n Following are the compatible Serviceguard versions,/n - Serviceguard for Linux A.11.18 to A.12.00.xx /n - Serviceguard for HP-UX A.11.16 to A.11.20", 
+            "QS-Version": "A.12.00.30 or later"
+        }, 
+        {
+            "CompatibleBaseOS": "RHEL 6.1 and later/nRHEL 5.7 and later/nSLES 11 ( SP2 and later)", 
+            "Notes": "Smart Quorum is supported from A.12.00.30 and later./nSmart Quorum is supported with clusters running Serviceguard for Linux A.12.00.30 (Enterprise Edition only) and later./n Following are the compatible Serviceguard versions,/n - Serviceguard for Linux A.11.18 to A.12.00.xx /n - Serviceguard for HP-UX A.11.16 to A.11.20", 
+            "QS-Version": "A.12.00.00"
+        }, 
+        {
+            "CompatibleBaseOS": "RHEL8.x /n RHEL7.x /n SLES12(SP0andlater) /n SLES15 /n OL 7.4and later /n OL8.2", 
+            "Notes": "Smart Quorum is supported from A.12.00.30 and later./nSmart Quorum is supported with clusters running Serviceguard for Linux A.12.00.30 (Enterprise Edition only) and later./n Following are the compatible Serviceguard versions,/n - Serviceguard for Linux A.11.18 to A.12.00.xx /n - Serviceguard for HP-UX A.11.16 to A.11.20", 
+            "QS-Version": "A.12.60.00"
+        }
+    ], 
+    "SGVersions": [
+        {
+            "ProductVersion": "A.12.00.00"
+        }, 
+        {
+            "ProductVersion": "A.12.00.10"
+        }, 
+        {
+            "ProductVersion": "A.12.00.20"
+        }, 
+        {
+            "ProductVersion": "A.12.00.21"
+        }, 
+        {
+            "ProductVersion": "A.12.00.22"
+        }, 
+        {
+            "ProductVersion": "A.12.00.30"
+        }, 
+        {
+            "ProductVersion": "A.12.00.40"
+        }, 
+        {
+            "ProductVersion": "A.12.00.41"
+        }, 
+        {
+            "ProductVersion": "A.12.00.50"
+        }, 
+        {
+            "ProductVersion": "A.12.00.51"
+        }, 
+        {
+            "ProductVersion": "A.12.10.00"
+        }, 
+        {
+            "ProductVersion": "A.12.20.00"
+        }, 
+        {
+            "ProductVersion": "A.12.30.00"
+        }, 
+        {
+            "ProductVersion": "A.12.40.00"
+        }, 
+        {
+            "ProductVersion": "A.12.50.00"
+        }, 
+        {
+            "ProductVersion": "A.12.50.03"
+        }, 
+        {
+            "ProductVersion": "A.12.60.00"
+        }, 
+        {
+            "ProductVersion": "A.12.70.00"
+        }, 
+        {
+            "ProductVersion": "A.12.80.00"
+        }, 
+        {
+            "ProductVersion": "A.15.00.00"
+        }
+    ], 
+    "Servers": [
+        {
+            "HPEServers": [
+                {
+                    "Generations": "Any", 
+                    "LatestProductVersion": "latest", 
+                    "Models": "Any", 
+                    "ProductVersion": "A.12.40.00", 
+                    "ServerName": "HPE Superdome Flex 280"
+                }, 
+                {
+                    "Generations": "Any", 
+                    "LatestProductVersion": "latest", 
+                    "Models": "Any", 
+                    "ProductVersion": "A.12.00.40", 
+                    "ServerName": "HPE Superdome Flex"
+                }, 
+                {
+                    "Generations": "Any", 
+                    "LatestProductVersion": "latest", 
+                    "Models": "Any", 
+                    "ProductVersion": "A.12.00.10", 
+                    "ServerName": "HPE Integrity Superdome X"
+                }, 
+                {
+                    "Generations": "Any", 
+                    "LatestProductVersion": "latest", 
+                    "Models": "Any", 
+                    "ProductVersion": "A.12.00.40", 
+                    "ServerName": "HPE Integrity MC990 X"
+                }, 
+                {
+                    "Generations": "Any", 
+                    "LatestProductVersion": "latest", 
+                    "Models": "Any", 
+                    "ProductVersion": "A.12.00.00", 
+                    "Remarks": "Any HPE manufactured Linux x86_64 servers (Intel & AMD 64-bit x86 architecture) with SGLX 12.xx.xx.", 
+                    "ServerName": "All HPE Servers(ML, DL, Synergy, etc.)"
+                }
+            ], 
+            "HyperconvergedSystems": [
+                {
+                    "HyperconvergedSystem": "HPE SimpliVity 380", 
+                    "LatestProductVersion": "latest", 
+                    "ProductVersion": "A.12.30.00", 
+                    "Remarks": "Supported only with VMware hypervisor with VMFS volumes./nQuorum Server is the only supported arbitration method"
+                }
+            ], 
+            "NonHPEServers": [
+                {
+                    "LatestProductVersion": "latest", 
+                    "ProductVersion": "A.12.00.00", 
+                    "Remarks": "HPE will resolve defects that are reproducible on HPE servers./nHPE does not test Serviceguard products on 3rd party hardware./nHPE may not be able to resolve issues that have a dependency on access to 3rd party hardware", 
+                    "Server": "Linux x86-64", 
+                    "Type": "Intel & AMD 64-bit x86 architecture"
+                }
+            ]
+        }
+    ], 
+    "Solutions": [
+        {
+            "DR": [
+                {
+                    "DRBD-LinuxFlexStorageAdd-on": [
+                        {
+                            "DRBDVersion": "[9.0.x, 9.0.30, 9.1.x, 9.1.3]", 
+                            "LatestProductVersion": "latest", 
+                            "Notes": "Supported Linux Distro - RedHat 7.6 up to 7.9 /nRedHat 8.1 up to 8.4 /nSLES 12 SP3 up to SP5 /nSLES 15 SP0 up to SP3", 
+                            "ProductVersion": "A.12.80.00", 
+                            "SGLX-FlexStorageAddOn-Version": "B.1.0.0"
+                        }
+                    ], 
+                    "Metrocluster-3PAR": [
+                        {
+                            "AdditionalChecks": " RHEL 5.7 to 5.11 Not Supported with Inform OS 3.3.1./n HPE 3PAR Inform OS CLI required only with RHEL 5.x Asynchronous streaming remote copy mode not supported with Inform OS 3.2.2 & earlier./nUnidirectional Remote Copy configuration", 
+                            "InformOSVersion": "3.3.x", 
+                            "LatestProductVersion": "latest", 
+                            "Notes": "Supported HPE 3PAR features 3PAR Synchronous Long Distance (SLD) replication with A.12.30.00 and Inform OS 3.3.x 3PAR Peer Persistence with A.12.00.40 and later 3PAR Asynchronous Streaming Mode Synchronous Replication mode Fully Provisioned and Thinly Provisioned Virtual Volumes 3PAR Virtual Domains Support for Asynchronous Periodic Replication mode N-1 or 1-N Remote Copy Configuration with below mentioned condition: In a N-1 or 1-N Remote Copy topology, 3PAR allows only one of the pairs to be bi - directional, rest of the pairs will be unidirectional./n3Par recommends not to use the unidirectional pairs for Disaster Recovery./nSo, one can configure Metrocluster or Continentalclusters only between the arrays that are in a bidirectional configuration within a N-1 or 1-N Remote Copy setup./n3PAR Remote Copy Failsafe mode is supported from Inform OS versionSGLX Specific Notes Support for use of VMware Virtual Machine File System (VMFS) based storage in 3PAR Metrocluster packages./nSupport for Recovery Point Objective (RPO) Sensitive failover with 3PAR Metrocluster packages Easy Deployment of Metrocluster Packages using Serviceguard Manager B.12.00.00 cmpreparestg command over 3PAR Remote Copy Volume Group disks", 
+                            "ProductVersion": "A.12.00.51"
+                        }, 
+                        {
+                            "AdditionalChecks": " RHEL 5.7 to 5.11 Not Supported with Inform OS 3.3.1 HPE 3PAR Inform OS CLI required only with RHEL 5.x Asynchronous streaming remote copy mode not supported with Inform OS 3.2.2 & earlier./nUnidirectional Remote Copy configuration", 
+                            "InformOSVersion": "3.2.x", 
+                            "LatestProductVersion": "latest", 
+                            "Notes": "Supported HPE 3PAR features 3PAR Synchronous Long Distance (SLD) replication with A.12.30.00 and Inform OS 3.3.x 3PAR Peer Persistence with A.12.00.40 and later 3PAR Asynchronous Streaming Mode Synchronous Replication mode Fully Provisioned and Thinly Provisioned Virtual Volumes 3PAR Virtual Domains Support for Asynchronous Periodic Replication mode N-1 or 1-N Remote Copy Configuration with below mentioned condition: In a N-1 or 1-N Remote Copy topology, 3PAR allows only one of the pairs to be bi - directional, rest of the pairs will be unidirectional./n3Par recommends not to use the unidirectional pairs for Disaster Recovery./nSo, one can configure Metrocluster or Continentalclusters only between the arrays that are in a bidirectional configuration within a N-1 or 1-N Remote Copy setup./n3PAR Remote Copy Failsafe mode is supported from Inform OS versionSGLX Specific Notes Support for use of VMware Virtual Machine File System (VMFS) based storage in 3PAR Metrocluster packages./nSupport for Recovery Point Objective (RPO) Sensitive failover with 3PAR Metrocluster packages Easy Deployment of Metrocluster Packages using Serviceguard Manager B.12.00.00 cmpreparestg command over 3PAR Remote Copy Volume Group disks", 
+                            "ProductVersion": "A.12.00.00"
+                        }, 
+                        {
+                            "AdditionalChecks": " RHEL 5.7 to 5.11 Not Supported with Inform OS 3.3.1 HPE 3PAR Inform OS CLI required only with RHEL 5.x Asynchronous streaming remote copy mode not supported with Inform OS 3.2.2 & earlier./nUnidirectional Remote Copy configuration", 
+                            "InformOSVersion": "3.1.x", 
+                            "LatestProductVersion": "latest", 
+                            "Notes": "Supported HPE 3PAR features 3PAR Synchronous Long Distance (SLD) replication with A.12.30.00 and Inform OS 3.3.x 3PAR Peer Persistence with A.12.00.40 and later 3PAR Asynchronous Streaming Mode Synchronous Replication mode Fully Provisioned and Thinly Provisioned Virtual Volumes 3PAR Virtual Domains Support for Asynchronous Periodic Replication mode N-1 or 1-N Remote Copy Configuration with below mentioned condition: In a N-1 or 1-N Remote Copy topology, 3PAR allows only one of the pairs to be bi - directional, rest of the pairs will be unidirectional./n3Par recommends not to use the unidirectional pairs for Disaster Recovery./nSo, one can configure Metrocluster or Continentalclusters only between the arrays that are in a bidirectional configuration within a N-1 or 1-N Remote Copy setup./n3PAR Remote Copy Failsafe mode is supported from Inform OS versionSGLX Specific Notes Support for use of VMware Virtual Machine File System (VMFS) based storage in 3PAR Metrocluster packages./nSupport for Recovery Point Objective (RPO) Sensitive failover with 3PAR Metrocluster packages Easy Deployment of Metrocluster Packages using Serviceguard Manager B.12.00.00 cmpreparestg command over 3PAR Remote Copy Volume Group disks", 
+                            "ProductVersion": "A.12.00.00"
+                        }, 
+                        {
+                            "InformOSVersion": "2.3.1 mu2", 
+                            "LatestProductVersion": "latest", 
+                            "Notes": "3PAR Remote Copy volume groups configured with fail_wrt_on_err policy./nRHEL 6 KVM \\u2013 Guest as Serviceguard Metrocluster Node not supported Command preview \\u201ccmdrprev\\u201d not supported 3.1.3 Onwards./n(Note: With Inform OS 3.2.1 HP Serviceguard Metrocluster for 3 PAR requires MU1 or later to support failsafe mode).", 
+                            "ProductVersion": "A.12.00.00"
+                        }
+                    ], 
+                    "Metrocluster-EMC-SRDF": [
+                        {
+                            "AdditionalChecks": "Not supported on SLES15, OL 7, OL 8 and RHEL 8", 
+                            "LatestProductVersion": "latest", 
+                            "Notes": "All features as supported by B.01.00.00 /n SRDF Synchronous & Asynchronous data replication on DMX, DMX-3, DMX-4, VMAX and PowerMAX series (Asynchronous replication on Symmetrix DMX requires microcode level 5671 or higher) /n Support for RDF (Remote Data Facility) group numbers > 64 /n SRDF Consistency Groups (for M by N configurations), Synchronous and Asynchronous data replication /n SRDF Control Operations: Disaster restart \\u2013 failover, Disaster recovery failback /n SRDF Swap: R1/R2 personality swap on static and dynamic RDF devices /n SRDF Domino mode /n Use of BCV protection /n DWDM up to 300km /n Support for Data Replication Storage Failover Support for controlled failback./nSupport for Cross-Subnet Configurations/nSupport for SONET/SDH as heartbeat and SRDF links/nSupport for Virtual Provisioning Volumes Persistent Reservations (PR)/nFollowing Features not supported in 12.00.50:/nCannot be deployed on Virtual Machines (VMware, KVM, RHEV)/ncmpreparestg command over SRDF Device Group disks/nNotes:/nMxN configurations not supported with Symmetrix 3/nR1/R2 swapping not supported with Symmetrix 3, 4, 4.8/nM by N configurations cannot be used with R1/R2 swapping/n", 
+                            "ProductVersion": "A.12.00.50", 
+                            "RAIDManagerVersion": "V8.x"
+                        }, 
+                        {
+                            "AdditionalChecks": "Not supported on SLES15, OL 7, OL 8 and RHEL 8", 
+                            "LatestProductVersion": "latest", 
+                            "Notes": "All features as supported by B.01.00.00 /n SRDF Synchronous & Asynchronous data replication on DMX, DMX-3, DMX-4, VMAX and PowerMAX series (Asynchronous replication on Symmetrix DMX requires microcode level 5671 or higher) /n Support for RDF (Remote Data Facility) group numbers > 64 /n SRDF Consistency Groups (for M by N configurations), Synchronous and Asynchronous data replication /n SRDF Control Operations: Disaster restart \\u2013 failover, Disaster recovery failback /n SRDF Swap: R1/R2 personality swap on static and dynamic RDF devices /n SRDF Domino mode /n Use of BCV protection /n DWDM up to 300km /n Support for Data Replication Storage Failover Support for controlled failback./nSupport for Cross-Subnet Configurations/nSupport for SONET/SDH as heartbeat and SRDF links/nSupport for Virtual Provisioning Volumes Persistent Reservations (PR)/nFollowing Features not supported in 12.00.50:/nCannot be deployed on Virtual Machines (VMware, KVM, RHEV)/ncmpreparestg command over SRDF Device Group disks/nNotes:/nMxN configurations not supported with Symmetrix 3/nR1/R2 swapping not supported with Symmetrix 3, 4, 4.8/nM by N configurations cannot be used with R1/R2 swapping/n", 
+                            "ProductVersion": "A.12.00.50", 
+                            "RAIDManagerVersion": "V9.x"
+                        }, 
+                        {
+                            "AdditionalChecks": "Not supported on SLES15, OL 7 and RHEL 8", 
+                            "LatestProductVersion": "latest", 
+                            "Notes": "All features as supported by B.01.00.00 /n SRDF Synchronous & Asynchronous data replication on DMX, DMX-3, DMX-4, VMAX and PowerMAX series (Asynchronous replication on Symmetrix DMX requires microcode level 5671 or higher) /n Support for RDF (Remote Data Facility) group numbers > 64 /n SRDF Consistency Groups (for M by N configurations), Synchronous and Asynchronous data replication /n SRDF Control Operations: Disaster restart \\u2013 failover, Disaster recovery failback /n SRDF Swap: R1/R2 personality swap on static and dynamic RDF devices /n SRDF Domino mode /n Use of BCV protection /n DWDM up to 300km /n Support for Data Replication Storage Failover Support for controlled failback./nSupport for Cross-Subnet Configurations/nSupport for SONET/SDH as heartbeat and SRDF links/nSupport for Virtual Provisioning Volumes Persistent Reservations (PR)/nFollowing Features not supported in 12.00.50:/nCannot be deployed on Virtual Machines (VMware, KVM, RHEV)/ncmpreparestg command over SRDF Device Group disks/nNotes:/nMxN configurations not supported with Symmetrix 3/nR1/R2 swapping not supported with Symmetrix 3, 4, 4.8/nM by N configurations cannot be used with R1/R2 swapping/n", 
+                            "ProductVersion": "A.12.00.50", 
+                            "RAIDManagerVersion": "V7.6.1.0"
+                        }
+                    ], 
+                    "Metrocluster-EVA": [
+                        {
+                            "AdditionalChecks": "Not supported on SLES 15, OL 7, OL 8 and RHEL 8", 
+                            "EvaFirmware": "XCS 1000X000", 
+                            "LatestProductVersion": "latest", 
+                            "Notes": "Synchronous Replication mode Enhanced Asynchronous Replication modeThe following features are not supported with in A.12.00.00: Configuring Metrocluster package with secure connection to Management Server is not supported on RHEL 6.1./nVxVM and VxFS", 
+                            "ProductVersion": "A.12.00.00", 
+                            "WindowsManagementServerSoftware": " CV EVA v9.4 SMI-S EVA v9.4 P6000 CV v10.0 SMI-S P6000 v10.0 P6000 CV v10.1 SMI-S P6000 v10.1 P6000 CV v10.2  SMI-S P6000 V10.2 P6000 CV v10.3 SMI-S P6000 V10.3"
+                        }, 
+                        {
+                            "AdditionalChecks": "Not supported on SLES 15, OL 7, OL 8 and RHEL 8", 
+                            "EvaFirmware": "XCS 11001100", 
+                            "LatestProductVersion": "latest", 
+                            "Notes": "Synchronous Replication mode Enhanced Asynchronous Replication modeThe following features are not supported with in A.12.00.00: Configuring Metrocluster package with secure connection to Management Server is not supported on RHEL 6.1./nVxVM and VxFS", 
+                            "ProductVersion": "A.12.00.00", 
+                            "WindowsManagementServerSoftware": " CV EVA v9.4 SMI-S EVA v9.4 P6000 CV v10.0 SMI-S P6000 v10.0 P6000 CV v10.1 SMI-S P6000 v10.1 P6000 CV v10.2  SMI-S P6000 V10.2 P6000 CV v10.3 SMI-S P6000 V10.3"
+                        }, 
+                        {
+                            "AdditionalChecks": "Not supported on SLES 15, OL 7, OL 8 and RHEL 8", 
+                            "EvaFirmware": "XCS 11200000", 
+                            "LatestProductVersion": "latest", 
+                            "Notes": "Synchronous Replication mode Enhanced Asynchronous Replication mode./nThe following features are not supported with in A.12.00.00: Configuring Metrocluster package with secure connection to Management Server is not supported on RHEL 6.1./nVxVM and VxFS", 
+                            "ProductVersion": "A.12.00.00", 
+                            "WindowsManagementServerSoftware": " CV EVA v9.4 SMI-S EVA v9.4 P6000 CV v10.0 SMI-S P6000 v10.0 P6000 CV v10.1 SMI-S P6000 v10.1 P6000 CV v10.2  SMI-S P6000 V10.2 P6000 CV v10.3 SMI-S P6000 V10.3"
+                        }, 
+                        {
+                            "AdditionalChecks": "Not supported on SLES 15, OL 7, OL 8 and RHEL 8", 
+                            "EvaFirmware": "XCS 11300000", 
+                            "LatestProductVersion": "latest", 
+                            "Notes": "Synchronous Replication mode Enhanced Asynchronous Replication modeThe following features are not supported with in A.12.00.00: Configuring Metrocluster package with secure connection to Management Server is not supported on RHEL 6.1./nVxVM and VxFS", 
+                            "ProductVersion": "A.12.00.00", 
+                            "WindowsManagementServerSoftware": " CV EVA v9.4 SMI-S EVA v9.4 P6000 CV v10.0 SMI-S P6000 v10.0 P6000 CV v10.1 SMI-S P6000 v10.1 P6000 CV v10.2  SMI-S P6000 V10.2 P6000 CV v10.3 SMI-S P6000 V10.3"
+                        }
+                    ], 
+                    "Metrocluster-Primera": [
+                        {
+                            "InformOSVersion": "[Primera 4.0, Primera 4.1, Primera 4.2, Primera 4.3, Primera 4.4]", 
+                            "LatestProductVersion": "latest", 
+                            "Notes": "Supported HPEPrimera /n Remote Copy replication can be configured with HPE Primera storage arrays and also mixed deployment comprising of HPE Primera and 3PAR (with only Inform OS 3.3.1) arrays. Refer to support matrix of HPE Primera for specific details./n Primera Synchronous Long Distance (SLD)replication /n Primera Peer Persistence /n Asynchronous periodic mode /n Fully Provisioned and Thinly Provisioned Virtual Volumes /n Primera Virtual Domains /n Support for Asynchronous Periodic Replication mode /nSGLXSpecificNotes /n Support for use of VMware Virtual Machine File System(VMFS) based storage in Primera Metrocluster packages./n Support for Recovery Point Objective (RPO)Sensitive failover with Primera Metrocluster packages /n Easy Deployment of Metrocluster Packages using Serviceguard Manager B.12.00.00 /n cmpreparestg commandover Primera Remote Copy Volume Group disks /nDRR feature is not supported with Inform OS 4.3 (due to Primera defect 332839)/n Restrictions & Unsupported Configurations /n Unidirectional Remote Copy configuration.", 
+                            "ProductVersion": "A.12.60.00"
+                        }, 
+                        {
+                            "InformOSVersion": "[Alletra 9000 9.3, Alletra 9000 9.4]", 
+                            "LatestProductVersion": "latest", 
+                            "Notes": "Supported HPEPrimera /n Remote Copy replication can be configured with HPE Primera storage arrays and also mixed deployment comprising of HPE Primera and 3PAR (with only Inform OS 3.3.1) arrays. Refer to support matrix of HPE Primera for specific details./n Primera Synchronous Long Distance (SLD)replication /n Primera Peer Persistence /n Asynchronous periodic mode /n Fully Provisioned and Thinly Provisioned Virtual Volumes /n Primera Virtual Domains /n Support for Asynchronous Periodic Replication mode /nSGLXSpecificNotes /n Support for use of VMware Virtual Machine File System(VMFS) based storage in Primera Metrocluster packages./n Support for Recovery Point Objective (RPO)Sensitive failover with Primera Metrocluster packages /n Easy Deployment of Metrocluster Packages using Serviceguard Manager B.12.00.00 /n cmpreparestg commandover Primera Remote Copy Volume Group disks /nDRR feature is not supported with Inform OS 4.3 (due to Primera defect 332839)/n Restrictions & Unsupported Configurations /n Unidirectional Remote Copy configuration.", 
+                            "ProductVersion": "A.12.60.00"
+                        }
+                    ], 
+                    "Metrocluster-XP": [
+                        {
+                            "LatestProductVersion": "latest", 
+                            "Notes": " Virtual Command DeviceNot supported: Site Controller packages in A.12.00.00 Three Data Center Disaster Recovery (3DC DR) solution VxVM and VxFS is not supported in A.12.00.00 /n Notsupported: Site Controller packages in A.12.00.00. Three Data Center  Disaster Recovery(3DC DR) solution. VxVM and VxFS is not supported in A.12.00.00. /n Following XP/P9000 Platform are supported and refer to HPE XP storage documents for certified version of Raid Manager & Micro code version details - XP20000/XP24000, P9500, XP7, XP8. /n The following features introduced in HP Storage P9000 RAID Manager are not supported with Metrocluster:  Virtual Command Device via LAN, Copy Group configuration based on RAID, User Authentication based on Command Device./n The User Authentication for the Command Device Security must be disabled in a Metrocluster environment.", 
+                            "ProductVersion": "A.12.00.00", 
+                            "RAIDManagerVersion": "XP Arrays:- 01.22.06 or later"
+                        }, 
+                        {
+                            "LatestProductVersion": "latest", 
+                            "Notes": " Virtual Command DeviceNot supported: Site Controller packages in A.12.00.00 Three Data Center Disaster Recovery (3DC DR) solution VxVM and VxFS is not supported in A.12.00.00 /n Notsupported: Site Controller packages in A.12.00.00. Three Data Center  Disaster Recovery(3DC DR) solution. VxVM and VxFS is not supported in A.12.00.00. /n Following XP/P9000 Platform are supported and refer to HPE XP storage documents for certified version of Raid Manager & Micro code version details - XP20000/XP24000, P9500, XP7, XP8. /n The following features introduced in HP Storage P9000 RAID Manager are not supported with Metrocluster:  Virtual Command Device via LAN, Copy Group configuration based on RAID, User Authentication based on Command Device./n The User Authentication for the Command Device Security must be disabled in a Metrocluster environment.", 
+                            "ProductVersion": "A.12.00.00", 
+                            "RAIDManagerVersion": "P9500 arrays:- 01.24.13 or later2"
+                        }
+                    ], 
+                    "MicrosoftSQLServer": [
+                        {
+                            "AdditionalChecks": "Not supported on SLES 15, OL 7 and OL 8", 
+                            "LatestProductVersion": "latest", 
+                            "Notes": "Support for Always ON Availability Groups (AOAI) and Always ON Failover Cluster Instance (AOFI) for SQL Server on Linux", 
+                            "ProductVersion": "A.12.40.00", 
+                            "Version": "SQL Server 2019 on Linux"
+                        }, 
+                        {
+                            "AdditionalChecks": "Not supported on SLES 15, OL 7 and OL 8", 
+                            "LatestProductVersion": "latest", 
+                            "Notes": "Support for Always ON Availability Groups (AOAI) and Always ON Failover Cluster Instance (AOFI) for SQL Server on Linux", 
+                            "ProductVersion": "A.12.20.00", 
+                            "Version": "SQL Server 2017 on Linux"
+                        }
+                    ], 
+                    "ODG": [
+                        {
+                            "LatestProductVersion": "latest", 
+                            "Notes": " Support for HPE Application Tuner Express (ATX) version 1.0.1-84 or later./nFollowing features are supported from A.12.50.1 onwards  o Two standby solution o Protected DB replica o Farsync monitoring  o Read IP management /n Easy deployment feature for 21c can be utilised by executing the steps mentioned in the CR QXCR1001815216.", 
+                            "ProductVersion": "A.12.00.50", 
+                            "Version": "21c"
+                        }, 
+                        {
+                            "LatestProductVersion": "latest", 
+                            "Notes": " Support for HPE Application Tuner Express (ATX) version 1.0.1-84 or later./nFollowing features are supported from A.12.50.1 onwards  o Two standby solution o Protected DB replica o Farsync monitoring  o Read IP management", 
+                            "ProductVersion": "A.12.00.50", 
+                            "Version": "19c"
+                        }, 
+                        {
+                            "LatestProductVersion": "latest", 
+                            "Notes": " Support for HPE Application Tuner Express (ATX) version 1.0.1-84 or later./n Following features are supported from A.12.50.1 onwards  o Two standby solution o Protected DB replica o Farsync monitoring  o Read IP management", 
+                            "ProductVersion": "A.12.00.50", 
+                            "Version": "18c"
+                        }, 
+                        {
+                            "LatestProductVersion": "latest", 
+                            "Notes": " Support for HPE Application Tuner Express (ATX) version 1.0.1-84 or later./n Following features are supported from A.12.50.1 onwards  o Two standby solution o Protected DB replica o Farsync monitoring  o Read IP management", 
+                            "ProductVersion": "A.12.00.50", 
+                            "Version": "12c R1"
+                        }, 
+                        {
+                            "LatestProductVersion": "latest", 
+                            "Notes": " Support for HPE Application Tuner Express (ATX) version 1.0.1-84 or later./n Following features are supported from A.12.50.1 onwards  o Two standby solution o Protected DB replica o Farsync monitoring  o Read IP management", 
+                            "ProductVersion": "A.12.00.50", 
+                            "Version": "12c R2"
+                        }
+                    ], 
+                    "OracleASMMirroring": [
+                        {
+                            "AdditionalChecks": "Easy deployment feature for 21c can be utilised by executing the steps mentioned in the CR QXCR1001815216.", 
+                            "LatestProductVersion": "latest", 
+                            "ProductVersion": "A.12.20.00", 
+                            "Version": "21c"
+                        }, 
+                        {
+                            "LatestProductVersion": "latest", 
+                            "ProductVersion": "A.12.20.00", 
+                            "Version": "19c"
+                        }, 
+                        {
+                            "LatestProductVersion": "latest", 
+                            "ProductVersion": "A.12.20.00", 
+                            "Version": "18c"
+                        }, 
+                        {
+                            "LatestProductVersion": "latest", 
+                            "ProductVersion": "A.12.20.00", 
+                            "Version": "12c R1"
+                        }, 
+                        {
+                            "LatestProductVersion": "latest", 
+                            "ProductVersion": "A.12.20.00", 
+                            "Version": "12c R2"
+                        }, 
+                        {
+                            "LatestProductVersion": "latest", 
+                            "ProductVersion": "A.12.20.00", 
+                            "Version": "11g R2"
+                        }
+                    ], 
+                    "SAP-HANA": [
+                        {
+                            "AdditionalChecks": "Supported Linux Distros: SLES 15 (up to SP3), SLES 12 (up to SP5), RHEL 8 (8.1 to 8.4), RHEL 7 (7.0 to 7.9) -  applicable for the respective SUSE Linux Enterprise Server for SAP Applications (SLES4SAP) and Red Hat Enterprise Linux for SAP Applications (RHEL4SAP)./nrev 122.16 or higher recommended./nThe HPE Serviceguard Quarantine feature is not supported with SAP HANA1. ", 
+                            "Database": "SAP HANA1 SPS12 revisions", 
+                            "Notes": "Serviceguard Extension for SAP for Linux (HPE SGeSAP/LX) clusters SAP HANA System /nReplication instance pairs in scale-up and scale-out installations./n", 
+                            "ProductVersion": "A.12.80.00"
+                        }, 
+                        {
+                            "AdditionalChecks": "Supported Linux Distros: SLES 15 (up to SP3), SLES 12 (up to SP5), RHEL 8 (8.1 to 8.4), RHEL 7 (7.0 to 7.9) -  applicable for the respective SUSE Linux Enterprise Server for SAP Applications (SLES4SAP) and Red Hat Enterprise Linux for SAP Applications (RHEL4SAP)./nrev48 or higher recommended/n HANA Dynamic Tiering clusters require HANA 2.0 SPS04 Rev 2.00.044 or higher", 
+                            "Database": "SAP HANA2 SPS04 revisions", 
+                            "Notes": "<b>Serviceguard for Linux Premium Edition: SAP Multi-Target HANA is available with SGLX premium Edition./nServiceguard Extension for SAP for Linux (HPE SGeSAP/LX) clusters three (or four) SAP HANA scale-up instances of the same SAP System using two tier-2 HANA System Replications. The optional fourth instance will be added in tier-3. </b>/nServiceguard Extension for SAP for Linux (HPE SGeSAP/LX) clusters SAP HANA System /nReplication instance pairs in scale-up and scale-out installations.", 
+                            "ProductVersion": "A.12.80.00"
+                        }, 
+                        {
+                            "AdditionalChecks": "Supported Linux Distros: SLES 15 (up to SP3), SLES 12 (up to SP5), RHEL 8 (8.1 to 8.4), RHEL 7 (7.0 to 7.9) - applicable for the respective SUSE Linux Enterprise Server for SAP Applications (SLES4SAP) and Red Hat Enterprise Linux for SAP Applications (RHEL4SAP).", 
+                            "Database": "SAP HANA2 SPS05 revisions", 
+                            "Notes": "<b>Serviceguard for Linux Premium Edition: SAP Multi-Target HANA is available with SGLX premium Edition.</b>/n<b>Serviceguard Extension for SAP for Linux (HPE SGeSAP/LX) clusters three (or four) SAP HANA scale-up instances of the same SAP System using two tier-2 HANA System Replications. The optional fourth instance will be added in tier-3. </b>/nServiceguard Extension for SAP for Linux (HPE SGeSAP/LX) clusters SAP HANA System /nReplication instance pairs in scale-up and scale-out installations.", 
+                            "ProductVersion": "A.12.80.00"
+                        }, 
+                        {
+                            "AdditionalChecks": "Supported Linux Distros: SLES 15 (up to SP3), SLES 12 (up to SP5), RHEL 8 (8.1 to 8.4), RHEL 7 (7.0 to 7.9) - applicable for the respective SUSE Linux Enterprise Server for SAP Applications (SLES4SAP) and Red Hat Enterprise Linux for SAP Applications (RHEL4SAP).", 
+                            "Database": "SAP HANA2 SPS06 revisions", 
+                            "Notes": "<b>Serviceguard for Linux Premium Edition: SAP Multi-Target HANA is available with SGLX premium Edition.</b>/n<b>Serviceguard Extension for SAP for Linux (HPE SGeSAP/LX) clusters three (or four) SAP HANA scale-up instances of the same SAP System using two tier-2 HANA System Replications. The optional fourth instance will be added in tier-3. </b>/nServiceguard Extension for SAP for Linux (HPE SGeSAP/LX) clusters SAP HANA System /nReplication instance pairs in scale-up and scale-out installations.", 
+                            "ProductVersion": "A.12.80.00"
+                        }, 
+                        {
+                            "AdditionalChecks": "Supported Linux Distros: SLES 15 (up to SP2), SLES 12 (up to SP5), RHEL 8 (8.1 to 8.4), RHEL 7 (7.0 to 7.9) -  applicable for the respective SUSE Linux Enterprise Server for SAP Applications (SLES4SAP) and Red Hat Enterprise Linux for SAP Applications (RHEL4SAP)./nrev 122.16 or higher recommended/nThe HPE Serviceguard Quarantine feature is not supported with SAP HANA1. ", 
+                            "Database": "SAP HANA1 SPS12 revisions", 
+                            "Notes": "Serviceguard Extension for SAP for Linux (HPE SGeSAP/LX) clusters SAP HANA System /nReplication instance pairs in scale-up and scale-out installations./n", 
+                            "ProductVersion": "A.12.70.00"
+                        }, 
+                        {
+                            "AdditionalChecks": "Supported Linux Distros: SLES 15 (up to SP2), SLES 12 (up to SP5), RHEL 8 (8.1 to 8.4), RHEL 7 (7.0 to 7.9) -  applicable for the respective SUSE Linux Enterprise Server for SAP Applications (SLES4SAP) and Red Hat Enterprise Linux for SAP Applications (RHEL4SAP)./nrev48 or higher recommended/n HANA Dynamic Tiering clusters require HANA 2.0 SPS04 Rev 2.00.044 or higher", 
+                            "Database": "SAP HANA2 SPS04 revisions", 
+                            "Notes": "<b>Serviceguard for Linux Premium Edition: SAP Multi-Target HANA is available with SGLX premium Edition.</b>/n <b>Serviceguard Extension for SAP for Linux (HPE SGeSAP/LX) clusters three (or four) SAP HANA scale-up instances of the same SAP System using two tier-2 HANA System Replications. The optional fourth instance will be added in tier-3. </b>/nServiceguard Extension for SAP for Linux (HPE SGeSAP/LX) clusters SAP HANA System /nReplication instance pairs in scale-up and scale-out installations.", 
+                            "ProductVersion": "A.12.70.00"
+                        }, 
+                        {
+                            "AdditionalChecks": "Supported Linux Distros: SLES 15 (up to SP2), SLES 12 (up to SP5), RHEL 8 (8.1 to 8.4), RHEL 7 (7.0 to 7.9) -  applicable for the respective SUSE Linux Enterprise Server for SAP Applications (SLES4SAP) and Red Hat Enterprise Linux for SAP Applications (RHEL4SAP).", 
+                            "Database": "SAP HANA2 SPS05 revisions", 
+                            "Notes": "<b>Serviceguard for Linux Premium Edition: SAP Multi-Target HANA is available with SGLX premium Edition.</b>/n <b>Serviceguard Extension for SAP for Linux (HPE SGeSAP/LX) clusters three (or four) SAP HANA scale-up instances of the same SAP System using two tier-2 HANA System Replications. The optional fourth instance will be added in tier-3. </b>\r/nServiceguard Extension for SAP for Linux (HPE SGeSAP/LX) clusters SAP HANA System \r/nReplication instance pairs in scale-up and scale-out installations.", 
+                            "ProductVersion": "A.12.70.00"
+                        }, 
+                        {
+                            "AdditionalChecks": "Supported Linux Distros: SLES 15 (up to SP2), SLES 12 (up to SP5), RHEL 8 (8.1 to 8.4), RHEL 7 (7.0 to 7.9) -  applicable for the respective SUSE Linux Enterprise Server for SAP Applications (SLES4SAP) and Red Hat Enterprise Linux for SAP Applications (RHEL4SAP).", 
+                            "Database": "SAP HANA2 SPS06 revisions", 
+                            "Notes": "<b>Serviceguard for Linux Premium Edition: SAP Multi-Target HANA is available with SGLX premium Edition.</b>/n <b>Serviceguard Extension for SAP for Linux (HPE SGeSAP/LX) clusters three (or four) SAP HANA scale-up instances of the same SAP System using two tier-2 HANA System Replications. The optional fourth instance will be added in tier-3. </b>\r/nServiceguard Extension for SAP for Linux (HPE SGeSAP/LX) clusters SAP HANA System \r/nReplication instance pairs in scale-up and scale-out installations.", 
+                            "ProductVersion": "A.12.70.00"
+                        }, 
+                        {
+                            "AdditionalChecks": "rev 122.16 or higher recommended\r/nThe HPE Serviceguard Quarantine feature is not supported with SAP HANA", 
+                            "Database": "SAP HANA1 SPS12 revisions", 
+                            "ProductVersion": "A.12.60.00"
+                        }, 
+                        {
+                            "AdditionalChecks": "rev48 or higher recommended", 
+                            "Database": "SAP HANA2 SPS04", 
+                            "ProductVersion": "A.12.60.00"
+                        }, 
+                        {
+                            "Database": "SAP HANA2 SPS05", 
+                            "ProductVersion": "A.12.60.00"
+                        }, 
+                        {
+                            "AdditionalChecks": "rev 122.16 or higher recommended", 
+                            "Database": "SAP HANA1 SPS12 revisions", 
+                            "ProductVersion": "A.12.50.00"
+                        }, 
+                        {
+                            "AdditionalChecks": "rev24.00 or higher recommended", 
+                            "Database": "SAP HANA2 SP2", 
+                            "ProductVersion": "A.12.50.00"
+                        }, 
+                        {
+                            "Database": "SAP HANA2 SP3", 
+                            "ProductVersion": "A.12.50.00"
+                        }, 
+                        {
+                            "Database": "SAP HANA2 SP4", 
+                            "ProductVersion": "A.12.50.00"
+                        }, 
+                        {
+                            "AdditionalChecks": "rev 122.16 or higher recommended", 
+                            "Database": "SAP HANA1 SPS12 revisions", 
+                            "ProductVersion": "A.12.50.03"
+                        }, 
+                        {
+                            "Database": "SAP HANA2 SPS03", 
+                            "ProductVersion": "A.12.50.03"
+                        }, 
+                        {
+                            "AdditionalChecks": "rev48 or higher recommended", 
+                            "Database": "SAP HANA2 SPS04", 
+                            "ProductVersion": "A.12.50.03"
+                        }, 
+                        {
+                            "Database": "SAP HANA2 SPS05", 
+                            "ProductVersion": "A.12.50.03"
+                        }, 
+                        {
+                            "AdditionalChecks": "Revision 122.16 or higher recommended", 
+                            "Database": "SAP HANA1 SPS12 revisions", 
+                            "ProductVersion": "A.12.40.00"
+                        }, 
+                        {
+                            "AdditionalChecks": "rev12.05 or higher recommended", 
+                            "Database": "SAP HANA2 SPS1", 
+                            "ProductVersion": "A.12.40.00"
+                        }, 
+                        {
+                            "AdditionalChecks": "rev24.00 or higher recommended", 
+                            "Database": "SAP HANA2 SPS2", 
+                            "ProductVersion": "A.12.40.00"
+                        }, 
+                        {
+                            "Database": "SAP HANA2 SPS3", 
+                            "ProductVersion": "A.12.40.00"
+                        }, 
+                        {
+                            "Database": "SAP HANA2 SPS4", 
+                            "ProductVersion": "A.12.40.00"
+                        }, 
+                        {
+                            "AdditionalChecks": "The last tested revision at the time of publication of thisdocument is HANA1 revision 122.16 ", 
+                            "Database": "SAP HANA1 SPS10 revisions", 
+                            "ProductVersion": "A.12.30.00"
+                        }, 
+                        {
+                            "AdditionalChecks": "The last tested revision at the time of publication of thisdocument is HANA1 revision 122.16 ", 
+                            "Database": "SAP HANA1 SPS11 revisions", 
+                            "ProductVersion": "A.12.30.00"
+                        }, 
+                        {
+                            "AdditionalChecks": "The last tested revision at the time of publication of thisdocument is HANA1 revision 122.16 ", 
+                            "Database": "SAP HANA1 SPS12 revisions", 
+                            "ProductVersion": "A.12.30.00"
+                        }, 
+                        {
+                            "AdditionalChecks": "rev12.05 or higher recommended", 
+                            "Database": "SAP HANA2 SPS1 ", 
+                            "ProductVersion": "A.12.30.00"
+                        }, 
+                        {
+                            "AdditionalChecks": "rev24.00 or higher recommended", 
+                            "Database": "SAP HANA2 SPS2 ", 
+                            "ProductVersion": "A.12.30.00"
+                        }, 
+                        {
+                            "Database": "SAP HANA2 SPS3", 
+                            "ProductVersion": "A.12.30.00"
+                        }, 
+                        {
+                            "AdditionalChecks": "The last tested revision at the time of publication of thisdocument is HANA1 revision 122.10", 
+                            "Database": "SAP HANA1 SPS10 revisions", 
+                            "ProductVersion": "A.12.20.00"
+                        }, 
+                        {
+                            "AdditionalChecks": "The last tested revision at the time of publication of thisdocument is HANA1 revision 122.10", 
+                            "Database": "SAP HANA1 SPS11 revisions", 
+                            "ProductVersion": "A.12.20.00"
+                        }, 
+                        {
+                            "AdditionalChecks": "The last tested revision at the time of publication of thisdocument is HANA1 revision 122.10", 
+                            "Database": "SAP HANA1 SPS12 revisions", 
+                            "ProductVersion": "A.12.20.00"
+                        }, 
+                        {
+                            "AdditionalChecks": "he last tested revision at the time of publication of this document is HANA2 revision 20", 
+                            "Database": "SAP HANA 2.00.00 - SAP HANA 2.00.20 and higher SPS2 revisions. ", 
+                            "ProductVersion": "A.12.20.00"
+                        }
+                    ], 
+                    "XDC": [
+                        {
+                            "LatestProductVersion": "latest", 
+                            "MirroringTechnology": "MD-RAID-1", 
+                            "Notes": " MD RAID with A.12.00.21 is supported only up to RHEL 6.5./nOn RHEL 7.3, LVM RAID1 Mirroring is supported from  A.12.00.51 and later./n LVM RAID 1 Mirroring is supported only on /n  RHEL (RHEL 6.6 and later)/n  OL (OL 7.4 and later)/n LVM RAID 1 Mirroring is supported on RHEL 8 from A.12.60.00 onwards./n VxVM RAID1 is supported only on physical systems.", 
+                            "ProductVersion": "A.12.00.00"
+                        }, 
+                        {
+                            "LatestProductVersion": "latest", 
+                            "MirroringTechnology": "LVM-RAID-1", 
+                            "Notes": " MD RAID with A.12.00.21 is supported only up to RHEL 6.5./nOn RHEL 7.3, LVM RAID1 Mirroring is supported from  A.12.00.51 and later./n LVM RAID 1 Mirroring is supported only on /n  RHEL (RHEL 6.6 and later)/n  OL (OL 7.4 and later)/n LVM RAID 1 Mirroring is supported on RHEL 8 from A.12.60.00 onwards./n VxVM RAID1 is supported only on physical systems.", 
+                            "ProductVersion": "A.12.00.21"
+                        }, 
+                        {
+                            "LatestProductVersion": "latest", 
+                            "MirroringTechnology": "VxVM-RAID-1", 
+                            "Notes": " MD RAID with A.12.00.21 is supported only up to RHEL 6.5./nOn RHEL 7.3, LVM RAID1 Mirroring is supported from  A.12.00.51 and later./n LVM RAID 1 Mirroring is supported only on /n  RHEL (RHEL 6.6 and later)/n  OL (OL 7.4 and later)/n LVM RAID 1 Mirroring is supported on RHEL 8 from A.12.60.00 onwards./n VxVM RAID1 is supported only on physical systems.", 
+                            "ProductVersion": "A.12.00.00"
+                        }
+                    ]
+                }
+            ], 
+            "HighAvailability": [
+                {
+                    "EDB-PPAS": [
+                        {
+                            "AdditionalChecks": "Not supported on SLES 15, OL 7 and OL 8./n For more information about which version of EDB is supported on which OS flavour, please refer the respected EDB product support matrix. EDB 13.x supported only with RH 7 and RH 8.", 
+                            "LatestProductVersion": "latest", 
+                            "ProductVersion": "A.12.00.00", 
+                            "Version": "12.x"
+                        }, 
+                        {
+                            "AdditionalChecks": "Not supported on SLES 15, OL 7 and OL 8./n For more information about which version of EDB is supported on which OS flavour, please refer the respected EDB product support matrix. EDB 13.x supported only with RH 7 and RH 8.", 
+                            "LatestProductVersion": "latest", 
+                            "ProductVersion": "A.12.00.00", 
+                            "Version": "11.x"
+                        }, 
+                        {
+                            "AdditionalChecks": "Not supported on SLES 15, OL 7 and OL 8./n For more information about which version of EDB is supported on which OS flavour, please refer the respected EDB product support matrix. EDB 13.x supported only with RH 7 and RH 8.", 
+                            "LatestProductVersion": "latest", 
+                            "ProductVersion": "A.12.00.00", 
+                            "Version": "10.x"
+                        }, 
+                        {
+                            "AdditionalChecks": "Not supported on SLES 15, OL 7 and OL 8./n For more information about which version of EDB is supported on which OS flavour, please refer the respected EDB product support matrix. EDB 13.x supported only with RH 7 and RH 8.", 
+                            "LatestProductVersion": "latest", 
+                            "ProductVersion": "A.12.00.00", 
+                            "Version": "9.5"
+                        }, 
+                        {
+                            "AdditionalChecks": "Not supported on SLES 15, OL 7 and OL 8./n For more information about which version of EDB is supported on which OS flavour, please refer the respected EDB product support matrix. EDB 13.x supported only with RH 7 and RH 8.", 
+                            "LatestProductVersion": "latest", 
+                            "ProductVersion": "A.12.00.00", 
+                            "Version": "9.4"
+                        }, 
+                        {
+                            "AdditionalChecks": "Not supported on SLES 15, OL 7 and OL 8./n For more information about which version of EDB is supported on which OS flavour, please refer the respected EDB product support matrix. EDB 13.x supported only with RH 7 and RH 8.", 
+                            "LatestProductVersion": "latest", 
+                            "ProductVersion": "A.12.00.00", 
+                            "Version": "9.2"
+                        }, 
+                        {
+                            "AdditionalChecks": "Not supported on SLES 15, OL 7 and OL 8./n For more information about which version of EDB is supported on which OS flavour, please refer the respected EDB product support matrix. EDB 13.x supported only with RH 7 and RH 8.", 
+                            "LatestProductVersion": "latest", 
+                            "ProductVersion": "A.12.00.00", 
+                            "Version": "9.1.x"
+                        }, 
+                        {
+                            "AdditionalChecks": "Not supported on SLES 15, OL 7 and OL 8./n For more information about which version of EDB is supported on which OS flavour, please refer the respected EDB product support matrix./nEDB 13.x supported only with RH 7 and RH 8.", 
+                            "LatestProductVersion": "latest", 
+                            "ProductVersion": "A.12.00.00", 
+                            "Version": "9.0.x"
+                        }, 
+                        {
+                            "AdditionalChecks": "Not supported on SLES 15, OL 7 and OL 8. /nFor more information about which version of EDB is supported on which OS flavour, please refer the respected EDB product support matrix./nEDB 13.x supported only with RH 7 and RH 8", 
+                            "LatestProductVersion": "latest", 
+                            "ProductVersion": "A.12.00.00", 
+                            "Version": "13.x"
+                        }
+                    ], 
+                    "IBM-Db2": [
+                        {
+                            "AdditionalChecks": "Not supported on OL 7 and OL 8", 
+                            "LatestProductVersion": "latest", 
+                            "ProductVersion": "A.12.20.00", 
+                            "Version": "10.x"
+                        }, 
+                        {
+                            "AdditionalChecks": "Not supported on OL 7 and OL 8", 
+                            "LatestProductVersion": "latest", 
+                            "ProductVersion": "A.12.20.00", 
+                            "Version": "11.x"
+                        }
+                    ], 
+                    "KVM": [
+                        {
+                            "AdditionalChecks": "Not supported on OL 7.x, OL 8.x", 
+                            "LatestProductVersion": "latest", 
+                            "Notes": "Live Migration not supported", 
+                            "ProductVersion": "A.12.50.00", 
+                            "Version": "RHEL8"
+                        }, 
+                        {
+                            "AdditionalChecks": "Not supported on OL 7.x, OL 8.x", 
+                            "LatestProductVersion": "latest", 
+                            "Notes": "Live Migration not supported", 
+                            "ProductVersion": "A.12.00.50", 
+                            "Version": "RHEL7"
+                        }, 
+                        {
+                            "AdditionalChecks": "Not supported on OL 7.x, OL 8.x", 
+                            "LatestProductVersion": "latest", 
+                            "Notes": "Live Migration not supported", 
+                            "ProductVersion": "A.12.00.50", 
+                            "Version": "RHEL6"
+                        }, 
+                        {
+                            "AdditionalChecks": "Not supported on OL 7.x, OL 8.x", 
+                            "LatestProductVersion": "latest", 
+                            "Notes": "Live Migration not supported", 
+                            "ProductVersion": "A.12.00.50", 
+                            "Version": "SLES12"
+                        }, 
+                        {
+                            "AdditionalChecks": "Not supported on OL 7.x, OL 8.x", 
+                            "LatestProductVersion": "latest", 
+                            "Notes": "Live Migration not supported", 
+                            "ProductVersion": "A.12.40.00", 
+                            "Version": "SLES15"
+                        }
+                    ], 
+                    "Microsoft-SQL-Server": [
+                        {
+                            "AdditionalChecks": "Not supported on SLES 15, OL 7 and OL 8", 
+                            "LatestProductVersion": "latest", 
+                            "Notes": "Support for Always ON Availability Groups (AOAI) and Always ON Failover Cluster Instance (AOFI) for SQL Server on Linux", 
+                            "ProductVersion": "A.12.20.00", 
+                            "Version": "SQL Server 2017 on Linux"
+                        }, 
+                        {
+                            "AdditionalChecks": "Not supported on SLES 15, OL 7 and OL 8", 
+                            "LatestProductVersion": "latest", 
+                            "Notes": "Support for Always ON Availability Groups (AOAI) and Always ON Failover Cluster Instance (AOFI) for SQL Server on Linux", 
+                            "ProductVersion": "A.12.40.00", 
+                            "Version": "SQL Server 2019 on Linux"
+                        }
+                    ], 
+                    "NFS": [
+                        {
+                            "ApplicationVersion": "OS supported version", 
+                            "LatestProductVersion": "A.12.00.21", 
+                            "Notes": "Application Version: OS supported version", 
+                            "ProductVersion": "A.12.00.00", 
+                            "Version": "A.12.00.00"
+                        }, 
+                        {
+                            "ApplicationVersion": "OS supported version", 
+                            "LatestProductVersion": "A.12.00.50", 
+                            "Notes": "Application Version: OS supported version/nA.12.00.10 has been delivered as patch SGLX_00497 [RHEL5], SGLX_00498 [RHEL6], SGLX_00499 [SLES]", 
+                            "ProductVersion": "A.12.00.00", 
+                            "Version": "A.12.00.10"
+                        }, 
+                        {
+                            "ApplicationVersion": "OS supported version", 
+                            "LatestProductVersion": "A.12.00.50", 
+                            "Notes": "Application Version: OS supported versionA.12.00.20 has been delivered as patch SGLX_00503 [RHEL5], SGLX_00504 [RHEL6], SGLX_00505 [SLES]", 
+                            "ProductVersion": "A.12.00.00", 
+                            "Version": "A.12.00.20"
+                        }, 
+                        {
+                            "ApplicationVersion": "OS supported version", 
+                            "LatestProductVersion": "A.12.00.50", 
+                            "Notes": "Application Version: OS supported version/nA.12.00.30 has been delivered as patch SGLX_00521 [RHEL5, RHEL 6 and RHEL7] SGLX_00522 [SLES 11 and SLES 12]", 
+                            "ProductVersion": "A.12.00.00", 
+                            "Version": "A.12.00.30"
+                        }, 
+                        {
+                            "ApplicationVersion": "OS supported version", 
+                            "LatestProductVersion": "A.12.00.50", 
+                            "Notes": "Application Version: OS supported version/nA.12.00.50 has been delivered as patch SGLX_00532 [RHEL5, RHEL 6 and RHEL7] SGLX_00533 [SLES 11 and SLES 12]", 
+                            "ProductVersion": "A.12.00.00", 
+                            "Version": "A.12.00.50"
+                        }, 
+                        {
+                            "ApplicationVersion": "OS supported version", 
+                            "LatestProductVersion": "latest", 
+                            "Notes": "Application Version: OS supported version", 
+                            "ProductVersion": "A.12.10.00", 
+                            "Version": "A.12.10.00"
+                        }, 
+                        {
+                            "ApplicationVersion": "OS supported version", 
+                            "LatestProductVersion": "latest", 
+                            "Notes": "Application Version: OS supported version", 
+                            "ProductVersion": "A.12.10.00", 
+                            "Version": "A.12.40.00"
+                        }, 
+                        {
+                            "AdditionalChecks": "A.12.50.00 NFS toolkit supports RHEL6, RHEL7, RHEL8, OL7, SLES 12 and SLES 15", 
+                            "ApplicationVersion": "OS supported version", 
+                            "LatestProductVersion": "latest", 
+                            "Notes": "Application Version: OS supported version", 
+                            "ProductVersion": "A.12.50.00", 
+                            "Version": "A.12.50.00"
+                        }, 
+                        {
+                            "AdditionalChecks": "A.12.60.00NFS toolkit supports RHEL7, RHEL8, OL7,OL8,SLES 12 andSLES 15", 
+                            "ApplicationVersion": "OS supported version", 
+                            "LatestProductVersion": "latest", 
+                            "Notes": "Application Version: OS supported version", 
+                            "ProductVersion": "A.12.60.00", 
+                            "Version": "A.12.60.00"
+                        }
+                    ], 
+                    "Oracle": [
+                        {
+                            "LatestProductVersion": "latest", 
+                            "Notes": "12c [R1, R2], 18c, 19c: Support for HPE Application Tuner Express (ATX) version 1.0.1-84 or later (Compatible with SGLXA.12.00.51 or later)./nSupport for failover of Oracle 12c Multitenant Container Database (CDB) on failure of specified critical Pluggable databases configured in CDB./nSupport for Multitenant Container Database (CDB) with oracle 12c./nNote: The CDB can have multiple Pluggable Databases (PDB)./nServiceguard will start, stop and monitor the PDB\\u2019s./nIn case of PDB failure Serviceguard will only issue log warnings and e-mail alerts (if configured)./nNo failover will be initiated./nFailover will be initiated only in case of CDB failure./nSupport for Easy Deployment from SG Manager with oracle 12c./n 11gR2: Support for Oracle 11gR2 single instance databases./nSupport for Oracle 11gR2 ASM storage layout.", 
+                            "ProductVersion": "A.12.20.00", 
+                            "Version": "18c"
+                        }, 
+                        {
+                            "LatestProductVersion": "latest", 
+                            "Notes": "12c [R1, R2], 18c, 19c: Support for HPE Application Tuner Express (ATX) version 1.0.1-84 or later (Compatible with SGLXA.12.00.51 or later)./nSupport for failover of Oracle 12c Multitenant Container Database (CDB) on failure of specified critical Pluggable databases configured in CDB./nSupport for Multitenant Container Database (CDB) with oracle 12c./nNote: The CDB can have multiple Pluggable Databases (PDB)./nServiceguard will start, stop and monitor the PDB\\u2019s./nIn case of PDB failure Serviceguard will only issue log warnings and e-mail alerts (if configured)./nNo failover will be initiated./nFailover will be initiated only in case of CDB failure./nSupport for Easy Deployment from SG Manager with oracle 12c11gR2: Support for Oracle 11gR2 single instance databases./nSupport for Oracle 11gR2 ASM storage layout.", 
+                            "ProductVersion": "A.12.20.00", 
+                            "Version": "12c-R1"
+                        }, 
+                        {
+                            "LatestProductVersion": "latest", 
+                            "Notes": "12c [R1, R2], 18c, 19c:/n Support for HPE Application Tuner Express (ATX) version 1.0.1-84 or later (Compatible with SGLX/nA.12.00.51 or later)./n Support for failover of Oracle 12c Multitenant Container Database (CDB) on failure of specified critical Pluggable databases configured in CDB./n Support for Multitenant Container Database (CDB) with oracle 12c/nNote: The CDB can have multiple Pluggable Databases (PDB)./nServiceguard will start, stop and monitor the PDB\\u2019s./nIn case of PDB failure Serviceguard will only issue log warnings and e-mail alerts (if configured)./nNo failover will be initiated./nFailover will be initiated only in case of CDB failure./n Support for Easy Deployment from SG Manager with oracle 12c/n11gR2:/n Support for Oracle 11gR2 single instance databases./n Support for Oracle 11gR2 ASM storage layout.", 
+                            "ProductVersion": "A.12.20.00", 
+                            "Version": "12c-R2"
+                        }, 
+                        {
+                            "LatestProductVersion": "latest", 
+                            "Notes": "12c [R1, R2], 18c, 19c:/n Support for HPE Application Tuner Express (ATX) version 1.0.1-84 or later (Compatible with SGLX/nA.12.00.51 or later)./n Support for failover of Oracle 12c Multitenant Container Database (CDB) on failure of specified critical Pluggable databases configured in CDB./n Support for Multitenant Container Database (CDB) with oracle 12c/nNote: The CDB can have multiple Pluggable Databases (PDB)./nServiceguard will start, stop and monitor the PDB\\u2019s./nIn case of PDB failure Serviceguard will only issue log warnings and e-mail alerts (if configured)./nNo failover will be initiated./nFailover will be initiated only in case of CDB failure./n Support for Easy Deployment from SG Manager with oracle 12c/n11gR2:/n Support for Oracle 11gR2 single instance databases./n Support for Oracle 11gR2 ASM storage layout.", 
+                            "ProductVersion": "A.12.20.00", 
+                            "Version": "19c"
+                        }, 
+                        {
+                            "LatestProductVersion": "latest", 
+                            "Notes": "12c [R1, R2], 18c, 19c, 21c:/n Support for HPE Application Tuner Express (ATX) version 1.0.1-84 or later (Compatible with SGLX/nA.12.00.51 or later)./n Support for failover of Oracle 12c Multitenant Container Database (CDB) on failure of specified critical Pluggable databases configured in CDB./n Support for Multitenant Container Database (CDB) with oracle 12c/nNote: The CDB can have multiple Pluggable Databases (PDB)./nServiceguard will start, stop and monitor the PDB\\u2019s./nIn case of PDB failure Serviceguard will only issue log warnings and e-mail alerts (if configured)./nNo failover will be initiated./nFailover will be initiated only in case of CDB failure./n Support for Easy Deployment from SG Manager with oracle 12c/n/n11gR2:/n Support for Oracle 11gR2 single instance databases./n Support for Oracle 11gR2 ASM storage layout. /n /n Easy deployment feature for 21c can be utilised by executing the steps mentioned in the CR QXCR1001815216.", 
+                            "ProductVersion": "A.12.20.00", 
+                            "Version": "21c"
+                        }, 
+                        {
+                            "LatestProductVersion": "latest", 
+                            "Notes": "12c [R1, R2], 18c, 19c:/n Support for HPE Application Tuner Express (ATX) version 1.0.1-84 or later (Compatible with SGLX/nA.12.00.51 or later)./n Support for failover of Oracle 12c Multitenant Container Database (CDB) on failure of specified critical Pluggable databases configured in CDB./n Support for Multitenant Container Database (CDB) with oracle 12c/nNote: The CDB can have multiple Pluggable Databases (PDB)./nServiceguard will start, stop and monitor the PDB\\u2019s./nIn case of PDB failure Serviceguard will only issue log warnings and e-mail alerts (if configured)./nNo failover will be initiated./nFailover will be initiated only in case of CDB failure./n Support for Easy Deployment from SG Manager with oracle 12c/n11gR2:/n Support for Oracle 11gR2 single instance databases./n Support for Oracle 11gR2 ASM storage layout.", 
+                            "ProductVersion": "A.12.00.00", 
+                            "Version": "11g-R1"
+                        }, 
+                        {
+                            "LatestProductVersion": "latest", 
+                            "Notes": "12c [R1, R2], 18c, 19c:/n Support for HPE Application Tuner Express (ATX) version 1.0.1-84 or later (Compatible with SGLX/nA.12.00.51 or later)./n Support for failover of Oracle 12c Multitenant Container Database (CDB) on failure of specified critical Pluggable databases configured in CDB./n Support for Multitenant Container Database (CDB) with oracle 12c/nNote: The CDB can have multiple Pluggable Databases (PDB)./nServiceguard will start, stop and monitor the PDB\\u2019s./nIn case of PDB failure Serviceguard will only issue log warnings and e-mail alerts (if configured)./nNo failover will be initiated./nFailover will be initiated only in case of CDB failure./n Support for Easy Deployment from SG Manager with oracle 12c/n11gR2:/n Support for Oracle 11gR2 single instance databases./n Support for Oracle 11gR2 ASM storage layout.", 
+                            "ProductVersion": "A.12.00.00", 
+                            "Version": "11g-R2"
+                        }, 
+                        {
+                            "LatestProductVersion": "latest", 
+                            "Notes": "12c [R1, R2], 18c, 19c:/n Support for HPE Application Tuner Express (ATX) version 1.0.1-84 or later (Compatible with SGLX/nA.12.00.51 or later)./n Support for failover of Oracle 12c Multitenant Container Database (CDB) on failure of specified critical Pluggable databases configured in CDB./n Support for Multitenant Container Database (CDB) with oracle 12c/nNote: The CDB can have multiple Pluggable Databases (PDB)./nServiceguard will start, stop and monitor the PDB\\u2019s./nIn case of PDB failure Serviceguard will only issue log warnings and e-mail alerts (if configured)./nNo failover will be initiated./nFailover will be initiated only in case of CDB failure./n Support for Easy Deployment from SG Manager with oracle 12c/n11gR2:/n Support for Oracle 11gR2 single instance databases./n Support for Oracle 11gR2 ASM storage layout.", 
+                            "ProductVersion": "A.12.00.00", 
+                            "Version": "10g-R2"
+                        }, 
+                        {
+                            "LatestProductVersion": "latest", 
+                            "Notes": "12c [R1, R2], 18c, 19c: Support for HPE Application Tuner Express (ATX) version 1.0.1-84 or later (Compatible with SGLXA.12.00.51 or later)./nSupport for failover of Oracle 12c Multitenant Container Database (CDB) on failure of specified critical Pluggable databases configured in CDB./nSupport for Multitenant Container Database (CDB) with oracle 12cNote: The CDB can have multiple Pluggable Databases (PDB)./nServiceguard will start, stop and monitor the PDB\\u2019s./nIn case of PDB failure Serviceguard will only issue log warnings and e-mail alerts (if configured)./nNo failover will be initiated./nFailover will be initiated only in case of CDB failure./nSupport for Easy Deployment from SG Manager with oracle 12c11gR2: Support for Oracle 11gR2 single instance databases./nSupport for Oracle 11gR2 ASM storage layout.", 
+                            "ProductVersion": "A.12.00.00", 
+                            "Version": "10g-R1"
+                        }
+                    ], 
+                    "SAP-Netweaver": [
+                        {
+                            "Notes": "<b>Supported Linux Distros:</b> SLES 15 (up to SP3), SLES 12 (up to SP5), RHEL 8 (8.1 to 8.4), RHEL 7 (7.0 to 7.9) -  applicable for the respective SUSE Linux Enterprise Server for SAP Applications (SLES4SAP) and Red Hat Enterprise Linux for SAP Applications (RHEL4SAP)./n<b>Netweaver Application:</b>/nServiceguard Extension for SAP for Linux (HPE SGeSAP/LX) clusters SAP NetWeaver-based SAP applications based on the mentioned NetWeaver kernel versions. In particular, coverage includes but is not restricted to support for clusters with S/4 HANA 1610, 1709, 1809, 1909 and 2020 applications./nSAP Enqueue Server Architecture (ENSA) 1 and 2 are supported./nFor support information regarding Serviceguard extension for SAP for Linux (SGeSAP/LX) versions 12.60 and older, please refer to corresponding SGeSAP release notes: \\u201cServiceguard Extension for SAP Version B.xx.yy Release Notes for Linux\\u201d available at http://www.hpe.com/info/linux-serviceguard-docs./nThe combination with HPE Serviceguard Flex Storage Add-on is supported for NetWeaver Instance directories starting from A.12.80.00. Central NetWeaver directories can likewise be based onHA NFS tk/DRBD./nThe Linux Distro listed is applicable for the respective SUSE Linux Enterprise Server for SAP Applications (SLES4SAP) and Red Hat Enterprise Linux for SAP Applications (RHEL4SAP)/n<b>DB</b>/nSAP use case-specific implementations of cluster packages for several legacy database technologies can optionally be used for the single-instance database technologies listed to the left. ", 
+                            "ProductVersion": "A.12.80.00", 
+                            "SAP-Kernel": "[7.81, 7.73, 7.77, 7.50, 7.51, 7.52, 7.53, 7.40, 7.41, 7.42, 7.45, 7.49, 7.20, 7.20_EXT, 7.21, 7.22]", 
+                            "Supported-DB": "[SAP Sybase ASE16.0 SP3 \n IBM DB/2 10.5,11.1 \n Oracle RDBMS 11gR2,12cR1,12cR2,19c /n SAP MAXDB/liveCache 7.9]"
+                        }, 
+                        {
+                            "Notes": "<b>Supported Linux Distros:</b> SLES 15 (up to SP2), SLES 12 (up to SP5), RHEL 8 (8.1 to 8.2), RHEL 7 (7.0 to 7.9) -  applicable for the respective SUSE Linux Enterprise Server for SAP Applications (SLES4SAP) and Red Hat Enterprise Linux for SAP Applications (RHEL4SAP).</b>/n<b>Netweaver Application:</b>/nServiceguard Extension for SAP for Linux (HPE SGeSAP/LX) clusters SAP NetWeaver-based SAP applications based on the mentioned NetWeaver kernel versions. In particular, coverage includes but is not restricted to support for clusters with S/4 HANA 1610, 1709, 1809, 1909 and 2020 applications./nSAP Enqueue Server Architecture (ENSA) 1 and 2 are supported./nFor support information regarding Serviceguard extension for SAP for Linux (SGeSAP/LX) versions 12.60 and older, please refer to corresponding SGeSAP release notes: \\u201cServiceguard Extension for SAP Version B.xx.yy Release Notes for Linux\\u201d available at http://www.hpe.com/info/linux-serviceguard-docs./nThe combination with HPE Serviceguard Flex Storage Add-on is supported for NetWeaver Instance directories starting from A.12.80.00. Central NetWeaver directories can likewise be based onHA NFS tk/DRBD./nThe Linux Distro listed is applicable for the respective SUSE Linux Enterprise Server for SAP Applications (SLES4SAP) and Red Hat Enterprise Linux for SAP Applications (RHEL4SAP)/n<b>DB</b>/nSAP use case-specific implementations of cluster packages for several legacy database technologies can optionally be used for the single-instance database technologies listed to the left. ", 
+                            "ProductVersion": "A.12.70.00", 
+                            "SAP-Kernel": "[7.81, 7.73, 7.77, 7.50, 7.51, 7.52, 7.53, 7.40, 7.41, 7.42, 7.45, 7.49, 7.20, 7.20_EXT, 7.21, 7.22]", 
+                            "Supported-DB": "[SAP Sybase ASE16.0 SP3 /n IBM DB/2 10.5,11.1 /n Oracle RDBMS 11gR2,12cR1,12cR2,19c /n SAP MAXDB/liveCache 7.9]"
+                        }, 
+                        {
+                            "Notes": "S/4 HANA 1610/1809 on premise solutions are supported for the application based on kernel 7.45,7.49,7.53,7.77", 
+                            "ProductVersion": "A.12.60.00", 
+                            "SAP-Kernel": "[7.20, 7.11, 7.10, 7.53, 7.38, 7.42]", 
+                            "Supported-DB": "[ORACLE RDBMS 11gR2 12cR1-R2 18c 19c /n IBM DB2 10.5,11.1 /n SAP Sybase ASE 15.7 16.0 (up to SP3)/nSAP MAXDB 7.9/nSAP Livecache 7.9/nSAP HANA1 SPS12 revisions/nSAP HANA2 SPS04/nSAP HANA2 SPS05]"
+                        }, 
+                        {
+                            "Notes": "S/4 HANA 1610/1809 on premise solutions are supported for the application based on kernel 7.45,7.49,7.53,7.77", 
+                            "ProductVersion": "A.12.50.03", 
+                            "SAP-Kernel": "[7.53, 7.38, 7.42, 7.20, 7.11, 7.10]", 
+                            "Supported-DB": "[ORACLE RDBMS 11gR2,12cR1-R2,18c,19c /n IBM-DB2 10.5,11.1 /n SAP Sybase ASE 15.7,16.0(up to SP3) /n SAP MAXDB 7.9 /n SAP Livecache 7.9 /n SAP HANA1 SPS12 revisions /n SAP HANA2 SPS03  /n SAP HANA2 SPS04 /n SAP HANA2 SPS05]"
+                        }, 
+                        {
+                            "Notes": "S/4 HANA 1610/1809 on premise solutions are supported for the applications  based on kernel 7.45,7.49,7.53 or 7.73.", 
+                            "ProductVersion": "A.12.50.00", 
+                            "SAP-Kernel": "[7.53, 7.38, 7.42, 7.20, 7.11, 7.10]", 
+                            "Supported-DB": "[ORACLE RDBMS 11gR2,12cR1-R2,18c /n IBM DB2 10.5 11.1 /n SAP Sybase ASE 15.7,16.0(up to SP2) /n SAP MAXDB 7.9 /n SAP Livecache 7. /n SAP HANA1 SPS12 revisions /n SAP HANA2 SPS2 /n SAP HANA2 SPS3 /n SAP HANA2 SPS4]"
+                        }, 
+                        {
+                            "Notes": "S/4 HANA 1610/1809 on premise solutions are supported for the applications  based on kernel 7.45,7.49,7.53 or 7.73.", 
+                            "ProductVersion": "A.12.40.00", 
+                            "SAP-Kernel": "[7.53, 7.38, 7.42, 7.20, 7.11, 7.10]", 
+                            "Supported-DB": "[ORACLE RDBMS 11gR2,12cR1-R2 /n IBM DB2 10.1,10.5 /n SAP Sybase ASE 15.7,16.0(up to SP2) /n SAP MAXDB 7.9 /n SAP Livecache 7.9 /n SAP HANA1 SPS12 revisions /n SAP HANA2 SPS1 /n SAP HANA2 SPS2 /n SAP HANA2 SPS3 /n SAP HANA2 SPS4]"
+                        }, 
+                        {
+                            "Notes": "S/4 HANA 1610/1709 on premise solutions are supported for the application based on ABAP 7.50/7.51/7.52 and kernel 7.45, 7.49 or 7.53", 
+                            "ProductVersion": "A.12.30.00", 
+                            "SAP-Kernel": "[7.41, 7.38, 7.42, 7.20, 7.11, 7.10]", 
+                            "Supported-DB": "[ORACLE RDBMS 10gR2,11gR2,12cR1-R2 /n IBM DB2 10.1,10.5 /n SAP Sybase ASE 15.7,16.0(up to SP2) /n SAP MAXDB 7.6 - 7.9 /n SAP Livecache 7.6 - 7.9 /n SAP HANA1 SPS10 revisions /n SAP HANA1 SPS11 revisions /n SAP HANA1 SPS12 revisions /n SAP HANA2 SPS1 /n SAP HANA2 SPS2 /n SAP HANA2 SPS3]"
+                        }, 
+                        {
+                            "Notes": "S/4 HANA 1610/1709 on premise solutions are supported for the application based on ABAP 7.50/7.51/7.52 and kernel 7.45, 7.49 or 7.53.", 
+                            "ProductVersion": "A.12.20.00", 
+                            "SAP-Kernel": "[7.41, 7.38, 7.42, 7.20, 7.11, 7.10]", 
+                            "Supported-DB": "[ORACLE RDBMS 10gR2,11gR2,12cR1-R2 /n IBM DB2 10.1,10.5 /n SAP Sybase ASE 15.7,16.0 /n SAP MAXDB 7.6 - 7.9 /n SAP Livecache 7.6 - 7.9 /n SAP HANA1 SPS10 revisions /n SAP HANA1 SPS11 revisions /n SAP HANA1 SPS12 revisions /n SAP HANA 2.00.00 - SAP HANA 2.00.20 and higher SPS2 revisions]"
+                        }
+                    ], 
+                    "Sybase": [
+                        {
+                            "AdditionalChecks": "Not supported on OL 7 and OL 8", 
+                            "LatestProductVersion": "latest", 
+                            "Notes": "Sybase ASE Standalone (single instance, non-Cluster Edition) supported./nIntegrating Sybase Replication Server with Serviceguard is supported only with coexistence of SGeSAP with Sybase ASE.", 
+                            "ProductVersion": "A.12.00.00", 
+                            "Version": "Sybase ASE 16.x"
+                        }, 
+                        {
+                            "AdditionalChecks": "Not supported on OL 7 and OL 8", 
+                            "LatestProductVersion": "latest", 
+                            "Notes": "Sybase ASE Standalone (single instance, non-Cluster Edition) supported./nIntegrating Sybase Replication Server with Serviceguard is supported only with coexistence of SGeSAP with Sybase ASE.", 
+                            "ProductVersion": "A.12.00.00", 
+                            "Version": "Sybase Replication Server 16.x"
+                        }, 
+                        {
+                            "AdditionalChecks": "Not supported on OL 7 and OL 8", 
+                            "LatestProductVersion": "latest", 
+                            "Notes": "Sybase ASE Standalone (single instance, non-Cluster Edition) supported./nIntegrating Sybase Replication Server with Serviceguard is supported only with coexistence of SGeSAP with Sybase ASE.", 
+                            "ProductVersion": "A.12.00.00", 
+                            "Version": "Sybase ASE 15.7.0,15.7.1 ESD-2,ESD-3,ESD-4,SP110,SP120"
+                        }, 
+                        {
+                            "AdditionalChecks": "Not supported on OL 7 and OL 8", 
+                            "LatestProductVersion": "latest", 
+                            "Notes": "Sybase ASE Standalone (single instance, non-Cluster Edition) supported./nIntegrating Sybase Replication Server with Serviceguard is supported only with coexistence of SGeSAP with Sybase ASE.", 
+                            "ProductVersion": "A.12.00.00", 
+                            "Version": "Sybase Replication Server15.7.1 ESD-2"
+                        }
+                    ]
+                }
+            ]
+        }
+    ], 
+    "Storage": [
+        {
+            "Connectivity": [
+                {
+                    "FC": "Yes", 
+                    "FCOE": "Yes", 
+                    "NFS": "Yes", 
+                    "SAS": "No", 
+                    "SupportedConnectivity": "Cluster Shared Storage", 
+                    "iSCSI": "Yes"
+                }, 
+                {
+                    "FC": "Yes", 
+                    "FCOE": "Yes", 
+                    "NFS": "No", 
+                    "SAS": "No", 
+                    "SupportedConnectivity": "Cluster Lock LUN", 
+                    "iSCSI": "No"
+                }, 
+                {
+                    "FC": "Yes", 
+                    "FCOE": "Yes", 
+                    "NFS": "Yes", 
+                    "Remarks": "All the SAP supported connectivity for Non-shared storage is supported.", 
+                    "SAS": "Yes", 
+                    "SupportedConnectivity": "Non Shared storage SAP HANA System Replication", 
+                    "iSCSI": "Yes"
+                }, 
+                {
+                    "FC": "Yes", 
+                    "FCOE": "Yes", 
+                    "NFS": "Yes", 
+                    "Remarks": "Requires A12.30.00 or above.", 
+                    "SAS": "Yes", 
+                    "SupportedConnectivity": "Non Shared storage Oracle Data guard", 
+                    "iSCSI": "Yes"
+                }, 
+                {
+                    "FC": "Yes", 
+                    "FCOE": "Yes", 
+                    "NFS": "NA", 
+                    "SAS": "Yes", 
+                    "SupportedConnectivity": "Non Shared storage SQL Server on Linux AOAI", 
+                    "iSCSI": "Yes"
+                }
+            ], 
+            "HPEStorage": [
+                {
+                    "Array": "Any", 
+                    "ClusterLockLUN": "Yes", 
+                    "ClusterSharedStorage": "Yes", 
+                    "LatestProductVersion": "latest", 
+                    "Model": "Any", 
+                    "ProductVersion": "A.12.10.00", 
+                    "TypeofStorage": "XP"
+                }, 
+                {
+                    "Array": "Any", 
+                    "ClusterLockLUN": "Yes", 
+                    "ClusterSharedStorage": "Yes", 
+                    "LatestProductVersion": "latest", 
+                    "Model": "Any", 
+                    "ProductVersion": "A.12.10.00", 
+                    "TypeofStorage": "3PAR"
+                }, 
+                {
+                    "Array": "Any", 
+                    "ClusterLockLUN": "Yes", 
+                    "ClusterSharedStorage": "Yes", 
+                    "LatestProductVersion": "latest", 
+                    "Model": "Any", 
+                    "ProductVersion": "A.12.10.00", 
+                    "TypeofStorage": "Primera"
+                }, 
+                {
+                    "Array": "Any", 
+                    "ClusterLockLUN": "Yes", 
+                    "ClusterSharedStorage": "Yes", 
+                    "LatestProductVersion": "latest", 
+                    "Model": "Any", 
+                    "ProductVersion": "A.12.10.00", 
+                    "TypeofStorage": "Nimble"
+                }, 
+                {
+                    "Array": "Any", 
+                    "ClusterLockLUN": "Yes", 
+                    "ClusterSharedStorage": "Yes", 
+                    "LatestProductVersion": "latest", 
+                    "Model": "Any", 
+                    "ProductVersion": "A.12.10.00", 
+                    "TypeofStorage": "EVA"
+                }, 
+                {
+                    "Array": "Any", 
+                    "ClusterLockLUN": "Yes", 
+                    "ClusterSharedStorage": "Yes", 
+                    "LatestProductVersion": "latest", 
+                    "Model": "Any", 
+                    "ProductVersion": "A.12.10.00", 
+                    "TypeofStorage": "MSA"
+                }, 
+                {
+                    "Array": "Any", 
+                    "ClusterLockLUN": "Yes", 
+                    "ClusterSharedStorage": "Yes", 
+                    "LatestProductVersion": "latest", 
+                    "Model": "Any", 
+                    "ProductVersion": "A.12.10.00", 
+                    "TypeofStorage": "Store Virtual"
+                }, 
+                {
+                    "Array": "Any", 
+                    "ClusterLockLUN": "No", 
+                    "ClusterSharedStorage": "Yes", 
+                    "LatestProductVersion": "latest", 
+                    "Model": "Any", 
+                    "ProductVersion": "A.12.10.00", 
+                    "TypeofStorage": "NFS Filter"
+                }, 
+                {
+                    "Array": "Any", 
+                    "ClusterLockLUN": "No", 
+                    "ClusterSharedStorage": "No", 
+                    "LatestProductVersion": "latest", 
+                    "Model": "Any", 
+                    "ProductVersion": "A.12.10.00", 
+                    "TypeofStorage": "Others(Ex.Object)"
+                }, 
+                {
+                    "ClusterLockLUN": "No", 
+                    "ClusterSharedStorage": "Yes", 
+                    "LatestProductVersion": "latest", 
+                    "ProductVersion": "A.12.10.00", 
+                    "Remarks": "Supported only with iSCSI Supported with Network RAID 10 Configuration.Multi-Site configuration is not supported", 
+                    "TypeofStorage": "Store Virtual VSA Software"
+                }, 
+                {
+                    "Array": "20850, 20800,20450", 
+                    "LatestProductVersion": "A.12.00.51", 
+                    "ProductVersion": "A.12.00.00", 
+                    "Remarks": "Device Mapper Multipathing is supported with 3PAR iSCSI devices only when there are 2 iSCSI ports on the array.", 
+                    "TypeofStorage": "3PAR StoreServ 20000"
+                }, 
+                {
+                    "Array": "10800, 10400", 
+                    "LatestProductVersion": "A.12.00.51", 
+                    "ProductVersion": "A.12.00.00", 
+                    "Remarks": "Device Mapper Multipathing is supported with 3PAR iSCSI devices only when there are 2 iSCSI ports on the array.", 
+                    "TypeofStorage": "3PAR StoreServ 10000"
+                }, 
+                {
+                    "Array": "8450, 8440,8400, 8200", 
+                    "LatestProductVersion": "A.12.00.51", 
+                    "ProductVersion": "A.12.00.00", 
+                    "Remarks": "Device Mapper Multipathing is supported with 3PAR iSCSI devices only when there are 2 iSCSI ports on the array.", 
+                    "TypeofStorage": "3PAR StoreServ 8000"
+                }, 
+                {
+                    "Array": "7450, 7400,7200", 
+                    "LatestProductVersion": "A.12.00.51", 
+                    "ProductVersion": "A.12.00.00", 
+                    "Remarks": "Device Mapper Multipathing is supported with 3PAR iSCSI devices only when there are 2 iSCSI ports on the array.", 
+                    "TypeofStorage": "3PAR StoreServ 7000"
+                }, 
+                {
+                    "Array": "T800, T400", 
+                    "LatestProductVersion": "A.12.00.51", 
+                    "ProductVersion": "A.12.00.00", 
+                    "TypeofStorage": "3PART Class"
+                }, 
+                {
+                    "Array": "F400, F200", 
+                    "LatestProductVersion": "A.12.00.51", 
+                    "ProductVersion": "A.12.00.00", 
+                    "TypeofStorage": "3PARFClass"
+                }, 
+                {
+                    "Array": "XP7, XP24000, XP20000, P9500", 
+                    "LatestProductVersion": "A.12.00.51", 
+                    "ProductVersion": "A.12.00.00", 
+                    "Remarks": "iSCSI Only", 
+                    "TypeofStorage": "XP"
+                }, 
+                {
+                    "Array": "4330, 4130", 
+                    "LatestProductVersion": "A.12.00.51", 
+                    "ProductVersion": "A.12.00.00", 
+                    "TypeofStorage": "StoreVirtual"
+                }, 
+                {
+                    "Array": "P2000G3,MSA 1040,2040", 
+                    "LatestProductVersion": "A.12.00.51", 
+                    "ProductVersion": "A.12.00.00", 
+                    "TypeofStorage": "StorageWorks MSA"
+                }, 
+                {
+                    "Array": "HP EVA 4x00 / 6x00/ 8x00, HP EVA 6300/P6350,HP EVA P6500/P6550", 
+                    "LatestProductVersion": "A.12.00.51", 
+                    "ProductVersion": "A.12.00.00", 
+                    "Remarks": "HPE EVA supported with firmware v3.01 or later.", 
+                    "TypeofStorage": "EVA/P6000"
+                }
+            ], 
+            "NonHPEStorage": [
+                {
+                    "Array": "Any", 
+                    "ClusterLockLUN": "Yes", 
+                    "ClusterSharedStorage": "Yes", 
+                    "LatestProductVersion": "latest", 
+                    "Model": "Any", 
+                    "ProductVersion": "A.12.10.00", 
+                    "Remarks": "Any vendor", 
+                    "TypeofStorage": "Block"
+                }, 
+                {
+                    "Array": "Any", 
+                    "ClusterLockLUN": "No", 
+                    "ClusterSharedStorage": "Yes", 
+                    "LatestProductVersion": "latest", 
+                    "Model": "Any", 
+                    "ProductVersion": "A.12.10.00", 
+                    "Remarks": "Any vendor", 
+                    "TypeofStorage": "NFS Filter"
+                }, 
+                {
+                    "Array": "Any", 
+                    "ClusterLockLUN": "No", 
+                    "ClusterSharedStorage": "No", 
+                    "LatestProductVersion": "latest", 
+                    "Model": "Any", 
+                    "ProductVersion": "A.12.10.00", 
+                    "Remarks": "Any vendor", 
+                    "TypeofStorage": "Others(Ex: Object)"
+                }, 
+                {
+                    "Array": "Symmetrix", 
+                    "LatestProductVersion": "A.12.00.51", 
+                    "Model": "Symmetrix DMX: 6, 6.5, 7.0./nSymmetrix VMAX & VMAXe Series(All arrays with microcode level5874.xx.xx or later)", 
+                    "ProductVersion": "A.12.00.00", 
+                    "TypeofStorage": "EMC"
+                }, 
+                {
+                    "Array": "VNX Series", 
+                    "LatestProductVersion": "A.12.00.51", 
+                    "Model": "VNX 5K, VNX7K", 
+                    "ProductVersion": "A.12.00.00", 
+                    "Remarks": "Block Storage Only", 
+                    "TypeofStorage": "EMC"
+                }, 
+                {
+                    "Array": "CLARiiON", 
+                    "LatestProductVersion": "A.12.00.51", 
+                    "Model": "CX,AX", 
+                    "ProductVersion": "A.12.00.00", 
+                    "TypeofStorage": "EMC"
+                }, 
+                {
+                    "Array": "Universal Storage Platform", 
+                    "LatestProductVersion": "A.12.00.51", 
+                    "Model": "VM, V, VSP, H24000, H20000", 
+                    "ProductVersion": "A.12.00.00", 
+                    "TypeofStorage": "Hitachi"
+                }, 
+                {
+                    "Array": "TagmaStore", 
+                    "LatestProductVersion": "A.12.00.51", 
+                    "Model": "USP11000, USP600, USP100, NSC55", 
+                    "ProductVersion": "A.12.00.00", 
+                    "TypeofStorage": "Hitachi"
+                }, 
+                {
+                    "Array": "Virtual Storage Platform", 
+                    "LatestProductVersion": "A.12.00.51", 
+                    "Model": "G1000, VX7, VP9500", 
+                    "ProductVersion": "A.12.00.00", 
+                    "TypeofStorage": "Hitachi"
+                }, 
+                {
+                    "Array": "NetApp FAS", 
+                    "LatestProductVersion": "A.12.00.51", 
+                    "Model": "FAS2000, FAS 3000,FAS 6000, FAS 8000", 
+                    "ProductVersion": "A.12.00.00", 
+                    "Remarks": "Only NFS (filer) option supported", 
+                    "TypeofStorage": "NetApp"
+                }, 
+                {
+                    "Array": "NetApp FAS", 
+                    "LatestProductVersion": "A.12.00.51", 
+                    "ProductVersion": "A.12.00.00", 
+                    "Remarks": "iSCSI Not Supported", 
+                    "TypeofStorage": "IBM"
+                }
+            ]
+        }
+    ], 
+    "Virtualization": [
+        {
+            "LinuxVirtualization": [
+                {
+                    "OracleLinuxKVM": [
+                        {
+                            "LatestProductVersion": "latest", 
+                            "Multipathing": "NA", 
+                            "Notes": "Supported only with application based replications. Example Oracle Data Guard", 
+                            "ProductVersion": "A.12.50.00", 
+                            "QuorumMechanism": "QuorumServer", 
+                            "SupportedGuestOS-ServiceguardNodes": "All Linux OS supported by Serviceguard.", 
+                            "SupportedHostOsVersion": "OL 7, 7.7 and later", 
+                            "SupportedSharedStorage": "NA"
+                        }
+                    ], 
+                    "RedHatEnterpriseVirtualization": [
+                        {
+                            "LatestProductVersion": "latest", 
+                            "Multipathing": "No", 
+                            "ProductVersion": "A.12.00.00", 
+                            "QuorumMechanism": "QuorumServer", 
+                            "SupportedGuestOS-ServiceguardNodes": "RHEL 6.5", 
+                            "SupportedHostOsVersion": "6.5", 
+                            "SupportedSharedStorage": "iSCSI"
+                        }
+                    ], 
+                    "RedHatKVMVersion": [
+                        {
+                            "LatestProductVersion": "latest", 
+                            "Multipathing": "Yes", 
+                            "ProductVersion": "A.12.00.30", 
+                            "QuorumMechanism": "Quorum ServerCluster Lock LUN", 
+                            "SupportedGuestOS-ServiceguardNodes": "All Linux OS supported by Serviceguard,except SLES 12", 
+                            "SupportedHostOsVersion": "RHEL 7 (7.1 to 7.8)", 
+                            "SupportedSharedStorage": "iSCSI, FC"
+                        }, 
+                        {
+                            "LatestProductVersion": "latest", 
+                            "Multipathing": "No", 
+                            "ProductVersion": "A.12.00.00", 
+                            "QuorumMechanism": "QuorumServer", 
+                            "SupportedGuestOS-ServiceguardNodes": "All Linux OS supported by Serviceguard,except SLES 12", 
+                            "SupportedHostOsVersion": "RHEL 6 (6.3 to 6.10)", 
+                            "SupportedSharedStorage": "iSCSI"
+                        }
+                    ], 
+                    "SLESKVMVersion": [
+                        {
+                            "LatestProductVersion": "latest", 
+                            "Multipathing": "No", 
+                            "ProductVersion": "A.12.00.30", 
+                            "QuorumMechanism": "QuorumServer", 
+                            "SupportedGuestOS-ServiceguardNodes": "All Linux OS supported by Serviceguard.", 
+                            "SupportedHostOsVersion": "SLES 12up to SP5", 
+                            "SupportedSharedStorage": "iSCSI"
+                        }, 
+                        {
+                            "LatestProductVersion": "latest", 
+                            "Multipathing": "No", 
+                            "ProductVersion": "A.12.40.00", 
+                            "QuorumMechanism": "QuorumServer", 
+                            "SupportedGuestOS-ServiceguardNodes": "All Linux OS supported by Serviceguard.", 
+                            "SupportedHostOsVersion": "SLES 15up to SP2", 
+                            "SupportedSharedStorage": "iSCSI"
+                        }
+                    ]
+                }
+            ], 
+            "VMWare": [
+                {
+                    "LatestProductVersion": "latest", 
+                    "MinimumESX/ESXiVersion": "ESX/ESXi 4.1", 
+                    "Notes": "\\u2022 For VMFS volumes the supported JRE versions can be referred at Linux Distributions and Errata/nNote: When using IBM Java, use IBM Java 1.7.1_sr3.0 and above only/n\\u2022 Serviceguard depends on JAVA to communicate with vCenter/ESXi\\u2022 Please check the VMware documents to verify the supported JAVA versions for a given ESXi/ vCenter version./n\\u2022 VMware NMP and DRS is not supported with RDM - Statically linked Storage only./n\\u2022 VMFS Volumes - Dynamically linked storage (DLS) on RHEL7.6 and later is supported starting from Serviceguard version A.12.40.00./n\\u2022 Serviceguard supports VMware vVols in all the deployments except the array-based replication environments./n\\u2022 Use of SCSI controller slot higher than 15 is supported with Dynamically linked storage (DLS) from Serviceguard version A.12.60.00 and later./n\\u2022 For more details on using Clustered VMDK, SLS with Multipathing support and vVol Storage Configurations with SGLX, refer to the VMware KB articles: for vSphere 7.x KB 89510 and for vSphere 6.x KB 85901.", 
+                    "ProductVersion": "A.12.00.00", 
+                    "QuorumMechanism": "Quorum Server", 
+                    "VMwareFeatures": "vMotion"
+                }, 
+                {
+                    "LatestProductVersion": "latest", 
+                    "MinimumESX/ESXiVersion": "ESX/ESXi 4.1", 
+                    "Notes": "\\u2022 For VMFS volumes the supported JRE versions can be referred at Linux Distributions and Errata/nNote: When using IBM Java, use IBM Java 1.7.1_sr3.0 and above only/n\\u2022 Serviceguard depends on JAVA to communicate with vCenter/ESXi\\u2022 Please check the VMware documents to verify the supported JAVA versions for a given ESXi/ vCenter version./n\\u2022 VMware NMP and DRS is not supported with RDM - Statically linked Storage only./n\\u2022 VMFS Volumes - Dynamically linked storage (DLS) on RHEL7.6 and later is supported starting from Serviceguard version A.12.40.00./n\\u2022 Serviceguard supports VMware vVols in all the deployments except the array-based replication environments./n\\u2022 Use of SCSI controller slot higher than 15 is supported with Dynamically linked storage (DLS) from Serviceguard version A.12.60.00 and later./n\\u2022 For more details on using Clustered VMDK, SLS with Multipathing support and vVol Storage Configurations with SGLX, refer to the VMware KB articles: for vSphere 7.x KB 89510 and for vSphere 6.x KB 85901.", 
+                    "ProductVersion": "A.12.00.00", 
+                    "QuorumMechanism": "Quorum Server/nCluster Lock LUN", 
+                    "VMwareFeatures": "RDM - (SLS)"
+                }, 
+                {
+                    "LatestProductVersion": "latest", 
+                    "MinimumESX/ESXiVersion": "ESX/ESXi 5.5", 
+                    "Notes": "\\u2022 For VMFS volumes the supported JRE versions can be referred at Linux Distributions and Errata/nNote: When using IBM Java, use IBM Java 1.7.1_sr3.0 and above only/n\\u2022 Serviceguard depends on JAVA to communicate with vCenter/ESXi\\u2022 Please check the VMware documents to verify the supported JAVA versions for a given ESXi/ vCenter version./n\\u2022 VMware NMP and DRS is not supported with RDM - Statically linked Storage only./n\\u2022 VMFS Volumes - Dynamically linked storage (DLS) on RHEL7.6 and later is supported starting from Serviceguard version A.12.40.00./n\\u2022 Serviceguard supports VMware vVols in all the deployments except the array-based replication environments./n\\u2022 Use of SCSI controller slot higher than 15 is supported with Dynamically linked storage (DLS) from Serviceguard version A.12.60.00 and later./n\\u2022 For more details on using Clustered VMDK, SLS with Multipathing support and vVol Storage Configurations with SGLX, refer to the VMware KB articles: for vSphere 7.x KB 89510 and for vSphere 6.x KB 85901.", 
+                    "ProductVersion": "A.12.00.40", 
+                    "QuorumMechanism": "Quorum Server/nCluster Lock LUN (RDM Devices)", 
+                    "VMwareFeatures": "VMFS Volumes -(DLS)"
+                }, 
+                {
+                    "LatestProductVersion": "latest", 
+                    "MinimumESX/ESXiVersion": "ESX/ESXi 5.5", 
+                    "Notes": "\\u2022 For VMFS volumes the supported JRE versions can be referred at Linux Distributions and Errata/nNote: When using IBM Java, use IBM Java 1.7.1_sr3.0 and above only/n\\u2022 Serviceguard depends on JAVA to communicate with vCenter/ESXi\\u2022 Please check the VMware documents to verify the supported JAVA versions for a given ESXi/ vCenter version./n\\u2022 VMware NMP and DRS is not supported with RDM - Statically linked Storage only./n\\u2022 VMFS Volumes - Dynamically linked storage (DLS) on RHEL7.6 and later is supported starting from Serviceguard version A.12.40.00./n\\u2022 Serviceguard supports VMware vVols in all the deployments except the array-based replication environments./n\\u2022 Use of SCSI controller slot higher than 15 is supported with Dynamically linked storage (DLS) from Serviceguard version A.12.60.00 and later./n\\u2022 For more details on using Clustered VMDK, SLS with Multipathing support and vVol Storage Configurations with SGLX, refer to the VMware KB articles: for vSphere 7.x KB 89510 and for vSphere 6.x KB 85901.", 
+                    "ProductVersion": "A.12.00.40", 
+                    "QuorumMechanism": "Quorum Server", 
+                    "VMwareFeatures": "VMware NMP"
+                }, 
+                {
+                    "LatestProductVersion": "latest", 
+                    "MinimumESX/ESXiVersion": "ESX/ESXi 5.5", 
+                    "Notes": "\\u2022 For VMFS volumes the supported JRE versions can be referred at Linux Distributions and Errata/nNote: When using IBM Java, use IBM Java 1.7.1_sr3.0 and above only/n\\u2022 Serviceguard depends on JAVA to communicate with vCenter/ESXi\\u2022 Please check the VMware documents to verify the supported JAVA versions for a given ESXi/ vCenter version./n\\u2022 VMware NMP and DRS is not supported with RDM - Statically linked Storage only./n\\u2022 VMFS Volumes - Dynamically linked storage (DLS) on RHEL7.6 and later is supported starting from Serviceguard version A.12.40.00./n\\u2022 Serviceguard supports VMware vVols in all the deployments except the array-based replication environments./n\\u2022 Use of SCSI controller slot higher than 15 is supported with Dynamically linked storage (DLS) from Serviceguard version A.12.60.00 and later./n\\u2022 For more details on using Clustered VMDK, SLS with Multipathing support and vVol Storage Configurations with SGLX, refer to the VMware KB articles: for vSphere 7.x KB 89510 and for vSphere 6.x KB 85901.", 
+                    "ProductVersion": "A.12.00.40", 
+                    "QuorumMechanism": "Quorum Server", 
+                    "VMwareFeatures": "DRS"
+                }, 
+                {
+                    "LatestProductVersion": "latest", 
+                    "MinimumESX/ESXiVersion": "ESX/ESXi 5.5", 
+                    "Notes": "\\u2022 For VMFS volumes the supported JRE versions can be referred at Linux Distributions and Errata/nNote: When using IBM Java, use IBM Java 1.7.1_sr3.0 and above only/n\\u2022 Serviceguard depends on JAVA to communicate with vCenter/ESXi\\u2022 Please check the VMware documents to verify the supported JAVA versions for a given ESXi/ vCenter version./n\\u2022 VMware NMP and DRS is not supported with RDM - Statically linked Storage only./n\\u2022 VMFS Volumes - Dynamically linked storage (DLS) on RHEL7.6 and later is supported starting from Serviceguard version A.12.40.00./n\\u2022 Serviceguard supports VMware vVols in all the deployments except the array-based replication environments./n\\u2022 Use of SCSI controller slot higher than 15 is supported with Dynamically linked storage (DLS) from Serviceguard version A.12.60.00 and later./n\\u2022 For more details on using Clustered VMDK, SLS with Multipathing support and vVol Storage Configurations with SGLX, refer to the VMware KB articles: for vSphere 7.x KB 89510 and for vSphere 6.x KB 85901.", 
+                    "ProductVersion": "A.12.10.00", 
+                    "QuorumMechanism": "Quorum Server/nCluster Lock LUN (RDM Devices)", 
+                    "VMwareFeatures": "SRM"
+                }, 
+                {
+                    "LatestProductVersion": "latest", 
+                    "MinimumESX/ESXiVersion": "ESX/ESXi 6.7", 
+                    "Notes": "\\u2022 For VMFS volumes the supported JRE versions can be referred at Linux Distributions and Errata/nNote: When using IBM Java, use IBM Java 1.7.1_sr3.0 and above only/n\\u2022 Serviceguard depends on JAVA to communicate with vCenter/ESXi\\u2022 Please check the VMware documents to verify the supported JAVA versions for a given ESXi/ vCenter version./n\\u2022 VMware NMP and DRS is not supported with RDM - Statically linked Storage only./n\\u2022 VMFS Volumes - Dynamically linked storage (DLS) on RHEL7.6 and later is supported starting from Serviceguard version A.12.40.00./n\\u2022 Serviceguard supports VMware vVols in all the deployments except the array-based replication environments./n\\u2022 Use of SCSI controller slot higher than 15 is supported with Dynamically linked storage (DLS) from Serviceguard version A.12.60.00 and later./n\\u2022 For more details on using Clustered VMDK, SLS with Multipathing support and vVol Storage Configurations with SGLX, refer to the VMware KB articles: for vSphere 7.x KB 89510 and for vSphere 6.x KB 85901.", 
+                    "ProductVersion": "A.12.50.00", 
+                    "QuorumMechanism": "Quorum Server Cluster Lock LUN (RDM and vVol Devices)", 
+                    "VMwareFeatures": "vVols"
+                }, 
+                {
+                    "LatestProductVersion": "latest", 
+                    "MinimumESX/ESXiVersion": "ESX/ESXi 7.0", 
+                    "Notes": "\\u2022 For VMFS volumes the supported JRE versions can be referred at Linux Distributions and Errata/nNote: When using IBM Java, use IBM Java 1.7.1_sr3.0 and above only/n\\u2022 Serviceguard depends on JAVA to communicate with vCenter/ESXi\\u2022 Please check the VMware documents to verify the supported JAVA versions for a given ESXi/ vCenter version./n\\u2022 VMware NMP and DRS is not supported with RDM - Statically linked Storage only./n\\u2022 VMFS Volumes - Dynamically linked storage (DLS) on RHEL7.6 and later is supported starting from Serviceguard version A.12.40.00./n\\u2022 Serviceguard supports VMware vVols in all the deployments except the array-based replication environments./n\\u2022 Use of SCSI controller slot higher than 15 is supported with Dynamically linked storage (DLS) from Serviceguard version A.12.60.00 and later./n\\u2022 For more details on using Clustered VMDK, SLS with Multipathing support and vVol Storage Configurations with SGLX, refer to the VMware KB articles: for vSphere 7.x KB 89510 and for vSphere 6.x KB 85901.", 
+                    "ProductVersion": "A.12.80.00", 
+                    "QuorumMechanism": "Quorum Server Cluster Lock LUN", 
+                    "VMwareFeatures": "Clustered VMDK"
+                }, 
+                {
+                    "LatestProductVersion": "latest", 
+                    "MinimumESX/ESXiVersion": "ESX/ESXi 6.5", 
+                    "Notes": "\\u2022 For VMFS volumes the supported JRE versions can be referred at Linux Distributions and Errata/nNote: When using IBM Java, use IBM Java 1.7.1_sr3.0 and above only/n\\u2022 Serviceguard depends on JAVA to communicate with vCenter/ESXi\\u2022 Please check the VMware documents to verify the supported JAVA versions for a given ESXi/ vCenter version./n\\u2022 VMware NMP and DRS is not supported with RDM - Statically linked Storage only./n\\u2022 VMFS Volumes - Dynamically linked storage (DLS) on RHEL7.6 and later is supported starting from Serviceguard version A.12.40.00./n\\u2022 Serviceguard supports VMware vVols in all the deployments except the array-based replication environments./n\\u2022 Use of SCSI controller slot higher than 15 is supported with Dynamically linked storage (DLS) from Serviceguard version A.12.60.00 and later./n\\u2022 For more details on using Clustered VMDK, SLS with Multipathing support and vVol Storage Configurations with SGLX, refer to the VMware KB articles: for vSphere 7.x KB 89510 and for vSphere 6.x KB 85901.", 
+                    "ProductVersion": "A.12.80.00", 
+                    "QuorumMechanism": "Quorum Server Cluster Lock LUN", 
+                    "VMwareFeatures": "SLS With Multipath"
+                }
+            ], 
+            "WindowsVirtualization": [
+                {
+                    "LatestProductVersion": "latest", 
+                    "Multipathing": "No", 
+                    "ProductVersion": "A.12.20.00", 
+                    "QuorumMechanism": "QuorumServer", 
+                    "SupportedGuestOS-ServiceguardNodes": "All Linux OS supported by Serviceguard.", 
+                    "SupportedHostOsVersion": "Windows Server 2012 R2,2016 and 2019", 
+                    "SupportedSharedStorage": "iSCSI"
+                }
+            ]
+        }
+    ]
+}
