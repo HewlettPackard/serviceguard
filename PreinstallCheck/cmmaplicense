@@ -1,0 +1,642 @@
+# (c) Copyright 2023 Hewlett Packard Enterprise Development LP 
+# All rights reserved
+#!/bin/bash
+
+typeset -i cores_supported_per_license=2
+typeset -i vcpus_supported_per_license=4
+typeset -i cores=0;
+typeset -i license_required=0;
+
+#this code is reused from tools/cmcomputelicense of SGCORE
+#if there are any changes please modify in the other location as well
+function calculate_license_req
+{
+    curr_node==$(host=`hostname`; echo ${host%%.*})
+    SG_VIRTUAL_NODE_TYPE=`echo "$view" | awk -F "[ :|=]" '$1 == "node" && $2 == "'$node'" && $3 == "virt_tech" {print $4}'`
+     
+    if [[ -z $SG_VIRTUAL_NODE_TYPE ]]; then
+        # It is a physical system.
+        NODE_TYPE="PHYSICAL"
+    else
+        NODE_TYPE="VM"
+    fi
+    cores=0
+    if [[ $NODE_TYPE != "VM" ]]; then    #physical node
+        vm_flag=0
+        if [[ $curr_node != $node ]]; then
+            sock=`cmexec $node "cat /proc/cpuinfo | grep \"^physical id\" | sort -u"`
+            sock=`echo $sock |awk '{print $NF}'`
+            for i in $sock 
+            do
+                core_val=`cmexec $node "cat /proc/cpuinfo | grep -A 5 -w \"^physical id[[:space:]]: $i\" | head -5 | grep \"^cpu cores\""`
+                core_val=`echo $core_val |awk '{print $NF}'` 
+                ((cores = cores + core_val )) 
+            done
+        else
+            for i in `cat /proc/cpuinfo | grep "^physical id" | sort -u |awk '{print $NF}'`
+            do
+                ((cores = cores + `cat /proc/cpuinfo | grep -A 5 -w "^physical id[[:space:]]: $i" | head -5 | grep -w "^cpu cores" | awk '{print $NF}'`));
+            done
+        fi
+        license_required=`expr '(' $cores '+' $cores_supported_per_license '-' 1 ')' '/' $cores_supported_per_license`
+    else #vm
+        vm_flag=1
+        if [[ $curr_node != $node ]]; then
+            vcpu=`cmexec $node "cat /proc/cpuinfo | grep processor | wc -l"`
+        else
+            vcpu=`cat /proc/cpuinfo | grep processor | wc -l`
+        fi
+        license_required=`expr '(' $vcpu '+' $vcpus_supported_per_license '-' 1 ')' '/'  $vcpus_supported_per_license`
+    fi
+}
+    
+view=`cmviewcl -vf line -s config 2> /dev/null`
+#check if cluster exists
+function check_for_cluster
+{
+    node=$1
+    curr_node=$(host=`hostname`; echo ${host%%.*})
+    if [[ ! -z "$node" && $node != $curr_node ]]; then
+        view=`ssh $node cmviewcl -vf line -s config 2> /dev/null`
+    fi
+    if [[ -z "$view" ]]; then
+        echo "cmmaplicense: HPE Serviceguard cluster does not exist. No workloads detected."
+
+        #have a temp file to store node details
+        export tmp_mapfile="/var/tmp/map.txt"
+        #check if file exists
+        if [[ -f $tmpfile ]]; then
+            rm -f $tmpfile
+        fi
+        #create file and give access
+        touch $tmp_mapfile
+        chmod 644 $tmp_mapfile
+        if [[ -z "$node" || $curr_node == $node ]]; then #current node
+            echo $curr_node
+            #store the output to a file
+            `hostnamectl > $tmp_mapfile`
+            node_type=`cat $tmp_mapfile | tr -d ' ' |awk -F':' '$1 == "Virtualization" {print $2}'`
+            if ! [[ -z "$node_type" ]]; then
+                NODE_TYPE="vm"
+            else
+                NODE_TYPE="physical"
+            fi
+            if [[ $NODE_TYPE == "vm" ]]; then
+                vcpu=`cat /proc/cpuinfo | grep processor | wc -l`
+                license_required=`expr '(' $vcpu '+' $vcpus_supported_per_license '-' 1 ')' '/'  $vcpus_supported_per_license`
+                echo "Number of vCPU(s) : $vcpu"
+            else
+                core=0
+                for i in `cat /proc/cpuinfo | grep "^physical id" | sort -u |awk '{print $NF}'`
+                do
+                    ((cores = cores + `cat /proc/cpuinfo | grep -A 5 -w "^physical id[[:space:]]: $i" | head -5 | grep -w "^cpu cores" | awk '{print $NF}'`));
+                done
+                license_required=`expr '(' $cores '+' $cores_supported_per_license '-' 1 ')' '/' $cores_supported_per_license`
+                echo "Number of Core(s) : $cores"
+            fi
+            echo -n "The Foundational License required is "
+            echo "$license_required LTU(s) of HPE Serviceguard for linux HA-E5 or HA-DR-E7"
+            echo "Note: Add-on license(s) might be required based on the workloads that will be deployed."
+            #delete the file
+            rm -f $tmpfile
+            return 0
+        else #node name is passed
+            echo $node
+            ssh $node hostnamectl > $tmp_mapfile
+            node_type=`cat $tmp_mapfile | tr -d ' ' |awk -F':' '$1 == "Virtualization" {print $2}'`
+            if ! [[ -z "$node_type" ]]; then
+                NODE_TYPE="vm"
+            else
+                NODE_TYPE="physical"
+            fi
+            if [[ $NODE_TYPE == "vm" ]]; then
+                vcpu=`ssh $node cat /proc/cpuinfo | grep processor | wc -l`
+                license_required=`expr '(' $vcpu '+' $vcpus_supported_per_license '-' 1 ')' '/'  $vcpus_supported_per_license`
+                echo "Number of vCPU(s) : $vcpu"
+            else
+                core=0
+                for i in `ssh cat /proc/cpuinfo | grep "^physical id" | sort -u |awk '{print $NF}'`
+                do
+                        ((cores = cores + `ssh cat /proc/cpuinfo | grep -A 5 -w "^physical id[[:space:]]: $i" | head -5 | grep -w "^cpu cores" | awk '{print $NF}'`));
+                done
+                license_required=`expr '(' $cores '+' $cores_supported_per_license '-' 1 ')' '/' $cores_supported_per_license`
+                echo "Number of Core(s) : $cores"
+            fi
+            echo -n "The Foundational License required is "
+            echo "$license_required LTU(s) of HPE Serviceguard for linux HA-E5 or HA-DR-E7"
+            echo "Note: Add-on license(s) might be required based on the workloads that will be deployed."
+            #delete the file
+            rm -f $tmpfile
+            return 0
+        fi
+    else
+        if ! [[ -z "$node" ]]; then 
+            echo "$node has a cluster, please run cmmaplicense on $node without -n option"
+        else
+            return 1
+        fi
+    fi
+}
+while getopts ":n:h" option; do
+    if [[ $option == "h" ]]; then
+        echo "Functionality: "
+        echo "Its a script that explore the configuration of current deployed solution and its platform then suggest the required license and its count for Serviceguard for Linux A.15.00.00"
+        echo "The script would discover the following "
+        echo "    1. Number of cores/vCPUs"
+        echo "    2. Workload deployed "
+        echo "    3. Multi target "
+        echo "    4. CC/push button recovery "
+        echo "    5. RPO configured (if it is > 0)"
+        echo
+        echo "Usage:"
+        echo "    cmmaplicense"
+        echo "    The script must be run on any node of the cluster & once per cluster"
+        echo
+        echo "OPTIONS"
+        echo "    -n    Name of the node(s) on which operation needs to be performed."
+        echo "          Ensure that ssh connection has been eshtablished between the nodes before running, else it will ask for password"
+        echo "          This option should only be used when serviceguard is not installed or serviceguard cluster is not formed" 
+        exit 1
+    fi
+    if [[ $option == "n" ]]; then
+        node="$OPTARG"
+        n_flag=1
+        check_for_cluster $node
+        echo
+    fi
+done
+
+if [[ n_flag -eq 1 ]]; then
+    exit 1
+fi
+
+check_for_cluster
+if [[ $? -eq 0 ]]; then
+    exit 1;
+fi
+
+#get all the nodelist
+nodelist=`echo "$view" | awk -F "[ :|=]" '$1 == "node" && $3 == "name"  {print $4}'`
+
+for node in $nodelist
+do
+    vm_flag=0
+    echo "$node"
+    
+    #get the number of license required
+    calculate_license_req $node
+    
+    #flag to check if there are any workloads in a given node
+    workload_flag=0
+
+    wrkld_list=()
+    rpo_list=()
+    multitarget_list=()
+    pushbutton_flag=0
+    lic_list=()
+    E7_flag=0
+    E5_flag=0
+    FlexStorage_flag=0
+    
+    #get all package name
+    package_list=`echo "$view" | awk -F "[ :|=]" '$1 == "package" && $3 == "node" && $4 == "'$node'" && $5 == "name"  {print $2}'`
+    
+
+    for pkg in $package_list
+    do
+        module_list=`echo "$view" | awk -F "[ :|=]" '$1 == "package" && $2 == "'$pkg'" && $3 == "module_name" && $5 == "module_name"   {print $6}'`
+        for module  in $module_list
+        do
+            if [[ $module =~ "dts/ccconf" ]]; then
+                workload_flag=1
+                pushbutton_flag=1
+                E5_flag=0
+                E7_flag=1
+            fi
+            if [[ $module =~ "sgesap/hdbtier" ]]; then
+                workload_flag=1
+                if ! [[ ${wrkld_list[@]} =~ "HANA" ]]; then
+                    wrkld_list+=( "HANA" )
+                fi
+                if ! [[ ${multitarget_list[@]} =~ "HANA" ]]; then
+                    multitarget_list+=( "HANA" )
+                fi
+                E5_flag=0
+                E7_flag=1
+                if ! [[ ${lic_list[@]} =~ "SAP-Add-on" ]]; then
+                    lic_list+=( "SAP-Add-on" )
+                fi
+
+            elif [[ $module =~ "sgesap" ]]; then
+                sync_time_tol=`echo "$view" | awk -F "[ :|=]" '$1 == "package" && $2 == "'$pkg'" && $3 == "sgesap/hdbprimary/hdb_sync_time_tolerance" {print $4}'`
+                sync_logpos_tol=`echo "$view" | awk -F "[ :|=]" '$1 == "package" && $2 == "'$pkg'" && $3 == "sgesap/hdbprimary/hdb_sync_logpos_tolerance" {print $4}'`
+                if [[  $sync_time_tol -gt 0 || $sync_logpos_tol -gt 0 ]]; then
+                    workload_flag=1
+                    if ! [[ ${wrkld_list[@]} =~ "HANA" ]]; then
+                        wrkld_list+=( "HANA" )
+                    fi
+                    if ! [[ ${rpo_list[@]} =~ "HANA" ]]; then
+                        rpo_list+=( "HANA" )
+                    fi
+                    E7_flag=1
+                    if ! [[ ${lic_list[@]} =~ "SAP-Add-on" ]]; then
+                        lic_list+=( "SAP-Add-on" )
+                    fi
+                
+                elif [[ $module =~ "sg/sc" ]]; then
+                    workload_flag=1
+                    if ! [[ ${wrkld_list[@]} =~ "HANA" ]]; then
+                        wrkld_list+=( "HANA" )
+                    fi
+                    E7_flag=1
+                    if ! [[ ${lic_list[@]} =~ "SAP-Add-on" ]]; then
+                        lic_list+=( "SAP-Add-on" )
+                    fi
+
+                else
+                    workload_flag=1
+                    if ! [[ ${wrkld_list[@]} =~ "HANA" ]]; then
+                        wrkld_list+=( "HANA" )
+                    fi                    
+                    if [[ E7_flag -eq 0 ]]; then     
+                        E5_flag=1
+                    fi
+                    if ! [[ ${lic_list[@]} =~ "SAP-Add-on" ]]; then
+                        lic_list+=( "SAP-Add-on" )
+                    fi
+                fi
+            fi
+
+            if [[ $module =~ "tkit/oracle" ]]; then
+                workload_flag=1
+                rpo_res=`echo "$view" | awk -F "[ :|=]" '$1 == "package" && $2 == "'$pkg'" && $3 == "'$module'/RPO_LIMIT"  {print $4}'`
+                if [[ ! -z $rpo_res  || $rpo_res -gt 0 ]]; then
+                    rpo_list+=( "Oracle" )
+                fi
+                if ! [[ ${wrkld_list[@]} =~ "Oracle" ]]; then
+                    wrkld_list+=( "Oracle" )
+                fi
+                
+                if [[ E7_flag -eq 0 ]]; then     
+                    E5_flag=1
+                fi
+                if ! [[ ${lic_list[@]} =~ "Oracle-Add-on" ]]; then
+                    lic_list+=( "Oracle-Add-on" )
+                fi
+            fi
+
+            if [[ $module =~ "tkit/dataguard" ]]; then
+                if [[ $module =~ "tkit/dataguard/dataguard_multi_dc" ]]; then
+                    workload_flag=1
+                    if ! [[ ${wrkld_list[@]} =~ "Dataguard" ]]; then
+                        wrkld_list+=( "Dataguard" )
+                    fi
+                    if ! [[ ${multitarget_list[@]} =~ "Dataguard" ]]; then
+                        multitarget_list+=( "Dataguard" )
+                    fi        
+                    E7_flag=1
+                    if ! [[ ${lic_list[@]} =~ "Oracle-Add-on" ]]; then
+                        lic_list+=( "Oracle-Add-on" )
+                    fi
+               else
+                    rpo_res=`echo "$view" | awk -F "[ :|=]" '$1 == "package" && $2 == "'$pkg'" && $3 == "'$module'/RPO_LIMIT"  {print $4}'`
+                    if [[ $rpo_res -gt 0 ]]; then
+                        workload_flag=1
+                        if ! [[ ${wrkld_list[@]} =~ "Dataguard" ]]; then
+                            wrkld_list+=( "Dataguard" )
+                        fi
+                        if ! [[ ${rpo_list[@]} =~ "Dataguard" ]]; then
+                            rpo_list+=( "Dataguard" )
+                        fi
+                        E7_flag=1
+                        if ! [[ ${lic_list[@]} =~ "Oracle-Add-on" ]]; then
+                            lic_list+=( "Oracle-Add-on" )
+                        fi
+                    else
+                        workload_flag=1
+                        if ! [[ ${wrkld_list[@]} =~ "Dataguard" ]]; then
+                            wrkld_list+=( "Dataguard" )
+                        fi
+                        if [[ E7_flag -eq 0 ]]; then     
+                            E5_flag=1
+                        fi
+                         if ! [[ ${lic_list[@]} =~ "Oracle-Add-on" ]]; then
+                                lic_list+=( "Oracle-Add-on" )
+                        fi
+                    fi
+                fi
+            fi
+
+            if [[ $module =~ "xdc/xdc" ]]; then
+                rpo_res=`echo "$view" | awk -F "[ :|=]" '$1 == "package" && $2 == "'$pkg'" && $3 == "'$module'/RPO_TARGET"  {print $4}'`
+                #check if that is greater than zero
+                if [[ $rpo_res -gt 0 ]]; then
+                    workload_flag=1
+                    if ! [[ ${wrkld_list[@]} =~ "XDC" ]]; then
+                        wrkld_list+=( "XDC" )
+                    fi 
+                    if ! [[ ${rpo_list[@]} =~ "XDC" ]]; then
+                        rpo_list+=( "XDC" )
+                    fi
+                    E7_flag=1
+                else
+                    workload_flag=1
+                    if ! [[ ${wrkld_list[@]} =~ "XDC" ]]; then
+                        wrkld_list+=( "XDC" ) 
+                    fi
+                    if [[ E7_flag -eq 0 ]]; then
+                        E5_flag=1
+                    fi
+                fi
+            fi
+
+            if [[ $module =~ "sgemssql/mssqldbinstance" ]]; then
+                workload_flag=1
+                if ! [[ ${wrkld_list[@]} =~ "MSSQL" ]]; then
+                    wrkld_list+=( "MSSQL" )
+                fi
+                if [[ E7_flag -eq 0 ]]; then     
+                    E5_flag=1
+                fi
+                if ! [[ ${lic_list[@]} =~ "MSSQL-Add-on" ]]; then
+                    lic_list+=( "MSSQL-Add-on" )
+                fi
+            fi
+
+            if [[ $module =~ "sgemssql/mssqlaoai" ]]; then
+                node_names=`echo "$view" | awk -F "[ :|=]" '$1 == "package" && $2 == "'$pkg'" && $3 == "sgemssql/mssqlaoai/nodename" && $5 == "sgemssql/mssqlaoai/nodename"  {print $6}'`
+                num_node_names=( $node_names )
+                if [[ ${#num_node_names[@]} -gt 2 ]]; then
+                    workload_flag=1
+                    if ! [[ ${wrkld_list[@]} =~ "MSSQL" ]]; then
+                        wrkld_list+=( "MSSQL" )
+                    fi
+                    if ! [[ ${multitarget_list[@]} =~ "MSSQL" ]]; then
+                        multitarget_list+=( "MSSQL" )
+                    fi
+                    E7_flag=1
+                    if ! [[ ${lic_list[@]} =~ "MSSQL-Add-on" ]]; then
+                        lic_list+=( "MSSQL-Add-on" )
+                    fi
+                else
+                    workload_flag=1
+                    if ! [[ ${wrkld_list[@]} =~ "MSSQL" ]]; then
+                        wrkld_list+=( "MSSQL" )
+                    fi
+                    
+                    if [[ E7_flag -eq 0 ]]; then     
+                        E5_flag=1
+                    fi
+                    if ! [[ ${lic_list[@]} =~ "MSSQL-Add-on" ]]; then
+                        lic_list+=( "MSSQL-Add-on" )
+                    fi
+                fi
+            fi
+
+            if [[ $module =~ "tkit/db2" ]]; then
+                workload_flag=1
+                if ! [[ ${wrkld_list[@]} =~ "DB2" ]]; then
+                    wrkld_list+=( "DB2" )
+                fi
+                if [[ E7_flag -eq 0 ]]; then     
+                    E5_flag=1
+                fi
+            fi
+
+            if [[ $module =~ "tkit/ppas" ]]; then
+                workload_flag=1
+                if ! [[ ${wrkld_list[@]} =~ "Postgres" ]]; then
+                    wrkld_list+=( "Postgres" )
+                fi
+                if [[ E7_flag -eq 0 ]]; then     
+                    E5_flag=1
+                fi
+            fi
+
+            if [[ $module =~ "tkit/sybase" ]]; then
+                workload_flag=1
+                if ! [[ ${wrkld_list[@]} =~ "Sybase" ]]; then
+                    wrkld_list+=( "Sybase")
+                fi
+                if [[ E7_flag -eq 0 ]]; then     
+                    E5_flag=1
+                fi
+            fi
+
+            if [[ $module =~ "tkit/kvm" ]]; then
+                workload_flag=1
+                if ! [[ ${wrkld_list[@]} =~ "KVM" ]]; then
+                    wrkld_list+=( "KVM" )
+                fi
+                if [[ E7_flag -eq 0 ]]; then     
+                    E5_flag=1
+                fi
+            fi
+            if [[ $module =~ "sgenss/rf_" ]]; then 
+                node_names=`echo "$view" | awk -F "[ :|=]" '$1 == "package" && $2 == "'$pkg'" && $3 == "sgenss/rf_" && $5 == "sgenss/rf_"  {print $6}'`
+                num_node_names=( $node_names )
+                if [[ ${#num_node_names[@]} -gt 2 ]]; then
+                    workload_flag=1
+                    if ! [[ ${wrkld_list[@]} =~ "DRBD" ]]; then
+                        wrkld_list+=( "DRBD" )
+                    fi
+                    if ! [[ ${multitarget_list[@]} =~ "DRBD" ]]; then
+                        multitarget_list+=( "DRBD" )
+                    fi
+                    E5_flag=0
+                    E7_flag=1
+                    FlexStorage_flag=1
+                       
+                else
+                    rpo_res=`echo "$view" | awk -F "[ :|=]" '$1 == "package" && $2 == "'$pkg'" && $3 == "'$module'/RPO_THRESHOLD"  {print $4}'`
+                    if [[ $rpo_res -gt 0 ]]; then
+                        workload_flag=1
+                        if ! [[ ${wrkld_list[@]} =~ "DRBD" ]]; then
+                            wrkld_list+=( "DRBD" )
+                        fi
+                        if ! [[ ${rpo_list[@]} =~ "DRBD" ]]; then
+                            rpo_list=( "DRBD" )
+                        fi
+                        E7_flag=1 
+                        FlexStorage_flag=1
+                    else
+                        workload_flag=1
+                        if ! [[ ${wrkld_list[@]} =~ "DRBD" ]]; then
+                            wrkld_list+=( "DRBD" )
+                        fi
+                        if [[ E7_flag -eq 0 ]]; then     
+                            E5_flag=1
+                        fi
+                        FlexStorage_flag=1
+                    fi
+                fi
+            fi
+
+            if [[ $module =~ "dts/mc3parrc" ]]; then
+                rpo_data=`echo "$view" | awk -F "[ :|=]" '$1 == "package" && $2 == "'$pkg'" && $3 == "dts/3parrc/RPO_THRESHOLD"  {print $4}'`
+                noncur_data=`echo "$view" | awk -F "[ :|=]" '$1 == "package" && $2 == "'$pkg'" && $3 == "dts/3parrc/AUTO_NONCURDATA" {print $4}'`
+                if [[ $rpo_data -gt 0 && $noncur_data -gt 0 ]]; then                   
+                    workload_flag=1
+                    if ! [[ ${rpo_list[@]} =~ "3PAR" ]]; then
+                        rpo_list+=( "3PAR" )
+                    fi
+                    if ! [[ ${wrkld_list[@]} =~ "3PAR" ]]; then
+                        wrkld_list+=( "3PAR" )
+                    fi
+                    E7_flag=1
+                
+                else
+                    workload_flag=1
+                    if ! [[ ${wrkld_list[@]} =~ "3PAR" ]]; then
+                        wrkld_list+=( "3PAR" )
+                    fi
+                    if [[ E7_flag -eq 0 ]]; then     
+                        E5_flag=1
+                    fi
+                fi
+            fi
+
+            if [[ $module =~ "dts/mcrcopy" ]]; then
+                rpo_data=`echo "$view" | awk -F "[ :|=]" '$1 == "package" && $2 == "'$pkg'" && $3 == "dts/rcopy/RPO_THRESHOLD"  {print $4}'`
+                noncur_data=`echo "$view" | awk -F "[ :|=]" '$1 == "package" && $2 == "'$pkg'" && $3 == "dts/rcopy/AUTO_NONCURDATA"  {print $4}'`
+                if [[ $rpo_data -gt 0 && $noncur_data -gt 0 ]]; then
+                    workload_flag=1
+                    if ! [[ ${wrkld_list[@]} =~ "Primera" ]]; then
+                        wrkld_list+=( "Primera" )
+                    fi 
+                    if ! [[ ${rpo_list[@]} =~ "Primera" ]]; then
+                        rpo_list+=( "Primera" )
+                    fi 
+                    E7_flag=1
+                    
+                else
+                    workload_flag=1
+                    if ! [[ ${wrkld_list[@]} =~ "Primera" ]]; then
+                        wrkld_list+=( "Primera" )
+                    fi
+                    if [[ E7_flag -eq 0 ]]; then     
+                        E5_flag=1
+                    fi
+                fi
+            fi
+            if [[ $module =~ "dts/mcsadr" ]]; then
+                mcsadr_rpo_threshold=`echo "$view" | awk -F "[ :|=]" '$1 == "package" && $2 == "'$pkg'" && $3 == "dts/mcsadr/RPO_THRESHOLD"  {print $4}'`
+                mcsadr_auto_noncurdata=`echo "$view" | awk -F "[ :|=]" '$1 == "package" && $2 == "'$pkg'" && $3 == "dts/mcsadr/AUTO_NONCURDATA"  {print $4}'`
+                if [[ $mcsadr_rpo_threshold -gt 0  && $mcsadr_auto_noncurdata -gt 0 ]]; then
+                    workload_flag=1
+                    if ! [[ ${rpo_list[@]} =~ "SADR" ]]; then
+                        rpo_list+=( "SADR" )
+                    fi
+                    if ! [[ ${wrkld_list[@]} =~ "SADR" ]]; then
+                        wrkld_list+=( "SADR")
+                    fi
+                    E7_flag=1
+                    
+                else 
+                    workload_flag=1
+                    if ! [[ ${wrkld_list[@]} =~ "SADR" ]]; then
+                        wrkld_list+=( "SADR")
+                    fi
+                    if [[ E7_flag -eq 0 ]]; then     
+                        E5_flag=1
+                    fi
+                fi
+            fi 
+
+            if [[ $module =~ "dts/mcxpca" ]]; then
+                workload_flag=1
+                if ! [[ ${wrkld_list[@]} =~ "XP" ]]; then
+                    wrkld_list+=( "XP")
+                fi
+                if [[ E7_flag -eq 0 ]]; then     
+                    E5_flag=1
+                fi
+            fi
+            
+            if [[ $module =~ "dts/mc3parsldrc" ]]; then
+                workload_flag=1
+                if ! [[ ${wrkld_list[@]} =~ "3PAR_SLD" ]]; then
+                    wrkld_list+=( "3PAR_SLD" )
+                fi
+                E7_flag=1
+            fi
+            if [[ $module =~ "dts/mcsldrcopy" ]]; then
+                workload_flag=1
+                if ! [[ ${wrkld_list[@]} =~ "Primera SLD" ]]; then
+                    wrkld_list+=( "Primera SLD" )
+                fi
+                E7_flag=1
+            fi
+
+            if [[ $module =~ "tkit/nfs/nfs" ]]; then
+                workload_flag=1
+                if ! [[ ${wrkld_list[@]} =~ "NFS" ]]; then
+                    wrkld_list+=( "NFS" )
+                fi
+                if [[ E7_flag -eq 0 ]]; then     
+                    E5_flag=1
+                fi
+                if ! [[ ${lic_list[@]} =~ "NFS-Add-on" ]]; then
+                    lic_list+=( "NFS-Add-on" )
+                fi
+            fi
+        done
+
+    done
+    total_license=0
+    if [[ vm_flag -eq 1 ]]; then
+        echo "Number of vCPU(s) : $vcpu"
+    else
+        echo "Number of Core(s) : $cores"
+    fi
+    if [[ $workload_flag -ne 0 ]]; then
+        printf -v wrkld '%s,' "${wrkld_list[@]}"
+        echo -n "Workload deployed : "
+        echo $(echo ${wrkld_list[@]}) | tr ' ' ','
+        if [[ ${#multitarget_list[@]} -ne "" ]]; then
+            echo -n "Multi target : Yes("
+            echo -n $(echo ${multitarget_list[@]}) | tr ' ' ','
+            echo ")"
+        fi
+        if [[ pushbutton_flag -eq 1 ]]; then
+            echo "Push Button Recovery : Yes"
+        fi
+        if [[ ${#rpo_list[@]} -gt 0 ]]; then
+            echo -n "RPO configured : Yes("
+            echo -n $(echo ${rpo_list[@]}) | tr ' ' ','
+            echo ")"
+        fi
+        echo "To upgrade to HPE Serviceguard for linux A.15.00.00, below licenses are required"
+        if [[ E7_flag -eq 1 ]]; then
+            echo "Foundational: $license_required LTU(s) of HPE Serviceguard for linux HA-DR-E7"
+            total_license=$(( $total_license + $license_required ))
+        else
+            echo "Foundational: $license_required LTU(s) of HPE Serviceguard for linux HA-E5"
+            total_license=$(( $total_license + $license_required ))
+        fi
+        if [[ ${#lic_list[@]} -gt 0 ]]; then 
+            for lic_name in ${lic_list[@]}
+            do
+                #if E7 and SAP-Add-on is already present, skip NFS-Add-on 
+                if ! [[ $lic_name == "NFS-Add-on" && ${lic_list[@]} =~ "SAP-Add-on" && E7_flag -eq 1 ]]; then
+                    echo "$license_required LTU(s) of HPE Serviceguard for linux $lic_name"
+                    total_license=$(( $total_license + $license_required ))
+                fi
+            done
+        fi
+        if [[ FlexStorage_flag -eq 1 ]]; then
+            echo "1 LTU(s) of HPE Serviceguard for linux Flex-Storage-Add-on"
+            total_license=$(( $total_license + 1 ))
+        fi
+        echo "Total number of license(s) required : $total_license"
+           
+    else
+        echo "To upgrade to HPE Serviceguard for linux A.15.00.00, below licenses are required"
+        echo "Foundational: $license_required LTU(s) of HPE Serviceguard for linux HA-E5 or HA-DR-E7"
+        total_license=$(( $total_license + $license_required ))
+        echo "Total number of license(s) required : $total_license"
+        echo "Note: Add-on license(s) might be required based on the workloads that will be deployed."
+
+    fi
+    echo
+done
