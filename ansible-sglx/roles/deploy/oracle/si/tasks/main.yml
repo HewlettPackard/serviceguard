@@ -1,0 +1,54 @@
+---
+#####################################################################
+# (C) Copyright 2023 Hewlett Packard Enterprise Development LP.
+#####################################################################
+
+# tasks file for si
+
+- name: Set OS distribution dependent variables
+  include_vars: "{{ item }}"
+  with_items:
+      - vars/os_{{ ansible_facts['distribution'] }}.yml
+      - group_vars/os_{{ ansible_facts['distribution'] }}.yml
+
+- name: Nodes on which workload will be deployed
+  set_fact: 
+    node_name={{ groups['oracle-si-hosts'] | map('regex_replace', '^(.*)$', '-n \\1') | join(' ')}}
+  run_once: true
+  ignore_errors: true
+  
+- name: Check Oracle DB Status on cluster node
+  shell: |
+       {{ oracle_cmd_path }}/deployOraclePkg -o {{ oracle_home }} -i {{ oracle_sid }} {{ node_name }} -r no -q check
+  register: discovery_result
+  run_once: yes
+  
+- name: Check for node where DB running is failed.
+  fail:
+   msg: "Oracle SIDB is not running on any node"
+  when: discovery_result.rc != 0
+  run_once: true        
+
+- name: Oracle DB running on node
+  shell: echo {{ discovery_result.stdout_lines[0] }} | awk -F ['='] '{print $2}'
+  register: oracle_node
+  when: discovery_result.rc == 0
+  ignore_errors: yes
+  run_once: yes
+    
+- name: Deploy Orcale SIDB Workload
+  shell: |
+       {{ sglx_cmd_path }}/cmexec {{ oracle_node.stdout_lines[0] }} {{ oracle_cmd_path }}/deployOraclePkg -o {{ oracle_home }} -i {{ oracle_sid }} {{ node_name }} -r no
+  register: deploy_result
+  ignore_errors: yes
+  run_once: yes
+  
+- debug:
+    msg: "Oracle SI Workload deployment Completed"
+  when: deploy_result.rc == 0
+  run_once: true        
+
+- fail:
+    msg: "Oracle SI Workload deployment failed"
+  when: deploy_result.rc != 0 
+  run_once: true

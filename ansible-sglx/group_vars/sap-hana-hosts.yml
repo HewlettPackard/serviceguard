@@ -1,0 +1,13 @@
+---
+#####################################################################
+# (C) Copyright 2023 Hewlett Packard Enterprise Development LP.
+#####################################################################
+
+# ansible vars for sap-hana-hosts 
+sap_hana_sid: "id-1"
+sites_config:
+    - name: 
+      nodes: [ ]
+    - name: 
+      nodes: [ ]
+

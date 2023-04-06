@@ -1,0 +1,6 @@
+---
+#####################################################################
+# (C) Copyright 2023 Hewlett Packard Enterprise Development LP.
+#####################################################################
+
+oracle_cmd_path: "/usr/local/cmcluster/conf/scripts/tkit/oracle"

@@ -1,0 +1,13 @@
+# DO NOT EDIT - This file is used internall during install/upgrade.
+---
+#####################################################################
+# (C) Copyright 2023 Hewlett Packard Enterprise Development LP.
+#####################################################################
+
+storage_flex_add_on_rpms:
+    - drbd-bash-completion 
+    - drbd-udev
+    - drbd-utils
+    - kmod-drbd
+    - serviceguard-flex-storage-addon 
+

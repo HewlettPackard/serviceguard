@@ -1,0 +1,98 @@
+---
+#####################################################################
+# (C) Copyright 2023 Hewlett Packard Enterprise Development LP.
+#####################################################################
+
+- name: Set OS distribution dependent variables
+  include_vars: group_vars/os_{{ ansible_facts['distribution'] }}.yml
+
+# This task will load the site configuration present in group_vars for a group of hosts under play
+# Info: {{ group_names[0] }} contains sap-hana-hosts if play is for hosts under group 'sap-hana-hosts'
+
+- name: Load site related configuration 
+  include_vars:
+     file: group_vars/{{ group_names[0] }}.yml
+  when: (groups['sap-hana-hosts'] is defined and ansible_hostname in groups['sap-hana-hosts']) or (sglx_smart_quorum == True) 
+  run_once: yes
+  ignore_errors: true
+
+# Set default values when site configuration is not provided for SAP HANA scale-up deployment
+- set_fact:
+      first_site_line:  -s {{ "site-1" if (sites_config[0]['name'] == None)
+                               else sites_config[0]['name'] }}
+      second_site_line:  -s {{ "site-2" if (sites_config[1]['name'] == None)
+                                else sites_config[1]['name'] }}
+      first_site_node_name_list: "{{  [groups['sap-hana-hosts'][0]] if
+                                      sites_config[0]['nodes'][0] is undefined
+                                      else sites_config[0]['nodes'] }}"
+      second_site_node_name_list: "{{ [groups['sap-hana-hosts'][1]]  if
+                                      sites_config[1]['nodes'][0] is undefined
+                                      else sites_config[1]['nodes'] }}"
+  when: (groups['sap-hana-hosts'] is defined and ansible_hostname in groups['sap-hana-hosts']) or (sglx_smart_quorum == True)
+  run_once: yes
+  ignore_errors: true
+
+- set_fact:
+      first_site_node_name_cmdline: "{{  first_site_node_name_list |
+                                         map('regex_replace', '^(.*)$', '-n \\1') |
+                                         join(' ') }}"
+      second_site_node_name_cmdline: "{{ second_site_node_name_list |
+                                         map('regex_replace', '^(.*)$', '-n \\1') |
+                                         join(' ') }}"
+  when: (groups['sap-hana-hosts'] is defined and ansible_hostname in groups['sap-hana-hosts']) or (sglx_smart_quorum == True)
+  run_once: yes
+  ignore_errors: true
+
+# TBD: Currently sites are only support for SAP HANA scale-up need to enhance for other workloads
+- set_fact:
+     node_name_cmdline: " -I {{ first_site_line }}  {{ first_site_node_name_cmdline }}
+                          {{ second_site_line }}  {{ second_site_node_name_cmdline }} "
+  when: (groups['sap-hana-hosts'] is defined and ansible_hostname in groups['sap-hana-hosts']) or (sglx_smart_quorum == True)
+  run_once: yes
+  ignore_errors: true
+
+
+# TBD: Need to enhance for smart quorum support
+- set_fact:
+      node_name_cmdline={{ groups[group_names[0]] |
+                           map('regex_replace', '^(.*)$', '-n \\1') | join(' ')}}
+  run_once: true
+  when: ((sglx_smart_quorum == False) and (groups['sap-hana-hosts'] is undefined)) or 
+        (groups['sap-hana-hosts'] is defined  and ansible_hostname not in groups['sap-hana-hosts'])
+  ignore_errors: true
+
+- name: Deploy Serviceguard cluster with Quorum Server
+  shell: |
+      {{ sglx_cmd_path }}/cmdeploycl {{ node_name_cmdline }} -q {{ sglx_quorum_server }}
+  register: sglx_qs_cmd_op
+  run_once: true
+  when: sglx_arbitation_method == "qs"
+  ignore_errors: true
+
+- set_fact: sglx_cmd_op="{{ sglx_qs_cmd_op }}"
+  when: sglx_qs_cmd_op.changed
+
+# TBD: Currently Lock LUN is support when the device name is same across name. Need
+#             to enhance to support different device names across nodes.  
+
+- name: Deploy Serviceguard cluster with Lock LUN
+  shell: |
+      {{ sglx_cmd_path }}/cmdeploycl -L {{ sglx_ll_dev_options.ll_const_dev_name }} {{ node_name_cmdline }}
+  register: sglx_ll_cmd_op
+  run_once: true
+  when: sglx_arbitation_method == "locklun"
+  ignore_errors: true
+
+- set_fact: sglx_cmd_op="{{ sglx_ll_cmd_op }}"
+  when: sglx_ll_cmd_op.changed
+
+- debug:
+      msg: "Cluster creation succeeded"
+  when: sglx_cmd_op.rc == 0
+
+- debug:
+      msg: "Cluster creation failed!!!"
+  when: sglx_cmd_op.rc != 0
+
+- set_fact: { "{{ cluster_cmd_exec.exec_result }}" : " {{ \"passed\" if
+                  sglx_cmd_op.rc == 0 else \"failed\" }}" }

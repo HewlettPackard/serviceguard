@@ -1,0 +1,17 @@
+---
+#####################################################################
+# (C) Copyright 2023 Hewlett Packard Enterprise Development LP.
+#####################################################################
+
+package_name: "sg_pkg"
+package_ip: "10.10.1.11"
+#values can be 'yes' or 'no'
+custom_app_sites_required: no 
+
+# Will be used only when sites_required is set to yes
+custom_app_sites_config:
+    - name: "primary"
+      nodes: [ ]
+    - name: "secondary"
+      nodes: [ ]
+

@@ -1,0 +1,55 @@
+---
+#####################################################################
+# (C) Copyright 2023 Hewlett Packard Enterprise Development LP.
+#####################################################################
+
+- name: Check if Serviceguard is installed
+  shell: | 
+      rpm -q --queryformat '%{version}' serviceguard
+  register: sgver_result
+  changed_when: no
+  ignore_errors: true
+
+- name: Abort creation of cluster when Serviceguard is not installed
+  debug:
+     msg: "Serviceguard is not installed on node {{ ansible_hostname }}.
+           Aborting cluster creation !!"
+  when: sgver_result.rc != 0 
+
+- meta: end_play
+  when: sgver_result.rc != 0 
+
+- name: Configure passwordless SSH for creating the cluster
+  include_tasks: roles/common/tasks/set_passwordless_ssh.yml
+  vars:
+     task_result: ssh_setup_op
+    
+# variables of the task in cluster folder are defined in ../defaults/main.yml
+
+- name: Deploy the cluster
+  include_tasks: easy_deploy_cl.yml
+  run_once: yes
+  when: ssh_setup_op is undefined or ssh_setup_op != "failed"
+  ignore_errors: yes
+
+- name: Unconfigure passwordless SSH
+  include: roles/common/tasks/unset_passwordless_ssh.yml
+  ignore_errors: yes
+
+- meta: end_play
+  when: cluster_cmd_result is match(".*failed")
+
+- name: LVM Activation Protection on cluster hosts 
+  include_tasks: roles/common/tasks/setup_lvm_config.yml
+  vars:
+      task_result: lvm_setup_result
+
+- debug:
+      msg: "LVM protect activation on nodes succeeded"
+  when: lvm_setup_result != "failed"
+
+- meta: end_play
+  when: lvm_setup_result == "failed"
+
+    
+     

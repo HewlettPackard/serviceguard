@@ -1,0 +1,21 @@
+---
+#####################################################################
+# (C) Copyright 2023 Hewlett Packard Enterprise Development LP.
+#####################################################################
+
+# tasks file for install
+
+- name: Serviceguard for Linux | Checking iso mode
+  include_tasks: iso_install.yml
+  when: (sglx_add_on_inst_upg_params.storage_flex_add_on.install_upg_mode  == "iso") and 
+        (sglx_add_on_inst_upg_params.storage_flex_add_on.install_upgrade == True) and 
+        (sglx_add_on_inst_upg_params.storage_flex_add_on.iso_params.iso_location is defined)
+  ignore_errors: true
+
+- name: Serviceguard for Linux | Checking repo mode
+  include_tasks: repo_install.yml
+  when: (sglx_add_on_inst_upg_params.storage_flex_add_on.install_upg_mode == "repo") and
+        (sglx_add_on_inst_upg_params.storage_flex_add_on.install_upgrade == True) and
+        (sglx_add_on_inst_upg_params.storage_flex_add_on.repo_params is defined)
+  ignore_errors: true
+ 

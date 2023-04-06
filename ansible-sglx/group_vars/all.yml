@@ -1,0 +1,105 @@
+---
+#####################################################################
+# (C) Copyright 2023 Hewlett Packard Enterprise Development LP.
+#####################################################################
+
+# vars file used by all
+vault_sglx_sgmgr_password: !vault |
+          $ANSIBLE_VAULT;1.1;AES256
+          34363834323266326237363636613833396665333061653138623431626261343064373363656165
+          6639383863383633643035656336336639373161323663380a303331306337396435366535313663
+          31336636333862303462346234336138393135393363323739633661653534306162323565646561
+          6662396366333534350a663033303862646331613765306433353632316435306630343761623237
+          3863
+vault_esxi_password: !vault |
+          $ANSIBLE_VAULT;1.1;AES256
+          34633130346365643739373631333462653235653039376537636236353337326231613339643332
+          3732616333646430313264383465626539623263303131630a373335353837666335366333643532
+          63643166363833383662613665616235313234633331353161393235393237613634303734316538
+          3865613764663631380a316531663231303237316532316334393761363863343436626365636638
+          3961
+
+
+
+sglx_version: 15.00.00
+
+# values can be ('iso', 'repo')
+# iso  - iso based installation
+# repo - HPE SDR based installation 
+
+sglx_inst_upg_mode: iso
+
+sglx_inst_upg_additional_params:
+    # not considered if mode is iso. To be filled only when mode is repo
+    repo_params:
+        repo_server: SDR_PATH
+        repo_username: USERNAME
+        repo_usertoken: USER_TOKEN 
+    iso_params:
+     # iso_location: nfs://<nfs_server_ip>/<nfs_share_name>
+     # iso_location: <absolute_path_of_ISO>(/home/username/SGLX.iso)
+        iso_location: nfs://<hostname>/root/SGLX_15_00 
+
+sglx_add_on_inst_upg_params:
+    # Workload is defined as parameters
+    # sap        - SAP specific integration 
+    # oracle     - Oracle specific integration
+    # mssql      - Microsoft SQL Server specific integration 
+    # DB2        - DB2 specific integration 
+    # nfs        - NFS specific integration
+    # custom     - No workload integrations will be installed
+    # kvm        - KVM specific integration.
+    # storage-plugins  - storage replication supported integrations will be installed
+    
+    sglx_addon: oracle
+
+    # Storage plugin install Array specific integrations supported by Serviceguard.
+    sglx_storage_plugin: yes
+
+    storage_flex_add_on:
+        # value can be ('yes', 'no')
+        install_upgrade: no 
+        # values can be ('iso', 'repo')
+        install_upg_mode: iso 
+        iso_params: 
+     # iso_location: nfs://<nfs_server_ip>/<nfs_share_name>
+     # iso_location: <absolute_path_of_ISO>(/home/username/SGLX.iso)
+            iso_location: nfs://<hostname>/root/SGLX_DRBD_15_00 
+        repo_params:
+            repo_server: SDR_PATH 
+            repo_username: USERNAME
+            repo_usertoken: USER_TOKEN 
+        sglx_add_on_rpms: storage_flex_add_on   
+
+#values can be ('locklun' ,'qs')
+sglx_arbitation_method: qs
+
+# shortname of the hostname to be used as arbitration
+sglx_quorum_server: <shortname_for_quorum_server> 
+
+# value can be ('yes', 'no')
+sglx_smart_quorum: no 
+
+
+sglx_sgmgr_password: "{{ vault_sglx_sgmgr_password }}"
+
+# values can ('vcenter', 'esxi')
+sglx_vm_mgmt_mode: vcenter
+sglx_vm_mgmt_options:
+    vcenter_password: "12iso*help"
+    esxi_options:
+        - esxi_host: ESXi_host1
+          esxi_password: "{{ vault_esxi_password }}"
+          # hostname of the vms that are controlled by ESXi
+          esxi_vm_nodes: []
+        - esxi_host: ESXi_host2
+          esxi_password: "{{ vault_esxi_password }}"
+          # hostname of the vms that are controlled by ESXi
+          esxi_vm_nodes: []
+
+#http(s)_proxy required for YUM
+proxy_env:
+  https_proxy: ""
+  http_proxy: ""
+
+domain: ""

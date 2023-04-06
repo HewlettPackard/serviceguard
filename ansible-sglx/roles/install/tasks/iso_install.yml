@@ -1,0 +1,89 @@
+---
+#####################################################################
+# (C) Copyright 2023 Hewlett Packard Enterprise Development LP.
+#####################################################################
+
+- name: Check if Serviceguard is already installed
+  shell: |
+      rpm -q --queryformat '%{version}' serviceguard
+  register: sgver_result
+  changed_when: no
+  ignore_errors: true
+
+- name: Check and set if NFS is specified in the mount location
+  set_fact:
+      nfs_mount_path: True
+  when: sglx_inst_upg_additional_params.iso_params.iso_location is regex("^nfs://*")
+  ignore_errors: true
+
+- name: Skip the node if Serviceguard is already installed
+  fail:
+    msg: "Serviceguard version {{ sgver_result.stdout_lines }} is already installed use upgrade option in playbook" 
+  when: sgver_result.rc == 0
+
+- name: Check if the ISO parameters contain NFS location
+  set_fact:
+       dest_iso_path: '{{ sglx_inst_upg_additional_params.iso_params.iso_location | regex_replace("^nfs://","") | regex_replace("(.+?)/(.*)","\1:/\2") }}'
+  when: nfs_mount_path == True
+  ignore_errors: true
+
+- name: Copy the ISO to nodes where Serviceguard is not installed
+  synchronize:
+      src: "{{ sglx_inst_upg_additional_params.iso_params.iso_location }}"
+      dest: "{{ dest_iso_path }}"
+      rsync_timeout: 60
+  register: iso_sync_op
+  when: sgver_result.rc != 0 and nfs_mount_path != True
+
+- name: Check if the copy was successful and print failure if unsucessfull
+  fail:
+     msg: " Failed to SYNC ISO. Retry.. on {{ ansible_hostname }}"
+  when: nfs_mount_path != True and iso_sync_op.rc != 0
+
+- name: Mount ISO on node
+  mount:
+     path: "{{ mount_dir }}"
+     src: "{{ dest_iso_path }}"
+     fstype: iso9660
+     state: mounted
+  when: nfs_mount_path != True
+
+- name: Mount NFS path for ISO on node
+  mount:
+     src: "{{ dest_iso_path }}"
+     path: "{{ mount_dir }}"
+     fstype: nfs
+     state: mounted
+  when: nfs_mount_path == True
+
+- name: Install Serviceguard software
+  shell: |
+      {{ mount_dir }}/cminstaller -d {{ mount_dir }} -w {{ sglx_add_on_inst_upg_params.sglx_addon }}
+  environment:
+      SGMGR_ENV: "{{ sglx_sgmgr_password }}"
+  register: cminstaller_output
+  ignore_errors: true
+ 
+- name: Summarize installation | Success 
+  debug:
+      msg: " Installation of Serviceguard on node Success: \n {{ cminstaller_output.stdout_lines }}"
+  when:
+      - cminstaller_output.rc == 0
+  ignore_errors: yes
+
+- name: Summarize installation | Failure
+  debug:
+      msg: " Installation of Serviceguard on node Failed: \n {{ cminstaller_output.stdout_lines }}"
+  when:
+      - cminstaller_output.rc != 0
+  ignore_errors: yes
+  
+- name: Umount depot
+  mount:
+      path: "{{ mount_dir }}"
+      state: absent
+
+- name: Remove ISO file 
+  file: 
+      path: "{{ dest_iso_path }}"
+      state: absent

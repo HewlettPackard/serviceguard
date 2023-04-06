@@ -1,0 +1,6 @@
+---
+#####################################################################
+# (C) Copyright 2023 Hewlett Packard Enterprise Development LP.
+#####################################################################
+
+sglx_cmd_path: "/usr/local/cmcluster/bin"

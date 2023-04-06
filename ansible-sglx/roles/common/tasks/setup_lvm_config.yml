@@ -1,0 +1,22 @@
+---
+#####################################################################
+# (C) Copyright 2023 Hewlett Packard Enterprise Development LP.
+#####################################################################
+
+- set_fact:
+      task_result="passed"
+
+- name: Setup LVM VG Activation protection on cluster hosts 
+  shell: "{{ item }}"
+  with_items:
+      - mv /etc/lvm/lvm.conf /etc/lvm/lvm.conf.sg
+      - mv /etc/lvm/lvm.conf.original /etc/lvm/lvm.conf
+      - mv /etc/lvm/lvm_{{ ansible_hostname }}.conf /etc/lvm/lvm_{{ ansible_hostname }}.conf.sg
+  register: lvm_setup_result
+  ignore_errors: true
+
+- set_fact:
+      task_result="failed"
+  when: item.rc != 0
+  with_items: "{{ lvm_setup_result.results }}"
+

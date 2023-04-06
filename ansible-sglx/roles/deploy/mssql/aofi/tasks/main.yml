@@ -1,0 +1,28 @@
+---
+#####################################################################
+# (C) Copyright 2023 Hewlett Packard Enterprise Development LP.
+#####################################################################
+
+# tasks file for hana
+#            cmdeploymssql -U SA -P {{ mssql_password }} -M 2 -S {{ write_ip_subnet }} -I {{ write_ip }} -D {{ database }} 
+
+- name: Set OS distribution dependent variables
+  include_vars: "{{ item }}"
+  with_items:
+      - group_vars/os_{{ ansible_facts['distribution'] }}.yml
+
+- name: Configure Microsoft SQL Server AOAI instance under Serviceguard HA/DR provider
+  shell: |
+       cmdeploymssql -U SA -P {{ mssql_password }} -M 2 -S {{ write_ip_subnet }} -I {{ write_ip }} -D {{ database }} 
+  register: sglx_cmd_op
+  run_once: true 
+
+- debug: 
+      msg: " Successful deployment of Microsoft SQL Server AOFI instance under Serviceguard HA/DR provider"
+  when: sglx_cmd_op.rc == 0  
+  run_once: true 
+
+- fail: 
+      msg: " Failed deployment of Microsoft SQL Server AOFI instance under Serviceguard HA/DR provider"
+  when: sglx_cmd_op.rc != 0 
+  run_once: true 

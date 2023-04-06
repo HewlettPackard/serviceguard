@@ -1,0 +1,7 @@
+---
+#####################################################################
+# (C) Copyright 2023 Hewlett Packard Enterprise Development LP.
+#####################################################################
+
+oracle_sid: "orcl"
+oracle_home: "/Oracle19C/home"

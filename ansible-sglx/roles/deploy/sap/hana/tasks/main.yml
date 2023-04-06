@@ -1,0 +1,27 @@
+---
+#####################################################################
+# (C) Copyright 2023 Hewlett Packard Enterprise Development LP.
+#####################################################################
+
+# tasks file for hana
+
+- name: Set OS distribution dependent variables
+  include_vars: "{{ item }}"
+  with_items:
+      - group_vars/os_{{ ansible_facts['distribution'] }}.yml
+
+- name: Configure SAP HANA control under Serviceguard HA/DR provider
+  shell: |
+      ls
+  register: sglx_cmd_op
+  run_once: yes
+
+- debug: 
+      msg: Successful deployment of HANA instance under Serviceguard HA/DR provider
+  when: sglx_cmd_op.rc == 0  
+  run_once: yes
+
+- fail: 
+      msg: Failed deployment of HANA instance under Serviceguard HA/DR provider
+  when: sglx_cmd_op.rc != 0 
+  run_once: yes 

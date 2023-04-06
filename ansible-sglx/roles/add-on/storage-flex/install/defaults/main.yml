@@ -1,0 +1,13 @@
+---
+#####################################################################
+# (C) Copyright 2023 Hewlett Packard Enterprise Development LP.
+#####################################################################
+
+# defaults file for drbd add-on
+mount_dir: "/root/_sglx_install_dir"
+dest_iso_path: "/root/_sglx_install.iso"
+install_upgrade: False
+nfs_mount_path: False
+repo_url:
+_install_result:
+

@@ -1,0 +1,12 @@
+---
+#####################################################################
+# (C) Copyright 2023 Hewlett Packard Enterprise Development LP.
+#####################################################################
+
+# defaults file for install
+mount_dir: "/root/_sglx_install_dir"
+dest_iso_path: "/root/_sglx_install.iso"
+nfs_mount_path: False
+repo_url:
+_install_result:
+

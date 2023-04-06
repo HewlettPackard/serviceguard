@@ -1,0 +1,131 @@
+---
+#####################################################################
+# (C) Copyright 2023 Hewlett Packard Enterprise Development LP.
+#####################################################################
+
+- name: Check if Serviceguard Storage Flex Add-on sofwtare is already installed
+  shell: |
+      rpm -q --queryformat '%{version}' serviceguard-flex-storage-addon 
+  register: sglx_storage_flex_result 
+  changed_when: no
+  ignore_errors: true
+
+- name: Skip the node if Serviceguard Storage Flex Add-on sofwtare is already installed
+  fail:
+    msg: "Serviceguard Storage Flex Add-on sofwtare version {{ sglx_storage_flex_result.stdout_lines }} 
+          is already installed. Use upgrade option in playbook."
+  when: sglx_storage_flex_result.rc == 0
+  ignore_errors: true
+
+- set_fact:
+      repo_user:"{{ sglx_add_on_inst_upg_params.storage_flex_add_on.repo_params.repo_username |
+                    replace('@', '%40') }}"
+  when: sglx_add_on_inst_upg_params.storage_flex_add_on.repo_params.repo_username != '' and
+        sglx_add_on_inst_upg_params.storage_flex_add_on.repo_params.repo_usertoken != ''
+
+- name: Set_fact repo url with username and usertoken 
+  set_fact:
+      repo_url: "https://{{ sglx_add_on_inst_upg_params.storage_flex_add_on.repo_params.repo_username |
+                 replace('@', '%40') }}:\
+                 {{ sglx_add_on_inst_upg_params.storage_flex_add_on.repo_params.repo_usertoken }}@\
+                 {{ sglx_add_on_inst_upg_params.storage_flex_add_on.repo_params.repo_server }}/\
+                 repo/sglx-eval/{{ ansible_os_family | lower }}/\
+                 {{ansible_distribution_version}}/x86_64/{{ sglx_version }}"
+      when: sglx_add_on_inst_upg_params.storage_flex_add_on.storage_flex_add_on.repo_params.repo_username != None and
+            sglx_add_on_inst_upg_params.storage_flex_add_on.repo_params.repo_usertoken != None 
+
+- name: Set_fact repo url without username and usertoken 
+  set_fact:
+      repo_url: "http://{{ sglx_add_on_inst_upg_params.storage_flex_add_on.repo_params.repo_server }}/\
+                 SDR/repo/sglx-eval/{{ ansible_os_family | lower }}/\
+                 {{ansible_distribution_version}}/x86_64/{{ sglx_version }}"
+  when: sglx_add_on_inst_upg_params.storage_flex_add_on.repo_params.repo_username == None and
+        sglx_add_on_inst_upg_params.storage_flex_add_on.repo_params.repo_usertoken == None
+
+- name: Include Serviceguard Storage Flex Add-on specific vars
+  include_vars: group_vars/sglx-add-on-items.yml
+
+- set_fact:
+     storage_flex_add_on_rpm_list_name: "{{sglx_add_on_inst_upg_params.storage_flex_add_on.sglx_add_on_rpms}}_rpms"
+
+- name: Configure YUM repository for when Distro is RHEL 
+  yum_repository: 
+      name: storage_flex__repo 
+      description: Storage Flex repository for version {{ sglx_version }} 
+      baseurl: "{{ repo_url }}"
+      enabled: yes
+      gpgcheck: no
+  when: sglx_storage_flex_result.rc != 0 and ansible_os_family is match("RedHat") 
+
+# TBD: Need to be tested for SUSE
+- name: Configure Zypper repository for when Distro is SuSE 
+  zypper_repository: 
+      name: storage_flex_repo 
+      description: Storage Flex repository for version {{ sglx_version }} 
+      baseurl: "{{ repo_url }}"
+      state: present 
+  when: sglx_storage_flex_result.rc != 0 and ansible_os_family is match("Suse") 
+
+- set_fact:
+      rpm_list: "{{ lookup('vars','{{storage_flex_add_on_rpm_list_name}}') | list }}"
+
+- name: Install Serviceguard Storage Flex Add-on sofwtare rpms
+  yum: 
+      name: "{{ rpm_list }}"
+      state: present
+  environment:
+      https_proxy: ""
+      http_proxy: ""
+  register: yum_repo_result
+  when: ansible_os_family is match("RedHat")
+  ignore_errors: true
+
+- name: Install Serviceguard Storage Flex Add-on sofwtare rpms
+  zypper: 
+      name: "{{ rpm_list }}"
+      state: present
+  environment:
+      https_proxy: ""
+      http_proxy: ""
+  register: zypp_repo_result
+  when: ansible_os_family is match("Suse")
+  ignore_errors: true
+
+- set_fact:
+    repo_result: "{{ yum_repo_result }}"
+  when: ansible_os_family is match("RedHat")
+
+- set_fact:
+    repo_result: "{{ zypp_repo_result }}"
+  when: ansible_os_family is match("Suse")
+
+- debug: 
+      msg: " Installation of Serviceguard Storage Flex Add-on sofwtare Succceeded on node {{ ansible_hostname }}\n"
+  when: repo_result.results[0].rc == 0
+  ignore_errors: true
+
+- debug: 
+      msg: " Installation of Serviceguard Storage Flex Add-on sofwtare Failed on node {{ ansible_hostname }} !!\n"
+  when: repo_result.results[0].rc != 0
+  ignore_errors: true
+ 
+- name: Remove Yum repository for RHEL
+  yum_repository:
+     name: storage_flex_repo 
+     state: absent
+  ignore_errors: true
+  when: ansible_os_family is match("RedHat")
+
+- name: Remove Zypper repository for SuSE 
+  yum_repository:
+     name: storage_flex_repo 
+     state: absent
+  ignore_errors: true
+  when: ansible_os_family is match("Suse")
+
+- name: Clean YUM related metadata 
+  command: yum clean metadata
+  args: 
+      warn: no
+  when: ansible_os_family is match("RedHat")
+  ignore_errors: true

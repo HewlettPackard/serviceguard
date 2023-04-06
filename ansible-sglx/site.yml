@@ -1,0 +1,74 @@
+---
+
+#####################################################################
+# (C) Copyright 2023 Hewlett Packard Enterprise Development LP.
+#####################################################################
+
+- hosts: sglx-cluster-hosts
+  gather_facts: yes 
+  remote_user: root
+  ignore_errors: yes
+  roles:
+    - { role: install }
+
+- hosts: sglx-storage-flex-add-on-hosts
+  gather_facts: yes
+  remote_user: root
+  roles:
+     - { role: add-on/storage-flex/install }
+
+- hosts: sap-hana-hosts 
+  gather_facts: yes
+  remote_user: root
+  roles:
+    - { role: config/cluster, vars: { op: "create"} }
+    - { role: deploy/sap/hana }
+    - { role: config/cluster, vars: { op: "view"} }
+
+- hosts: sap-app-hosts 
+  gather_facts: yes
+  remote_user: root
+  roles:
+    - { role: config/cluster, vars: { op: "create"} }
+    - { role: deploy/sap/sap-app }
+    - { role: config/cluster, vars: { op: "view"} }
+
+- hosts: oracle-si-hosts 
+  gather_facts: yes
+  remote_user: root
+  roles:
+    - { role: config/cluster, vars: { op: "create"} }
+    - { role: deploy/oracle/si }
+    - { role: config/cluster, vars: { op: "view"} }
+
+- hosts: oracle-dg-hosts 
+  gather_facts: yes
+  remote_user: root
+  roles:
+    - { role: config/cluster, vars: { op: "create"} }
+    - { role: deploy/oracle/dg }
+    - { role: config/cluster, vars: { op: "view"} }
+
+- hosts: mssql-aoai-hosts 
+  gather_facts: yes
+  remote_user: root
+  roles:
+    - { role: config/cluster, vars: { op: "create"} }
+    - { role: deploy/mssql/aoai }
+    - { role: config/cluster, vars: { op: "view"} }
+
+- hosts: mssql-aofi-hosts 
+  gather_facts: yes
+  remote_user: root
+  roles:
+    - { role: config/cluster, vars: { op: "create"} }
+    - { role: deploy/mssql/aofi }
+    - { role: config/cluster, vars: { op: "view"} }
+
+- hosts: custom-app-hosts 
+  gather_facts: yes
+  remote_user: root
+  roles:
+    - { role: config/cluster, vars: { op: "create"} }
+    - { role: deploy/custom }
+    - { role: config/cluster, vars: { op: "view"} }

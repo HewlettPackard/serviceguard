@@ -1,0 +1,20 @@
+# DO NOT EDIT - This file is used internall during install/upgrade.
+---
+#####################################################################
+# (C) Copyright 2023 Hewlett Packard Enterprise Development LP.
+#####################################################################
+
+sap_rpms:
+    - serviceguard-extension-for-sap
+oracle_rpms:
+    - serviceguard-oracle-toolkit
+mssql_rpms:
+    - serviceguard-extension-for-mssql
+custom_rpms:
+   - serviceguard
+storage_plugin_rpms:
+   - serviceguard-storage-plugin
+nfs_rpms:
+   - serviceguard-nfs-toolkit
+kvm_rpms:
+   - serviceguard-kvm-toolkit

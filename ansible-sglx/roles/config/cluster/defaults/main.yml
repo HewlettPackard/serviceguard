@@ -1,0 +1,8 @@
+---
+#####################################################################
+# (C) Copyright 2023 Hewlett Packard Enterprise Development LP.
+#####################################################################
+
+# defaults file for cluster
+cluster_cmd_exec:
+   exec_result: "cluster_cmd_result"

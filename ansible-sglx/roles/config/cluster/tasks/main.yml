@@ -1,0 +1,20 @@
+---
+#####################################################################
+# (C) Copyright 2023 Hewlett Packard Enterprise Development LP.
+#####################################################################
+
+# tasks file for cluster
+- debug:
+      msg: "Value of variable {{ op }}" 
+
+- name: Start create cluster 
+  include_tasks: create_cluster.yml
+  when: op == "create"
+
+- name: Start edit cluster 
+  include_tasks: edit_cluster.yml
+  when: op == "edit"
+
+- name: View Cluster
+  include_tasks: view_cluster.yml
+  when: op == "view"
