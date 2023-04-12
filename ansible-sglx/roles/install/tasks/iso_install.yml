@@ -61,6 +61,7 @@
       {{ mount_dir }}/cminstaller -d {{ mount_dir }} -w {{ sglx_add_on_inst_upg_params.sglx_addon }}
   environment:
       SGMGR_ENV: "{{ sglx_sgmgr_password }}"
+      ACCEPT_EULA: "Y"
   register: cminstaller_output
   ignore_errors: true
  
