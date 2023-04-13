@@ -20,13 +20,14 @@ Actions for HPE Serviceguard for Linux Clusters currently include
 Clone the repository on ansible control node.
 
 ```bash
-git clone https://github.hpe.com/SG/sglxansible.git
+git clone https://github.com/HewlettPackard/serviceguard.git
+cd serviceguard/ansible-sglx
 ```
 
 To upgrade to the latest version of the playbooks:
 
 ```bash
-git pull https://github.hpe.com/SG/sglxansible.git
+git pull https://github.com/HewlettPackard/serviceguard.git
 ```
 ### Install, Configure and Deploy HPE Serviceguard Clusters.
 
@@ -123,6 +124,7 @@ When the parameters specified above are configured, playbook [site.yml](site.yml
 from the directory where the repository is cloned on the ansible control node.
 
 ```bash
+cd serviceguard/ansible-sglx
 ansible-playbook -i hosts -v --vault-password-file <path_to_vault_password_file> site.yml
 ```
 
