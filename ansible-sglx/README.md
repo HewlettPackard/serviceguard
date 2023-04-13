@@ -80,24 +80,24 @@ Serviceguard supports multiple add-ons, installation for specific add-on can be 
 sglx_add_on_inst_upg_params:
     sglx_addon: oracle
 ```
-Serviceguard requires a arbitration mechanism for configuring a cluster. Arbitration mechanism
+Serviceguard requires an arbitration mechanism for configuring a cluster. Arbitration mechanism
 can be configured under
 
 ```yaml
 sglx_arbitation_method: qs
 ```
 
-Serviceguard installation mandates a replicated user configuration. As part of installation replicated
-user "sgmgr" is created on the hosts and password for the same can be configured under parameter.
+Serviceguard installation mandates a replicated user configuration. As part of the installation,
+a replicated user for Serviceguard Manager (sgmgr) is created on the hosts and the password for
+the same can be configured under the below parameter.
 
 ```yaml
 sglx_sgmgr_password: "{{ vault_sglx_sgmgr_password }}"
 ```
 
 ### Encrypting the Passwords using Ansible vault
-
-Create a file For example, "vault_password.txt" in your home directory. Key in password string to be used
-for creating ansible vault secret.
+Create a file in your home directory. Example: “vault_password.txt”.
+Key specified as part of "vault_password.txt" will be used to create the ansible vault secret.
     
 More information on generating ansible vault secrets can be found
 [here](https://docs.ansible.com/ansible/latest/user_guide/vault.html#managing-vault-passwords)
