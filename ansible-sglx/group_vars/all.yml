@@ -54,7 +54,7 @@ sglx_add_on_inst_upg_params:
     sglx_addon: oracle
 
     # Storage plugin install Array specific integrations supported by Serviceguard.
-    sglx_storage_plugin: yes
+    sglx_storage_plugin: no
 
     storage_flex_add_on:
         # value can be ('yes', 'no')
@@ -84,9 +84,9 @@ sglx_smart_quorum: no
 sglx_sgmgr_password: "{{ vault_sglx_sgmgr_password }}"
 
 # values can ('vcenter', 'esxi')
-sglx_vm_mgmt_mode: vcenter
+sglx_vm_mgmt_mode: ""
 sglx_vm_mgmt_options:
-    vcenter_password: "12iso*help"
+    vcenter_password: ""
     esxi_options:
         - esxi_host: ESXi_host1
           esxi_password: "{{ vault_esxi_password }}"
