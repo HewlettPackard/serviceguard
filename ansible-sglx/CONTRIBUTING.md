@@ -4,7 +4,7 @@ We welcome and encourage community contributions to Playbooks for HPE servicegua
 
 ## Contributing
 
-The best way to directly collaborate with the project contributors is through GitHub: <https://github.com/HewlettPackard/serviceguard/ansible-sglx>
+The best way to directly collaborate with the project contributors is through GitHub: <[serviceuard/ansible-sglx](https://github.com/HewlettPackard/serviceguard/tree/master/ansible-sglx)>
 
 * If you want to contribute to our code by either fixing a problem or creating a new feature, please open a GitHub pull request.
 * If you want to raise an issue such as a defect, an enhancement request or a general issue, please open a GitHub issue.
