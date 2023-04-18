@@ -147,7 +147,7 @@ of everything, because we assure you that is not the case.
 ## Features
 
 The ansible deliverables includes
-[roles](https://github.hpe.com/SG/sglxansible/tree/aspeneagle_2022_phase1_eb/roles)
+[roles](roles)
 
 
 ## Copyright
