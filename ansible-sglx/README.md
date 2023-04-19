@@ -14,6 +14,11 @@ Actions for HPE Serviceguard for Linux Clusters currently include
 
  - Ansible >= 2.9
  - python >= 3.4.2
+   
+   Ensure that symbolic link for python is created on the nodes.
+   ```bash
+   ln -sf /usr/bin/python3 /usr/bin/python
+   ```
  - ansible.posix collection
    
    To install ansible posix collection incase it is not installed.
