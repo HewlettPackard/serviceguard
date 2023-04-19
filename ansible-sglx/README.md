@@ -14,6 +14,12 @@ Actions for HPE Serviceguard for Linux Clusters currently include
 
  - Ansible >= 2.9
  - python >= 3.4.2
+ - ansible.posix collection
+   
+   To install ansible posix collection incase it is not installed.
+   ```bash
+   ansible-galaxy collection install ansible.posix
+   ```
 
 ## Usage
 
