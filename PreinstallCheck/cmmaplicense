@@ -1,5 +1,6 @@
 # (c) Copyright 2023 Hewlett Packard Enterprise Development LP 
 # All rights reserved
+# version 2.0
 #!/bin/bash
 
 typeset -i cores_supported_per_license=2
@@ -14,7 +15,7 @@ function calculate_license_req
     curr_node==$(host=`hostname`; echo ${host%%.*})
     SG_VIRTUAL_NODE_TYPE=`echo "$view" | awk -F "[ :|=]" '$1 == "node" && $2 == "'$node'" && $3 == "virt_tech" {print $4}'`
      
-    if [[ -z $SG_VIRTUAL_NODE_TYPE ]]; then
+    if [[ $SG_VIRTUAL_NODE_TYPE == "none" ]]; then
         # It is a physical system.
         NODE_TYPE="PHYSICAL"
     else
@@ -25,7 +26,6 @@ function calculate_license_req
         vm_flag=0
         if [[ $curr_node != $node ]]; then
             sock=`cmexec $node "cat /proc/cpuinfo | grep \"^physical id\" | sort -u"`
-            sock=`echo $sock |awk '{print $NF}'`
             for i in $sock 
             do
                 core_val=`cmexec $node "cat /proc/cpuinfo | grep -A 5 -w \"^physical id[[:space:]]: $i\" | head -5 | grep \"^cpu cores\""`
