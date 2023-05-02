@@ -36,9 +36,10 @@ sglx_inst_upg_additional_params:
         repo_username: USERNAME
         repo_usertoken: USER_TOKEN 
     iso_params:
-     # iso_location: nfs://<nfs_server_ip>/<nfs_share_name>
-     # iso_location: <absolute_path_of_ISO>(/home/username/SGLX.iso)
-        iso_location: nfs://<hostname>/root/SGLX_15_00 
+     # iso_location: nfs://<nfs_server_ip>/<nfs_share_name_of_ISO>
+     # iso_location: <absolute_path_of_ISO_on_Ansible_controller_node>(/home/username/SGLX.iso)
+     # iso_location: <local_path_of_ISO_on_installation_node>(file://home/username/SGLX.iso)
+        iso_location: nfs://<hostname>/nfsshare/SGLX_15_00.iso
 
 sglx_add_on_inst_upg_params:
     # Workload is defined as parameters
@@ -62,9 +63,10 @@ sglx_add_on_inst_upg_params:
         # values can be ('iso', 'repo')
         install_upg_mode: iso 
         iso_params: 
-     # iso_location: nfs://<nfs_server_ip>/<nfs_share_name>
-     # iso_location: <absolute_path_of_ISO>(/home/username/SGLX.iso)
-            iso_location: nfs://<hostname>/root/SGLX_DRBD_15_00 
+     # iso_location: nfs://<nfs_server_ip>/<nfs_share_location_of_ISO>
+     # iso_location: <absolute_path_of_ISO_on_Ansible_controller_node>(/home/username/SGLX.iso)
+     # iso_location: <local_path_of_ISO_on_installation_node>(file://home/username/SGLX.iso)
+            iso_location: nfs://<hostname>/nfsshare/SGLX_DRBD_15_00.iso
         repo_params:
             repo_server: SDR_PATH 
             repo_username: USERNAME
