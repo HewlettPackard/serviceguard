@@ -16,6 +16,12 @@
   when: sglx_inst_upg_additional_params.iso_params.iso_location is regex("^nfs://*")
   ignore_errors: true
 
+- name: Check and set if Local file path is specified in the mount location
+  set_fact:
+      local_mount_path: True
+  when: sglx_inst_upg_additional_params.iso_params.iso_location is regex("^file://*")
+  ignore_errors: true
+
 - name: Skip the node if Serviceguard is already installed
   fail:
     msg: "Serviceguard version {{ sgver_result.stdout_lines }} is already installed use upgrade option in playbook" 
@@ -23,8 +29,23 @@
 
 - name: Check if the ISO parameters contain NFS location
   set_fact:
-       dest_iso_path: '{{ sglx_inst_upg_additional_params.iso_params.iso_location | regex_replace("^nfs://","") | regex_replace("(.+?)/(.*)","\1:/\2") }}'
+      nfs_mount_dir: '{{ sglx_inst_upg_additional_params.iso_params.iso_location | 
+                        regex_replace("^nfs://","") | 
+                        regex_replace("(.*)/(.*)","\1@\2") | 
+                        regex_replace("(.*)@(.*)","\1/") | 
+                        regex_replace("(.+?)/(.*)","\1:/\2") }}'
+      nfs_iso_name: '{{ sglx_inst_upg_additional_params.iso_params.iso_location | 
+                        regex_replace("^nfs://","") | 
+                        regex_replace("(.*)/(.*)","\1@\2") | 
+                        regex_replace("(.*)@(.*)","\2") }}'
   when: nfs_mount_path == True
+  ignore_errors: true
+
+- name: Check if the ISO parameters contain local node location
+  set_fact:
+       dest_iso_path: '{{ sglx_inst_upg_additional_params.iso_params.iso_location | 
+                          regex_replace("^file://","/") }}'
+  when: local_mount_path == True
   ignore_errors: true
 
 - name: Copy the ISO to nodes where Serviceguard is not installed
@@ -33,12 +54,32 @@
       dest: "{{ dest_iso_path }}"
       rsync_timeout: 60
   register: iso_sync_op
-  when: sgver_result.rc != 0 and nfs_mount_path != True
+  when: sgver_result.rc != 0 and nfs_mount_path != True and local_mount_path != True
+
+# required to be initialized when NFS location(nfs://) is provided or 
+# local path is provided using (file://) option. This will ensure that missing 
+# variable(iso_sync_op) condition is satisfied.
+- set_fact:
+    iso_sync_op:
+      rc: 0
+  when: nfs_mount_path == True or local_mount_path == True
 
 - name: Check if the copy was successful and print failure if unsucessfull
   fail:
      msg: " Failed to SYNC ISO. Retry.. on {{ ansible_hostname }}"
-  when: nfs_mount_path != True and iso_sync_op.rc != 0
+  when: nfs_mount_path != True and iso_sync_op.rc != 0 and local_mount_path != True
+
+- name: Mount NFS path for ISO on node
+  mount:
+     src: "{{ nfs_mount_dir }}"
+     path: "{{ nfs_mount_loc }}"
+     fstype: nfs
+     state: mounted
+  when: nfs_mount_path == True
+
+- set_fact:
+     dest_iso_path: "{{ nfs_mount_loc }}/{{ nfs_iso_name }}"
+  when: nfs_mount_path == True
 
 - name: Mount ISO on node
   mount:
@@ -46,15 +87,6 @@
      src: "{{ dest_iso_path }}"
      fstype: iso9660
      state: mounted
-  when: nfs_mount_path != True
-
-- name: Mount NFS path for ISO on node
-  mount:
-     src: "{{ dest_iso_path }}"
-     path: "{{ mount_dir }}"
-     fstype: nfs
-     state: mounted
-  when: nfs_mount_path == True
 
 - name: Install Serviceguard software
   shell: |
@@ -84,7 +116,14 @@
       path: "{{ mount_dir }}"
       state: absent
 
+- name: Umount NFS location
+  mount:
+      path: "{{ nfs_mount_loc }}"
+      state: absent
+  when: nfs_mount_path == True
+
 - name: Remove ISO file 
   file: 
       path: "{{ dest_iso_path }}"
       state: absent
+  when: nfs_mount_path == False and local_mount_path == False
