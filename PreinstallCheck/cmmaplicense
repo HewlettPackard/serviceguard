@@ -12,7 +12,7 @@ typeset -i license_required=0;
 #if there are any changes please modify in the other location as well
 function calculate_license_req
 {
-    curr_node==$(host=`hostname`; echo ${host%%.*})
+    curr_node=$(host=`hostname`; echo ${host%%.*})
     SG_VIRTUAL_NODE_TYPE=`echo "$view" | awk -F "[ :|=]" '$1 == "node" && $2 == "'$node'" && $3 == "virt_tech" {print $4}'`
      
     if [[ $SG_VIRTUAL_NODE_TYPE == "none" ]]; then
