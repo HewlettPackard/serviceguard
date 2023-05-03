@@ -34,6 +34,10 @@ Clone the repository on ansible control node.
 git clone https://github.com/HewlettPackard/serviceguard.git
 cd serviceguard/ansible-sglx
 ```
+Checkout the stable branch. For ex: to checkout branch 1.0,
+```bash
+git checkout Stable-v1.0 
+```
 
 To upgrade to the latest version of the playbooks:
 
@@ -72,19 +76,31 @@ sglx_inst_upg_mode: iso
 sglx_inst_upg_additional_params:
     ..
     iso_params:
-        iso_location: <absolute path of the iso>
+        iso_location: <absolute path of the iso on ansible controller node>
 ```
 
-Some users prefer a method of mounting Serviceguard ISO on a node and export it as a NFS share in their
+Some users prefer a method of keeping ISO on a NFS server and export share in their
 environment. In case NFS server is configured then it can be specified as
 ```yaml
 sglx_inst_upg_mode: iso
 sglx_inst_upg_additional_params:
     ..
     iso_params:
-        iso_location: nfs://<NFS_server_hostname>/<exported_share_path>
+        iso_location: nfs://<NFS_server_hostname>/<exported_share_path_of_ISO_file>
 ```
 ##### Note: Ensure that exported share is accessible to all the hosts specified in the inventory file.
+
+User can manually copy the ISO on the nodes where Serviceguard needs to be
+installed and specify that path as a value for iso_location parameter. 
+This option can be specified as
+```yaml
+sglx_inst_upg_mode: iso
+sglx_inst_upg_additional_params:
+    ..
+    iso_params:
+        iso_location: file://<ISO_path_on_node_where_SGLX_will_be_installed>
+```
+##### Note: Ensure that ISO is available on the same path on all the hosts specified in the inventory file.
 
 Serviceguard supports multiple add-ons, installation for specific add-on can be configured under
 
