@@ -1,12 +1,15 @@
-# (c) Copyright 2023 Hewlett Packard Enterprise Development LP 
+# (c) Copyright 2023 Hewlett Packard Enterprise Development LP
 # All rights reserved
-# version 2.0
+# version 2.1
 #!/bin/bash
 
 typeset -i cores_supported_per_license=2
 typeset -i vcpus_supported_per_license=4
 typeset -i cores=0;
 typeset -i license_required=0;
+typeset -i sg_flag=0;
+
+echo "cmmaplicense version: 2.1"
 
 #this code is reused from tools/cmcomputelicense of SGCORE
 #if there are any changes please modify in the other location as well
@@ -25,32 +28,46 @@ function calculate_license_req
     if [[ $NODE_TYPE != "VM" ]]; then    #physical node
         vm_flag=0
         if [[ $curr_node != $node ]]; then
-            sock=`cmexec $node "cat /proc/cpuinfo | grep \"^physical id\" | sort -u"`
+            sock=`cmexec $node "grep \"^physical id\" /proc/cpuinfo | sort -u"  2> /dev/null` 
             for i in $sock 
             do
-                core_val=`cmexec $node "cat /proc/cpuinfo | grep -A 5 -w \"^physical id[[:space:]]: $i\" | head -5 | grep \"^cpu cores\""`
+                core_val=`cmexec $node "grep -A 5 -w \"^physical id[[:space:]]: $i\" /proc/cpuinfo | head -5 | grep \"^cpu cores\""  2> /dev/null`
                 core_val=`echo $core_val |awk '{print $NF}'` 
                 ((cores = cores + core_val )) 
             done
+            if [[ -z $sock || $cores -eq 0 ]];then 
+                echo "Unable to calculate the license required for $node. Execute cmmaplicense directly on $node."
+                return 1
+            fi
         else
-            for i in `cat /proc/cpuinfo | grep "^physical id" | sort -u |awk '{print $NF}'`
+            for i in `grep "^physical id" /proc/cpuinfo | sort -u |awk '{print $NF}'`
             do
-                ((cores = cores + `cat /proc/cpuinfo | grep -A 5 -w "^physical id[[:space:]]: $i" | head -5 | grep -w "^cpu cores" | awk '{print $NF}'`));
+                ((cores = cores + `grep -A 5 -w "^physical id[[:space:]]: $i" /proc/cpuinfo | head -5 | grep -w "^cpu cores" | awk '{print $NF}'`));
             done
         fi
         license_required=`expr '(' $cores '+' $cores_supported_per_license '-' 1 ')' '/' $cores_supported_per_license`
     else #vm
         vm_flag=1
         if [[ $curr_node != $node ]]; then
-            vcpu=`cmexec $node "cat /proc/cpuinfo | grep processor | wc -l"`
+            vcpu=`cmexec $node "grep -w ^processor /proc/cpuinfo | wc -l"  2> /dev/null`
+            if [[ $vcpu -eq 0 ]];then 
+                echo "Unable to calculate the license required for $node. Execute cmmaplicense directly on $node."
+                return 1
+            fi
         else
-            vcpu=`cat /proc/cpuinfo | grep processor | wc -l`
+            vcpu=`grep -w ^processor /proc/cpuinfo | wc -l`
         fi
         license_required=`expr '(' $vcpu '+' $vcpus_supported_per_license '-' 1 ')' '/'  $vcpus_supported_per_license`
     fi
 }
     
 view=`cmviewcl -vf line -s config 2> /dev/null`
+if [[ -z $view ]]; then 
+    sg_flag=0
+else
+    sg_flag=1
+fi
+
 #check if cluster exists
 function check_for_cluster
 {
@@ -58,9 +75,13 @@ function check_for_cluster
     curr_node=$(host=`hostname`; echo ${host%%.*})
     if [[ ! -z "$node" && $node != $curr_node ]]; then
         view=`ssh $node cmviewcl -vf line -s config 2> /dev/null`
+        if [[ $? -ge 255 ]]; then
+            echo "Unable to connect to $node. Execute cmmaplicense directly on $node."
+            return 1
+        fi
     fi
     if [[ -z "$view" ]]; then
-        echo "cmmaplicense: HPE Serviceguard cluster does not exist. No workloads detected."
+        echo "HPE Serviceguard cluster does not exist. No workloads detected."
 
         #have a temp file to store node details
         export tmp_mapfile="/var/tmp/map.txt"
@@ -82,20 +103,20 @@ function check_for_cluster
                 NODE_TYPE="physical"
             fi
             if [[ $NODE_TYPE == "vm" ]]; then
-                vcpu=`cat /proc/cpuinfo | grep processor | wc -l`
+                vcpu=`grep -w ^processor /proc/cpuinfo | wc -l`
                 license_required=`expr '(' $vcpu '+' $vcpus_supported_per_license '-' 1 ')' '/'  $vcpus_supported_per_license`
                 echo "Number of vCPU(s) : $vcpu"
             else
                 core=0
-                for i in `cat /proc/cpuinfo | grep "^physical id" | sort -u |awk '{print $NF}'`
+                for i in `grep "^physical id" /proc/cpuinfo | sort -u |awk '{print $NF}'`
                 do
-                    ((cores = cores + `cat /proc/cpuinfo | grep -A 5 -w "^physical id[[:space:]]: $i" | head -5 | grep -w "^cpu cores" | awk '{print $NF}'`));
+                    ((cores = cores + `grep -A 5 -w "^physical id[[:space:]]: $i" /proc/cpuinfo | head -5 | grep -w "^cpu cores" | awk '{print $NF}'`));
                 done
                 license_required=`expr '(' $cores '+' $cores_supported_per_license '-' 1 ')' '/' $cores_supported_per_license`
                 echo "Number of Core(s) : $cores"
             fi
-            echo -n "The Foundational License required is "
-            echo "$license_required LTU(s) of HPE Serviceguard for linux HA-E5 or HA-DR-E7"
+            echo "HPE Serviceguard for linux A.15.00.00 and above, requires following licenses"
+            echo "Foundational: $license_required LTU(s) of HPE Serviceguard for linux HA-E5 or HA-DR-E7"
             echo "Note: Add-on license(s) might be required based on the workloads that will be deployed."
             #delete the file
             rm -f $tmpfile
@@ -109,21 +130,33 @@ function check_for_cluster
             else
                 NODE_TYPE="physical"
             fi
+            
             if [[ $NODE_TYPE == "vm" ]]; then
-                vcpu=`ssh $node cat /proc/cpuinfo | grep processor | wc -l`
+                vcpu=`ssh $node grep -w ^processor /proc/cpuinfo | wc -l  2> /dev/null`
+                if [[ $vcpu -eq 0 ]]; then
+                    echo "Unable to calculate the license required for $node. Execute cmmaplicense directly on $node."
+                    return 1
+                fi
                 license_required=`expr '(' $vcpu '+' $vcpus_supported_per_license '-' 1 ')' '/'  $vcpus_supported_per_license`
                 echo "Number of vCPU(s) : $vcpu"
             else
-                core=0
-                for i in `ssh cat /proc/cpuinfo | grep "^physical id" | sort -u |awk '{print $NF}'`
+                cores=0
+                for i in `ssh $node grep \"^physical id\" /proc/cpuinfo | sort -u |awk '{print $NF}' 2> /dev/null`
                 do
-                        ((cores = cores + `ssh cat /proc/cpuinfo | grep -A 5 -w "^physical id[[:space:]]: $i" | head -5 | grep -w "^cpu cores" | awk '{print $NF}'`));
+                    core_val=`ssh $node "grep -A 5 -w \"^physical id[[:space:]]: $i\" /proc/cpuinfo | head -5 | grep \"^cpu cores\"" 2> /dev/null`
+                    core_val=`echo $core_val |awk '{print $NF}'` 
+                    ((cores = cores + core_val )) 
                 done
+                if [[ $cores -eq 0 ]]; then
+                    echo "Unable to calculate the license required for $node. Execute cmmaplicense directly on $node."
+                    return 1
+                fi
                 license_required=`expr '(' $cores '+' $cores_supported_per_license '-' 1 ')' '/' $cores_supported_per_license`
                 echo "Number of Core(s) : $cores"
             fi
-            echo -n "The Foundational License required is "
-            echo "$license_required LTU(s) of HPE Serviceguard for linux HA-E5 or HA-DR-E7"
+            
+            echo "HPE Serviceguard for linux A.15.00.00 and above, requires following licenses"
+            echo "Foundational: $license_required LTU(s) of HPE Serviceguard for linux HA-E5 or HA-DR-E7"
             echo "Note: Add-on license(s) might be required based on the workloads that will be deployed."
             #delete the file
             rm -f $tmpfile
@@ -182,9 +215,20 @@ for node in $nodelist
 do
     vm_flag=0
     echo "$node"
-    
+    curr_node=$(host=`hostname`; echo ${host%%.*})
+    if [[ sg_flag -eq 1 ]]; then
+        if [[ $node == $curr_node ]]; then
+            sgversion=`cmversion`
+        else
+            sgversion=`cmexec $node cmversion`
+        fi
+        echo "Serviceguard installed: $sgversion"
+    fi
     #get the number of license required
     calculate_license_req $node
+    if [[ $? -ne 0 ]]; then
+        continue;
+    fi
     
     #flag to check if there are any workloads in a given node
     workload_flag=0
@@ -606,7 +650,7 @@ do
             echo -n $(echo ${rpo_list[@]}) | tr ' ' ','
             echo ")"
         fi
-        echo "To upgrade to HPE Serviceguard for linux A.15.00.00, below licenses are required"
+        echo "HPE Serviceguard for linux A.15.00.00 and above, requires following licenses"
         if [[ E7_flag -eq 1 ]]; then
             echo "Foundational: $license_required LTU(s) of HPE Serviceguard for linux HA-DR-E7"
             total_license=$(( $total_license + $license_required ))
@@ -629,9 +673,8 @@ do
             total_license=$(( $total_license + 1 ))
         fi
         echo "Total number of license(s) required : $total_license"
-           
     else
-        echo "To upgrade to HPE Serviceguard for linux A.15.00.00, below licenses are required"
+        echo "HPE Serviceguard for linux A.15.00.00 and above, requires following licenses"
         echo "Foundational: $license_required LTU(s) of HPE Serviceguard for linux HA-E5 or HA-DR-E7"
         total_license=$(( $total_license + $license_required ))
         echo "Total number of license(s) required : $total_license"
@@ -640,3 +683,4 @@ do
     fi
     echo
 done
+    
