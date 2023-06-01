@@ -1,0 +1,16 @@
+---
+
+#####################################################################
+# (C) Copyright 2023 Hewlett Packard Enterprise Development LP.
+#####################################################################
+
+####################################################################
+# To deploy Serviceguard cluster use this yml.
+###################################################################
+
+- hosts: sglx-cluster-hosts 
+  gather_facts: yes
+  remote_user: root
+  roles:
+    - { role: config/cluster, vars: { op: "create"} }
+    - { role: config/cluster, vars: { op: "view"} }
