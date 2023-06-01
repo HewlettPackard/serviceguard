@@ -1,0 +1,15 @@
+---
+
+#####################################################################
+# (C) Copyright 2023 Hewlett Packard Enterprise Development LP.
+#####################################################################
+#####################################################################
+# To run only install of Serviceguard use this yml
+######################################################################
+
+- hosts: sglx-cluster-hosts
+  gather_facts: yes 
+  remote_user: root
+  ignore_errors: yes
+  roles:
+    - { role: install }
