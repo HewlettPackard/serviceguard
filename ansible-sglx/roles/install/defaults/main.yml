@@ -4,11 +4,6 @@
 #####################################################################
 
 # defaults file for install
-mount_dir: "/root/_sglx_install_dir"
-dest_iso_path: "/root/_sglx_install.iso"
-nfs_mount_loc: "/root/_sglx_nfs_mount"
-nfs_mount_path: False
-local_mount_path: False
 repo_url:
 _install_result:
 
