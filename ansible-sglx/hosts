@@ -1,8 +1,6 @@
 [sap-app-hosts]
 
 [sap-hana-hosts]
-sgxhost2
-sgxhost3
 
 [oracle-si-hosts]
 
@@ -11,9 +9,14 @@ sgxhost3
 [mssql-aofi-hosts]
 
 [mssql-aoai-hosts]
-sgxhost4
 
 [custom-app-hosts]
+sglxtestansnode1
+sglxtestansnode2
+
+[workload-central-hosts]
+
+[quorum-server-hosts]
 
 [sglx-storage-flex-add-on-hosts:children]
 sap-app-hosts

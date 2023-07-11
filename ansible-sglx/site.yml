@@ -72,3 +72,15 @@
     - { role: config/cluster, vars: { op: "create"} }
     - { role: deploy/custom }
     - { role: config/cluster, vars: { op: "view"} }
+
+- hosts: workload-central-hosts
+  gather_facts: yes
+  remote_user: root
+  roles:
+    - { role: sgmgr-plus/install }
+
+- hosts: quorum-server-hosts
+  gather_facts: yes
+  remote_user: root
+  roles:
+    - { role: quorum-server/install }
