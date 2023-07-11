@@ -32,21 +32,21 @@
       
       - name: Check if the ISO parameters contain NFS location
         set_fact:
-            nfs_mount_dir: '{{ sglx_add_on_inst_upg_params.storage_flex_add_on.iso_params.iso_location |
-                              regex_replace("^nfs://","") |
-                              regex_replace("(.*)/(.*)","\1@\2") |
-                              regex_replace("(.*)@(.*)","\1/") |
+            nfs_mount_dir: '{{ sglx_add_on_inst_upg_params.storage_flex_add_on.iso_params.iso_location | 
+                              regex_replace("^nfs://","") | 
+                              regex_replace("(.*)/(.*)","\1@\2") | 
+                              regex_replace("(.*)@(.*)","\1/") | 
                               regex_replace("(.+?)/(.*)","\1:/\2") }}'
-            nfs_iso_name: '{{ sglx_add_on_inst_upg_params.storage_flex_add_on.iso_params.iso_location |
-                              regex_replace("^nfs://","") |
-                              regex_replace("(.*)/(.*)","\1@\2") |
+            nfs_iso_name: '{{ sglx_add_on_inst_upg_params.storage_flex_add_on.iso_params.iso_location | 
+                              regex_replace("^nfs://","") | 
+                              regex_replace("(.*)/(.*)","\1@\2") | 
                               regex_replace("(.*)@(.*)","\2") }}'
         when: nfs_mount_path == True
         ignore_errors: true
 
       - name: Check if the ISO parameters contain local node location
         set_fact:
-             dest_iso_path: '{{ sglx_add_on_inst_upg_params.storage_flex_add_on.iso_params.iso_location |
+             dest_iso_path: '{{ sglx_add_on_inst_upg_params.storage_flex_add_on.iso_params.iso_location | 
                                 regex_replace("^file://","/") }}'
         when: local_mount_path == True
         ignore_errors: true
@@ -127,8 +127,8 @@
             state: absent
         when: nfs_mount_path == True
       
-      - name: Remove ISO file
-        file:
+      - name: Remove ISO file 
+        file: 
             path: "{{ dest_iso_path }}"
             state: absent
         when: nfs_mount_path == False and local_mount_path == False
