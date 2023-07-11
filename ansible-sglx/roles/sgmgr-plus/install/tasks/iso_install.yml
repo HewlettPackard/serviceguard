@@ -1,0 +1,74 @@
+---
+#####################################################################
+# (C) Copyright 2023 Hewlett Packard Enterprise Development LP.
+#####################################################################
+
+- name: Check if Serviceguard Manager Plus is already installed
+  shell: |
+      rpm -q --queryformat '%{version}' workload-central 
+  register: sgver_result 
+  changed_when: no
+  ignore_errors: true
+
+- name: Skip the node if Serviceguard Manager Plus is already installed
+  fail:
+    msg: "Serviceguard Manager Plus version {{ sgver_result.stdout_lines }}
+          is already installed use upgrade option in playbook" 
+  when: sgver_result.rc == 0
+
+- name: Mount the ISO on the node
+  include_tasks: roles/common/tasks/sglx_mount_iso.yml
+  vars:
+      mount_result:
+          rc: 0
+          opmsg: "" 
+  when: sgver_result.rc != 0
+  ignore_errors: true
+
+- set_fact:
+      mount_result:
+          rc: 1
+          opmsg: "Skipping install {{ ansible_hostname }} as Serviceguard manager 
+                  plus is already installed use upgrade option in playbook"
+  when: sgver_result.rc == 0
+
+- name: Install Serviceguard Manager Plus software
+  shell: |
+      {{ mount_dir }}/cminstaller -d {{ mount_dir }} -u sgmgr+ \
+      --pwd {{ wc_user_password }} --pgpwd {{ wc_pgdbuser_password }} 
+  register: cminstaller_output
+  when: mount_result.rc == 0
+
+- set_fact:
+      cminstaller_output:
+          rc: 1
+          stdout_lines: "{{ mount_result.opmsg }}"
+  when: mount_result.rc != 0
+ 
+- name: Summarize installation | Success 
+  debug:
+      msg: " Installation of Serviceguard Manager Plus on node 
+             Success: \n {{ cminstaller_output.stdout_lines }}"
+  when:
+      - cminstaller_output.rc == 0
+  ignore_errors: true 
+
+- name: Summarize installation | Failure
+  debug:
+      msg: " Installation of Serviceguard Manager Plus on node 
+             Failed: \n {{ cminstaller_output.stdout_lines }}"
+  when:
+      - cminstaller_output.rc != 0
+  ignore_errors: true 
+  
+- name: Unmount the ISO on the node
+  include_tasks: roles/common/tasks/sglx_umount_iso.yml
+  vars:
+      umount_result:
+          rc: 0
+          opmsg: "" 
+  ignore_errors: true
+ 
+- debug:
+      msg: "Umount of ISO returned with {{ umount_result.rc }} 
+            and {{ umount_result.opmsg }}"  
