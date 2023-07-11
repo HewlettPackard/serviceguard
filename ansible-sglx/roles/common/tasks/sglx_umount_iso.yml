@@ -1,0 +1,107 @@
+---
+#####################################################################
+# (C) Copyright 2023 Hewlett Packard Enterprise Development LP.
+#####################################################################
+
+- include_vars: roles/common/vars/main.yml
+
+- name: Check and set if NFS is specified in the mount location
+  set_fact:
+      nfs_mount_path: True
+  when: sglx_inst_upg_additional_params.iso_params.iso_location is regex("^nfs://*")
+  ignore_errors: true
+
+- name: Check and set if Local file path is specified in the mount location
+  set_fact:
+      local_mount_path: True
+  when: sglx_inst_upg_additional_params.iso_params.iso_location is regex("^file://*")
+  ignore_errors: true
+
+- name: Check if the ISO parameters contain NFS location
+  set_fact:
+      nfs_mount_dir: '{{ sglx_inst_upg_additional_params.iso_params.iso_location | 
+                        regex_replace("^nfs://","") | 
+                        regex_replace("(.*)/(.*)","\1@\2") | 
+                        regex_replace("(.*)@(.*)","\1/") | 
+                        regex_replace("(.+?)/(.*)","\1:/\2") }}'
+      nfs_iso_name: '{{ sglx_inst_upg_additional_params.iso_params.iso_location | 
+                        regex_replace("^nfs://","") | 
+                        regex_replace("(.*)/(.*)","\1@\2") | 
+                        regex_replace("(.*)@(.*)","\2") }}'
+  when: nfs_mount_path == True
+  ignore_errors: true
+
+- name: Check if the ISO parameters contain local node location
+  set_fact:
+       dest_iso_path: '{{ sglx_inst_upg_additional_params.iso_params.iso_location | 
+                          regex_replace("^file://","/") }}'
+  when: local_mount_path == True
+  ignore_errors: true
+
+- name: Umount depot
+  mount:
+      path: "{{ mount_dir }}"
+      state: absent
+  ignore_errors: true
+
+- name: Check result of umount command
+  shell: df -kh | grep -w {{ mount_dir }}
+  register: iso_umount_result
+  ignore_errors: true
+
+- set_fact:
+      umount_result:
+          rc: 1
+          opmsg: "Failed to unmount the ISO on node {{ ansible_hostname }}"
+  when: iso_umount_result.rc == 0 
+
+- set_fact:
+      umount_result:
+          rc: 0
+          opmsg: "Successful to unmount the ISO on node {{ ansible_hostname }}"
+  when: iso_umount_result.rc != 0 
+
+- name: Umount NFS location
+  mount:
+      path: "{{ nfs_mount_loc }}"
+      state: absent
+  when: nfs_mount_path == True
+  ignore_errors: true
+
+- name: Check result of umount command
+  shell: df -kh | grep -w {{ nfs_mount_loc }}
+  register: umount_nfs_result
+  when: nfs_mount_path == True
+  ignore_errors: true
+
+- set_fact:
+      umount_nfs_result:
+          rc: 0
+  when: nfs_mount_path != True
+
+- set_fact:
+      umount_result:
+          rc: 1
+          opmsg: "Failed to unmount the NFS location on node {{ ansible_hostname }}"
+  when: umount_nfs_result.rc == 0 and nfs_mount_path == True 
+
+- set_fact:
+      umount_result:
+          rc: 0
+          opmsg: "Successful to unmount the NFS location on node {{ ansible_hostname }}"
+  when: umount_nfs_result.rc != 0 and nfs_mount_path == True 
+
+- name: Remove ISO file 
+  file: 
+      path: "{{ dest_iso_path }}"
+      state: absent
+  when: nfs_mount_path == False and local_mount_path == False
+  ignore_errors: true
+
+# We are ignoring the result of removing the file for now. Assume it is always
+# success.
+- set_fact:
+      umount_result:
+          rc: 0
+          opmsg: "Successful to remove the ISO on node {{ ansible_hostname }}"
+  when: nfs_mount_path == False and local_mount_path == False
