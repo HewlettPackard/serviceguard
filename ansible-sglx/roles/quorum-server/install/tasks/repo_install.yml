@@ -1,0 +1,132 @@
+---
+
+#####################################################################
+# (C) Copyright 2023 Hewlett Packard Enterprise Development LP.
+#####################################################################
+
+- name: Check if Serviceguard Quorum server is already installed
+  shell: |
+      rpm -q --queryformat '%{version}' serviceguard-qs
+  register: sgver_result
+  changed_when: no
+  ignore_errors: true
+
+- name: Skip the node if Serviceguard Quorum server is already installed
+  fail:
+    msg: "Serviceguard Quorum server {{ sgver_result.stdout_lines }} is already
+          installed use upgrade option in playbook"
+  when: sgver_result.rc == 0
+
+- name: Fail the node if Serviceguard Quorum server is not already installed
+  fail:
+    msg: "Serviceguard Quorum server is not installed. Currently repo option is not
+          supported"
+  when: sgver_result.rc != 0
+ 
+- meta: end_play
+  when: sgver_result.rc != 0
+
+- set_fact:
+      repo_user:"{{ sglx_inst_upg_additional_params.repo_params.repo_username |
+                    replace('@', '%40') }}"
+  when: sglx_inst_upg_additional_params.repo_params.repo_username != '' and
+        sglx_inst_upg_additional_params.repo_params.repo_username != ''
+
+- name: Set_fact repo url with username and usertoken 
+  set_fact:
+      repo_url: "https://{{ sglx_inst_upg_additional_params.repo_params.repo_username |
+                 replace('@', '%40') }}:\
+                 {{ sglx_inst_upg_additional_params.repo_params.repo_usertoken }}@\
+                 {{ sglx_inst_upg_additional_params.repo_params.repo_server }}/\
+                 repo/sglx-eval/{{ ansible_os_family | lower }}/\
+                 {{ansible_distribution_version}}/x86_64/{{ sglx_version }}"
+  when: sglx_inst_upg_additional_params.repo_params.repo_username != None and
+                 sglx_inst_upg_additional_params.repo_params.repo_usertoken != None
+
+- name: Set_fact repo url without username and usertoken 
+  set_fact:
+      repo_url: "http://{{ sglx_inst_upg_additional_params.repo_params.repo_server }}/\
+                 SDR/repo/sglx-eval/{{ ansible_os_family | lower }}/\
+                 {{ansible_distribution_version}}/x86_64/{{ sglx_version }}"
+  when: sglx_inst_upg_additional_params.repo_params.repo_username == None and
+        sglx_inst_upg_additional_params.repo_params.repo_usertoken == None
+
+- set_fact:
+     workload_rpm_list_name: "{{sglx_add_on_inst_upg_params.sglx_addon }}_rpms"
+
+- name: Configure YUM repository for when Distro is RHEL 
+  yum_repository: 
+      name: SGLX_repo 
+      description: SGLX repository for version {{ sglx_version }} 
+      baseurl: "{{ repo_url }}"
+      enabled: yes
+      gpgcheck: no
+  when: sgver_result.rc != 0 and ansible_os_family is match("RedHat") 
+
+- name: Configure Zypper repository for when Distro is SuSE 
+  zypper_repository: 
+      name: SGLX_repo 
+      description: SGLX repository for version {{ sglx_version }} 
+      baseurl: "{{ repo_url }}"
+      state: present 
+  when: sgver_result.rc != 0 and ansible_os_family is match("Suse") 
+
+- name: Install Serviceguardi Quorum server rpm 
+  yum: 
+      name: "serviceguard-qs"
+      state: present
+  environment:
+      https_proxy: "{{ https_proxy }}"
+      http_proxy: "{{ http_proxy }}"
+  register: yum_repo_result
+  when: ansible_os_family is match("RedHat")
+
+- name: Install Serviceguard Quorum server rpm
+  zypper: 
+      name: "serviceguard-qs"
+      state: present
+  environment:
+      https_proxy: "{{ https_proxy }}"
+      http_proxy: "{{ http_proxy }}"
+  register: zypp_repo_result
+  when: ansible_os_family is match("Suse")
+
+- set_fact:
+    repo_result: "{{ yum_repo_result }}"
+  when: ansible_os_family is match("RedHat")
+
+- set_fact:
+    repo_result: "{{ zypp_repo_result }}"
+  when: ansible_os_family is match("Suse")
+
+- debug: 
+      msg: " Installation of Serviceguard Quorum server on node 
+             Succceeded on {{ ansible_hostname }}\n"
+  when: repo_result.results[0].rc == 0
+
+- debug: 
+      msg: " Installation of Serviceguard Quorum server on node 
+             Failed on {{ ansible_hostname }} !!\n"
+  when: repo_result.results[0].rc != 0
+ 
+- name: Remove Yum repository for RHEL
+  yum_repository:
+     name: SGLX_repo 
+     state: absent
+  ignore_errors: true
+  when: ansible_os_family is match("RedHat")
+
+# TBD: Need to be tested for SUSE
+- name: Remove Zypper repository for SuSE 
+  zypper_repository:
+     name: SGLX_repo 
+     state: absent
+  ignore_errors: true
+  when: ansible_os_family is match("Suse")
+
+- name: Clean YUM related metadata 
+  command: yum clean metadata
+  args: 
+      warn: no
+  when: ansible_os_family is match("RedHat")
+  ignore_errors: true

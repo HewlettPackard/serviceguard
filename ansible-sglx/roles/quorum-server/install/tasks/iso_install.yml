@@ -1,0 +1,73 @@
+---
+#####################################################################
+# (C) Copyright 2023 Hewlett Packard Enterprise Development LP.
+#####################################################################
+
+- name: Check if Serviceguard Quorum server is already installed
+  shell: |
+      rpm -q --queryformat '%{version}' serviceguard-qs
+  register: sgver_result
+  changed_when: no
+  ignore_errors: true
+
+- name: Skip the node if Serviceguard Quorum Server is already installed
+  fail:
+    msg: "Serviceguard Quorum server version {{ sgver_result.stdout_lines }}
+          is already installed use upgrade option in playbook"
+  when: sgver_result.rc == 0
+
+- name: Mount the ISO on the node
+  include_tasks: roles/common/tasks/sglx_mount_iso.yml
+  vars:
+      mount_result:
+          rc: 0
+          opmsg: ""
+  when: sgver_result.rc != 0
+  ignore_errors: true
+
+- set_fact:
+      mount_result:
+          rc: 1
+          opmsg: "Skipping install {{ ansible_hostname }} as Serviceguard Quorum
+                  server is already installed use upgrade option in playbook"
+  when: sgver_result.rc == 0
+
+- name: Install Serviceguard Quorum server
+  shell: |
+      {{ mount_dir }}/cminstaller -d {{ mount_dir }} -u quorum-server
+  register: cminstaller_output
+  when: mount_result.rc == 0
+
+- set_fact:
+      cminstaller_output:
+          rc: 1
+          stdout_lines: "{{ mount_result.opmsg }}"
+  when: mount_result.rc != 0
+
+- name: Summarize installation | Success
+  debug:
+      msg: "Installation of Serviceguard Quorum server on node Success:
+             Success: \n {{ cminstaller_output.stdout_lines }}"
+  when:
+      - cminstaller_output.rc == 0
+  ignore_errors: true
+
+- name: Summarize installation | Failure
+  debug:
+      msg: "Installation of Serviceguard Quorum server on node
+             Failed: \n {{ cminstaller_output.stdout_lines }}"
+  when:
+      - cminstaller_output.rc != 0
+  ignore_errors: true
+  
+- name: Unmount the ISO on the node
+  include_tasks: roles/common/tasks/sglx_umount_iso.yml
+  vars:
+      umount_result:
+          rc: 0
+          opmsg: ""
+  ignore_errors: true
+
+- debug:
+      msg: "Umount of ISO returned with {{ umount_result.rc }}
+            and {{ umount_result.opmsg }}"
