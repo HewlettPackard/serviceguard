@@ -10,83 +10,27 @@
   changed_when: no
   ignore_errors: true
 
-- name: Check and set if NFS is specified in the mount location
-  set_fact:
-      nfs_mount_path: True
-  when: sglx_inst_upg_additional_params.iso_params.iso_location is regex("^nfs://*")
-  ignore_errors: true
-
-- name: Check and set if Local file path is specified in the mount location
-  set_fact:
-      local_mount_path: True
-  when: sglx_inst_upg_additional_params.iso_params.iso_location is regex("^file://*")
-  ignore_errors: true
-
 - name: Skip the node if Serviceguard is already installed
   fail:
-    msg: "Serviceguard version {{ sgver_result.stdout_lines }} is already installed use upgrade option in playbook" 
+    msg: "Serviceguard version {{ sgver_result.stdout_lines }} is 
+          already installed use upgrade option in playbook" 
   when: sgver_result.rc == 0
 
-- name: Check if the ISO parameters contain NFS location
-  set_fact:
-      nfs_mount_dir: '{{ sglx_inst_upg_additional_params.iso_params.iso_location | 
-                        regex_replace("^nfs://","") | 
-                        regex_replace("(.*)/(.*)","\1@\2") | 
-                        regex_replace("(.*)@(.*)","\1/") | 
-                        regex_replace("(.+?)/(.*)","\1:/\2") }}'
-      nfs_iso_name: '{{ sglx_inst_upg_additional_params.iso_params.iso_location | 
-                        regex_replace("^nfs://","") | 
-                        regex_replace("(.*)/(.*)","\1@\2") | 
-                        regex_replace("(.*)@(.*)","\2") }}'
-  when: nfs_mount_path == True
+- name: Mount the ISO on the node
+  include_tasks: roles/common/tasks/sglx_mount_iso.yml
+  vars:
+      mount_result:
+          rc: 0
+          opmsg: "" 
+  when: sgver_result.rc != 0
   ignore_errors: true
 
-- name: Check if the ISO parameters contain local node location
-  set_fact:
-       dest_iso_path: '{{ sglx_inst_upg_additional_params.iso_params.iso_location | 
-                          regex_replace("^file://","/") }}'
-  when: local_mount_path == True
-  ignore_errors: true
-
-- name: Copy the ISO to nodes where Serviceguard is not installed
-  synchronize:
-      src: "{{ sglx_inst_upg_additional_params.iso_params.iso_location }}"
-      dest: "{{ dest_iso_path }}"
-      rsync_timeout: 60
-  register: iso_sync_op
-  when: sgver_result.rc != 0 and nfs_mount_path != True and local_mount_path != True
-
-# required to be initialized when NFS location(nfs://) is provided or 
-# local path is provided using (file://) option. This will ensure that missing 
-# variable(iso_sync_op) condition is satisfied.
 - set_fact:
-    iso_sync_op:
-      rc: 0
-  when: nfs_mount_path == True or local_mount_path == True
-
-- name: Check if the copy was successful and print failure if unsucessfull
-  fail:
-     msg: " Failed to SYNC ISO. Retry.. on {{ ansible_hostname }}"
-  when: nfs_mount_path != True and iso_sync_op.rc != 0 and local_mount_path != True
-
-- name: Mount NFS path for ISO on node
-  mount:
-     src: "{{ nfs_mount_dir }}"
-     path: "{{ nfs_mount_loc }}"
-     fstype: nfs
-     state: mounted
-  when: nfs_mount_path == True
-
-- set_fact:
-     dest_iso_path: "{{ nfs_mount_loc }}/{{ nfs_iso_name }}"
-  when: nfs_mount_path == True
-
-- name: Mount ISO on node
-  mount:
-     path: "{{ mount_dir }}"
-     src: "{{ dest_iso_path }}"
-     fstype: iso9660
-     state: mounted
+      mount_result:
+          rc: 1
+          opmsg: "Skipping install {{ ansible_hostname }} as Serviceguard is 
+                  already installed use upgrade option in playbook"
+  when: sgver_result.rc == 0
 
 - name: Install Serviceguard software
   shell: |
@@ -95,35 +39,38 @@
       SGMGR_ENV: "{{ sglx_sgmgr_password }}"
       ACCEPT_EULA: "Y"
   register: cminstaller_output
-  ignore_errors: true
+  when: mount_result.rc == 0
+
+- set_fact:
+      cminstaller_output:
+          rc: 1
+          stdout_lines: "{{ mount_result.opmsg }}"
+  when: mount_result.rc != 0
  
 - name: Summarize installation | Success 
   debug:
-      msg: " Installation of Serviceguard on node Success: \n {{ cminstaller_output.stdout_lines }}"
+      msg: " Installation of Serviceguard on node 
+             Success: \n {{ cminstaller_output.stdout_lines }}"
   when:
       - cminstaller_output.rc == 0
-  ignore_errors: yes
+  ignore_errors: true 
 
 - name: Summarize installation | Failure
   debug:
-      msg: " Installation of Serviceguard on node Failed: \n {{ cminstaller_output.stdout_lines }}"
+      msg: " Installation of Serviceguard on node 
+             Failed: \n {{ cminstaller_output.stdout_lines }}"
   when:
       - cminstaller_output.rc != 0
-  ignore_errors: yes
-  
-- name: Umount depot
-  mount:
-      path: "{{ mount_dir }}"
-      state: absent
+  ignore_errors: true 
 
-- name: Umount NFS location
-  mount:
-      path: "{{ nfs_mount_loc }}"
-      state: absent
-  when: nfs_mount_path == True
-
-- name: Remove ISO file 
-  file: 
-      path: "{{ dest_iso_path }}"
-      state: absent
-  when: nfs_mount_path == False and local_mount_path == False
+- name: Unmount the ISO on the node
+  include_tasks: roles/common/tasks/sglx_umount_iso.yml
+  vars:
+      umount_result:
+          rc: 0
+          opmsg: "" 
+  ignore_errors: true
+ 
+- debug:
+      msg: "Umount of ISO returned with {{ umount_result.rc }} 
+            and {{ umount_result.opmsg }}"  

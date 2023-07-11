@@ -69,6 +69,7 @@
 - set_fact:
       rpm_list: "{{ lookup('vars','{{workload_rpm_list_name}}') | list }}"
 
+# TBD: http(s)_proxy are required for YUM need to pass from group_vars/all.yml
 - name: Install Serviceguard Workload rpms
   yum: 
       name: "{{ item }}"
@@ -118,7 +119,7 @@
 
 # TBD: Need to be tested for SUSE
 - name: Remove Zypper repository for SuSE 
-  yum_repository:
+  zypper_repository:
      name: SGLX_repo 
      state: absent
   ignore_errors: true
