@@ -5,16 +5,18 @@
 #####################################################################
 
 sap_rpms:
-    - serviceguard-extension-for-sap
+    - serviceguard-sap-addon 
 oracle_rpms:
-    - serviceguard-oracle-toolkit
+    - serviceguard-oracle-addon 
 mssql_rpms:
-    - serviceguard-extension-for-mssql
+    - serviceguard-mssql-addon 
 custom_rpms:
    - serviceguard
+   - serviceguard-pushbutton-dr
+   - serviceguard-pushbutton-dr-snmp
 storage_plugin_rpms:
    - serviceguard-storage-plugin
 nfs_rpms:
-   - serviceguard-nfs-toolkit
+   - serviceguard-nfs-addon 
 kvm_rpms:
-   - serviceguard-kvm-toolkit
+   - serviceguard-kvm-addon 

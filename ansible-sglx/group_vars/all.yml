@@ -18,10 +18,30 @@ vault_esxi_password: !vault |
           63643166363833383662613665616235313234633331353161393235393237613634303734316538
           3865613764663631380a316531663231303237316532316334393761363863343436626365636638
           3961
+vault_wc_user_password: !vault |
+          $ANSIBLE_VAULT;1.1;AES256
+          35666262313966653930363134373831303266363139373766376631636337643363636636666538
+          6566623132373431633363383164353862383139323135390a346364346233323065386535616637
+          64633830653836653539326336393834306338386435316634356236623762616131663464333333
+          3638386430643363310a653534653566336439643036643963646237343232623539663138323562
+          3930
+vault_wc_pgdbusr_password: !vault |
+          $ANSIBLE_VAULT;1.1;AES256
+          38313935313336663736323535623661303333376135633439636135386339306438373266643661
+          3431663038616536366235386335396136663564313937660a356239363832326466356235353830
+          35343436343036376233386434663838346430353933343531353262343538313038393736353361
+          6139303032383034630a656138313533356633633565653766636235373730353633623230333266
+          6337
 
 
 
-sglx_version: 15.00.00
+sglx_version: 15.10.00
+# Version for Serviceguard Manager Plus version.
+sglx_sgmgr_plus_version: 15.00.00
+# Password for the workload central user.
+wc_user_password: "{{ vault_wc_user_password }}"
+# Password for workload central DB user. this is postgres DB user.
+wc_pgdbuser_password: "{{ vault_wc_pgdbusr_password }}"
 
 # values can be ('iso', 'repo')
 # iso  - iso based installation
@@ -39,7 +59,7 @@ sglx_inst_upg_additional_params:
      # iso_location: nfs://<nfs_server_ip>/<nfs_share_name_of_ISO>
      # iso_location: <absolute_path_of_ISO_on_Ansible_controller_node>(/home/username/SGLX.iso)
      # iso_location: <local_path_of_ISO_on_installation_node>(file://home/username/SGLX.iso)
-        iso_location: nfs://<hostname>/nfsshare/SGLX_15_00.iso
+        iso_location: /home/azuser/SGLX_15.10.00.iso  
 
 sglx_add_on_inst_upg_params:
     # Workload is defined as parameters
@@ -51,8 +71,9 @@ sglx_add_on_inst_upg_params:
     # custom     - No workload integrations will be installed
     # kvm        - KVM specific integration.
     # storage-plugins  - storage replication supported integrations will be installed
+    # sgmgr+     - Installing Serviceguard Manager Plus.
     
-    sglx_addon: oracle
+    sglx_addon: custom 
 
     # Storage plugin install Array specific integrations supported by Serviceguard.
     sglx_storage_plugin: no
@@ -77,7 +98,7 @@ sglx_add_on_inst_upg_params:
 sglx_arbitation_method: qs
 
 # shortname of the hostname to be used as arbitration
-sglx_quorum_server: <shortname_for_quorum_server> 
+sglx_quorum_server: sglxtestansnode3  
 
 # value can be ('yes', 'no')
 sglx_smart_quorum: no 
