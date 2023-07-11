@@ -11,8 +11,6 @@
 [mssql-aoai-hosts]
 
 [custom-app-hosts]
-sglxtestansnode1
-sglxtestansnode2
 
 [workload-central-hosts]
 
