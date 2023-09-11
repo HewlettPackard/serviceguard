@@ -1,6 +1,6 @@
 # (c) Copyright 2023 Hewlett Packard Enterprise Development LP
 # All rights reserved
-# version 2.2
+# version 2.4
 #!/bin/bash
 
 typeset -i cores_supported_per_license=2
@@ -9,7 +9,39 @@ typeset -i cores=0;
 typeset -i license_required=0;
 typeset -i sg_flag=0;
 
-echo "cmmaplicense version: 2.2"
+typeset -x newline_char=$'\n'
+typeset -x bullet_char="*"
+
+typeset -i NFS_Add_on_count=0;
+typeset -i SAP_Add_on_count=0;
+typeset -i Oracle_Add_on_count=0
+typeset -i MSSQL_Add_on_count=0
+typeset -i Flex_Storage_Add_on_count=0
+typeset -i HA_DR_E7_count=0
+typeset -i HA_E5_count=0
+
+typeset -i exi_HA_E5_count=0
+typeset -i exi_NFS_Add_on_count=0;
+typeset -i exi_SAP_Add_on_count=0;
+typeset -i exi_Oracle_Add_on_count=0
+typeset -i exi_MSSQL_Add_on_count=0
+typeset -i exi_Flex_Storage_Add_on_count=0
+typeset -i exi_HA_DR_E7_count=0
+typeset -i exi_Instant_on_count=0
+typeset -i exi_Base_count=0
+typeset -i exi_Advance_count=0
+typeset -i exi_Enterprise_count=0
+
+typeset -i node_HA_E5_count=0
+typeset -i node_NFS_Add_on_count=0;
+typeset -i node_SAP_Add_on_count=0;
+typeset -i node_Oracle_Add_on_count=0
+typeset -i node_MSSQL_Add_on_count=0
+typeset -i node_Flex_Storage_Add_on_count=0
+typeset -i node_HA_DR_E7_count=0
+
+echo "cmmaplicense version: 2.4"
+echo
 
 #this code is reused from tools/cmcomputelicense of SGCORE
 #if there are any changes please modify in the other location as well
@@ -17,7 +49,7 @@ function calculate_license_req
 {
     curr_node=$(host=`hostname`; echo ${host%%.*})
     SG_VIRTUAL_NODE_TYPE=`echo "$view" | awk -F "[ :|=]" '$1 == "node" && $2 == "'$node'" && $3 == "virt_tech" {print $4}'`
-     
+
     if [[ $SG_VIRTUAL_NODE_TYPE == "none" ]]; then
         # It is a physical system.
         NODE_TYPE="PHYSICAL"
@@ -76,13 +108,22 @@ function check_for_cluster
     if [[ ! -z "$node" && $node != $curr_node ]]; then
         view=`ssh $node cmviewcl -vf line -s config 2> /dev/null`
         if [[ $? -ge 255 ]]; then
+            echo "Node: $node"
             echo "Unable to connect to $node. Execute cmmaplicense directly on $node."
             return 1
         fi
     fi
     if [[ -z "$view" ]]; then
+        if [[ -z $node ]]; then
+            echo "Node: $curr_node"
+            echo "Current Serviceguard configuration on $curr_node"
+        else
+            echo "Node: $node"
+            echo "Current Serviceguard configuration on $node"
+        fi
         echo "HPE Serviceguard cluster does not exist. No workloads detected."
-
+        echo
+        echo "Checking the node configuration..."
         #have a temp file to store node details
         export tmp_mapfile="/var/tmp/map.txt"
         #check if file exists
@@ -93,7 +134,6 @@ function check_for_cluster
         touch $tmp_mapfile
         chmod 644 $tmp_mapfile
         if [[ -z "$node" || $curr_node == $node ]]; then #current node
-            echo $curr_node
             #store the output to a file
             `hostnamectl > $tmp_mapfile`
             node_type=`cat $tmp_mapfile | tr -d ' ' |awk -F':' '$1 == "Virtualization" {print $2}'`
@@ -107,7 +147,7 @@ function check_for_cluster
                 license_required=`expr '(' $vcpu '+' $vcpus_supported_per_license '-' 1 ')' '/'  $vcpus_supported_per_license`
                 echo "Number of vCPU(s) : $vcpu"
             else
-                core=0
+                cores=0
                 for i in `grep "^physical id" /proc/cpuinfo | sort -u |awk '{print $NF}'`
                 do
                     ((cores = cores + `grep -m 1 -A 5 -w "^physical id[[:space:]]: $i" /proc/cpuinfo 2> /dev/null | head -5 | grep -w "^cpu cores" | awk '{print $NF}'`));
@@ -115,14 +155,15 @@ function check_for_cluster
                 license_required=`expr '(' $cores '+' $cores_supported_per_license '-' 1 ')' '/' $cores_supported_per_license`
                 echo "Number of Core(s) : $cores"
             fi
-            echo "HPE Serviceguard for linux A.15.00.00 and above, requires following licenses"
-            echo "Foundational: $license_required LTU(s) of HPE Serviceguard for linux HA-E5 or HA-DR-E7"
+            echo
+            echo "For upgrading node $node to HPE Serviceguard for linux A.15.00.00 and above, requires following licenses"
+            echo "Total number of license(s) required for $node: $license_required"
+            echo "    * Foundational: $license_required LTU(s) of HPE Serviceguard for linux HA-E5 or HA-DR-E7"
             echo "Note: Add-on license(s) might be required based on the workloads that will be deployed."
             #delete the file
             rm -f $tmpfile
             return 0
         else #node name is passed
-            echo $node
             ssh $node hostnamectl > $tmp_mapfile
             node_type=`cat $tmp_mapfile | tr -d ' ' |awk -F':' '$1 == "Virtualization" {print $2}'`
             if ! [[ -z "$node_type" ]]; then
@@ -154,9 +195,10 @@ function check_for_cluster
                 license_required=`expr '(' $cores '+' $cores_supported_per_license '-' 1 ')' '/' $cores_supported_per_license`
                 echo "Number of Core(s) : $cores"
             fi
-
-            echo "HPE Serviceguard for linux A.15.00.00 and above, requires following licenses"
-            echo "Foundational: $license_required LTU(s) of HPE Serviceguard for linux HA-E5 or HA-DR-E7"
+            echo
+            echo "For upgrading node $node to HPE Serviceguard for linux A.15.00.00 and above, requires following licenses"
+            echo "Total number of license(s) required for $node: $license_required"
+            echo "    * Foundational: $license_required LTU(s) of HPE Serviceguard for linux HA-E5 or HA-DR-E7"
             echo "Note: Add-on license(s) might be required based on the workloads that will be deployed."
             #delete the file
             rm -f $tmpfile
@@ -170,6 +212,77 @@ function check_for_cluster
         fi
     fi
 }
+
+function save_lic_count
+{
+    sgver=$1
+    if [[ $sgver =~ "15." ]]; then
+        #reset the node lic count to zero
+        node_HA_E5_count=0
+        node_NFS_Add_on_count=0;
+        node_SAP_Add_on_count=0;
+        node_Oracle_Add_on_count=0
+        node_MSSQL_Add_on_count=0
+        node_Flex_Storage_Add_on_count=0
+        node_HA_DR_E7_count=0
+
+        if [[ -z "$installed_license" ]]; then
+            #no licenses installed
+            return
+        fi
+        lic_list=(`echo "$installed_license" | awk -F "[ :|=]" '{print $3}'`)
+        count_list=(`echo "$installed_license" | awk -F "[ :|=]" '{print $NF}'`)
+        for ind in ${!lic_list[@]}
+        do
+            echo "${count_list[$ind]} LTU(s) of HPE Serviceguard for linux - ${lic_list[$ind]}"
+            if [[ ${lic_list[$ind]} =~ "NFS-Add-on" ]]; then
+                exi_NFS_Add_on_count=$(( $exi_NFS_Add_on_count + ${count_list[$ind]} ))
+                node_NFS_Add_on_count=${count_list[$ind]}
+            elif [[ ${lic_list[$ind]} =~ "SAP-Add-on" ]]; then
+                exi_SAP_Add_on_count=$(( $exi_SAP_Add_on_count + ${count_list[$ind]} ))
+                node_SAP_Add_on_count=${count_list[$ind]}
+            elif [[ ${lic_list[$ind]} =~ "Oracle-Add-on" ]]; then
+                exi_Oracle_Add_on_count=$(( $exi_Oracle_Add_on_count + ${count_list[$ind]} ))
+                node_Oracle_Add_on_count=${count_list[$ind]}
+            elif [[ ${lic_list[$ind]} =~ "MSSQL-Add-on" ]]; then
+                exi_MSSQL_Add_on_count=$(( $exi_MSSQL_Add_on_count + ${count_list[$ind]} ))
+                node_MSSQL_Add_on_count=${count_list[$ind]}
+            elif [[ ${lic_list[$ind]} =~ "E5" ]]; then
+                exi_HA_E5_count=$(( $exi_HA_E5_count + ${count_list[$ind]} ))
+                node_HA_E5_count=${count_list[$ind]}
+            elif [[ ${lic_list[$ind]} =~ "E7" ]]; then
+                exi_HA_DR_E7_count=$(( $exi_HA_DR_E7_count + ${count_list[$ind]} ))
+                node_HA_DR_E7_count=${count_list[$ind]}
+            elif [[ ${lic_list[$ind]} =~ "Flex" ]]; then
+                exi_Flex_Storage_Add_on_count=$(( $exi_Flex_Storage_Add_on_count + ${count_list[$ind]} ))
+                node_Flex_Storage_Add_on_count=${count_list[$ind]}
+            elif [[ ${lic_list[$ind]} =~ "Instant" ]]; then
+                exi_Instant_on_count=$(( $exi_Instant_on_count + ${count_list[$ind]} ))
+            fi
+        done
+    else
+        #extract license and its count
+        lic_list=(`echo "$installed_license" | awk -F "[ :|=]" '{print $3}'`)
+        count_list=(`echo "$installed_license" | awk -F "[ :|=]" '{print $NF}'`)
+
+        for ind in ${!lic_list[@]}
+        do
+            echo "${count_list[$ind]} LTU(s) of HPE Serviceguard for linux - ${lic_list[$ind]}"
+            if [[ ${lic_list[$ind]} =~ "Instant" ]]; then
+                exi_Instant_on_count=$(( $exi_Instant_on_count + ${count_list[$ind]} ))
+            elif [[ ${lic_list[$ind]} =~ "Base" ]]; then
+                exi_Base_count=$(( $exi_Base_count + ${count_list[$ind]} ))
+            elif [[ ${lic_list[$ind]} =~ "Advance" ]]; then
+                exi_Advance_count=$(( $exi_Advance_count + ${count_list[$ind]} ))
+            elif [[ ${lic_list[$ind]} =~ "Enterprise" ]]; then
+                exi_Enterprise_count=$(( $exi_Enterprise_count + ${count_list[$ind]} ))
+            elif [[ ${lic_list[$ind]} =~ "Flex" ]]; then
+                exi_Flex_Storage_Add_on_count=$(( $exi_Enterprise_count + ${count_list[$ind]} ))
+            fi
+        done
+    fi
+}
+
 
 while getopts ":n:h" option; do
     if [[ $option == "h" ]]; then
@@ -211,24 +324,45 @@ fi
 
 #get all the nodelist
 nodelist=`echo "$view" | awk -F "[ :|=]" '$1 == "node" && $3 == "name"  {print $4}'`
-
+cluster_license_count=0
+cluster_name=`echo $view | awk -F "[ :|=]" '$1 == "name" {print $2}'`
+echo "Serviceguard Cluster : $cluster_name"
 for node in $nodelist
 do
     vm_flag=0
-    echo "$node"
+    node_license=""
+    echo "Node: $node"
+    echo "Current Serviceguard configuration on $node"
     curr_node=$(host=`hostname`; echo ${host%%.*})
     if [[ sg_flag -eq 1 ]]; then
         if [[ $node == $curr_node ]]; then
             sgversion=`cmversion`
+            license_installed=`cmgetlicense`
         else
-            sgversion=`cmexec $node cmversion 2> /dev/null`    
+            sgversion=`cmexec $node cmversion 2> /dev/null`
             if [[ -z $sgversion ]]; then
                 echo "Unable to detect serviceguard version installed. Run cmmaplicense directly on $node"
                 echo
                 continue
             fi
+            license_installed=`cmexec $node cmgetlicense 2> /dev/null`        
         fi
-        echo "Serviceguard installed: $sgversion"
+        if [[ $sgversion =~ "15." ]]; then 
+            sg15_flag=1
+        else
+            sg15_flag=0
+        fi
+        installed_license=`echo "$license_installed" | grep "Number"`
+        if ! [[ -z $installed_license ]]; then
+            echo "Serviceguard version installed: $sgversion"
+            echo "Serviceguard License(s) installed: "
+            save_lic_count $sgversion 
+            echo
+        else 
+            echo "No valid license found on $node"
+            echo
+            save_lic_count $sgversion
+        fi
     fi
     #get the number of license required
     calculate_license_req $node
@@ -238,7 +372,6 @@ do
 
     #flag to check if there are any workloads in a given node
     workload_flag=0
-
     wrkld_list=()
     rpo_list=()
     multitarget_list=()
@@ -250,7 +383,6 @@ do
 
     #get all package name
     package_list=`echo "$view" | awk -F "[ :|=]" '$1 == "package" && $3 == "node" && $4 == "'$node'" && $5 == "name"  {print $2}'`
-
 
     for pkg in $package_list
     do
@@ -564,7 +696,7 @@ do
                 if ! [[ ${wrkld_list[@]} =~ "NFS" ]]; then
                     wrkld_list+=( "NFS" )
                 fi
-                if [[ E7_flag -eq 0 ]]; then     
+                if [[ E7_flag -eq 0 ]]; then
                     E5_flag=1
                 fi
                 if ! [[ ${lic_list[@]} =~ "NFS-Add-on" ]]; then
@@ -572,9 +704,9 @@ do
                 fi
             fi
         done
-
     done
     total_license=0
+    echo "Checking the node configuration..."
     if [[ vm_flag -eq 1 ]]; then
         echo "Number of vCPU(s) : $vcpu"
     else
@@ -598,36 +730,227 @@ do
             echo -n $(echo ${rpo_list[@]}) | tr ' ' ','
             echo ")"
         fi
-        echo "HPE Serviceguard for linux A.15.00.00 and above, requires following licenses"
+        echo
         if [[ E7_flag -eq 1 ]]; then
-            echo "Foundational: $license_required LTU(s) of HPE Serviceguard for linux HA-DR-E7"
-            total_license=$(( $total_license + $license_required ))
+            if [[ $sg15_flag -eq 1 ]]; then
+                if [[ $node_HA_DR_E7_count -lt $license_required ]]; then
+                    delta=$(( $license_required - $node_HA_DR_E7_count ))
+                    node_license+="    $bullet_char Foundational: $delta LTU(s) of HPE Serviceguard for linux HA-DR-E7"
+                    node_license+=$newline_char
+                    total_license=$(( $total_license + $delta ))
+                    HA_DR_E7_count=$(( $HA_DR_E7_count + $delta ))
+                fi
+            else
+                echo "For upgrading node $node to HPE Serviceguard for linux A.15.00.00 and above, requires following licenses"
+                node_license+="    $bullet_char Foundational: $license_required LTU(s) of HPE Serviceguard for linux HA-DR-E7"
+                node_license+=$newline_char
+            fi
         else
-            echo "Foundational: $license_required LTU(s) of HPE Serviceguard for linux HA-E5"
-            total_license=$(( $total_license + $license_required ))
+            if [[ $sg15_flag -eq 1 ]]; then
+                if [[ $node_HA_E5_count -lt $license_required ]]; then
+                    #check if node has sufficent HA_DR_E7 licenses
+                    if [[ $node_HA_DR_E7_count -lt $license_required ]]; then
+                        delta=$(( $license_required - $node_HA_E5_count ))
+                        node_license+="    $bullet_char Foundational: $delta LTU(s) of HPE Serviceguard for linux HA-E5"
+                        node_license+=$newline_char
+                        total_license=$(( $total_license + $delta ))
+                        HA_E5_count=$(( $HA_E5_count + $delta ))
+                    fi
+                fi
+            else    #sg version is < 15; calculate the total_license based on license_required per node
+                node_license+="    $bullet_char Foundational: $license_required LTU(s) of HPE Serviceguard for linux HA-E5"
+                node_license+=$newline_char
+                total_license=$(( $total_license + $license_required ))
+                HA_E5_count=$(( $HA_E5_count + $license_required ))
+            fi
         fi
-        if [[ ${#lic_list[@]} -gt 0 ]]; then 
+        if [[ ${#lic_list[@]} -gt 0 ]]; then
             for lic_name in ${lic_list[@]}
             do
-                #if E7 and SAP-Add-on is already present, skip NFS-Add-on 
+                #if E7 and SAP-Add-on is already present, skip NFS-Add-on
                 if ! [[ $lic_name == "NFS-Add-on" && ${lic_list[@]} =~ "SAP-Add-on" && E7_flag -eq 1 ]]; then
-                    echo "$license_required LTU(s) of HPE Serviceguard for linux $lic_name"
-                    total_license=$(( $total_license + $license_required ))
+                    if [[ $sg15_flag -eq 1 ]]; then
+                        delta=0
+                        #check if required licenses are already installed, else calculate the delta
+                        if [[ $lic_name == "NFS-Add-on" ]]; then
+                            if [[ $node_NFS_Add_on_count -lt  $license_required ]]; then 
+                                delta=$(( $license_required - $node_NFS_Add_on_count ))
+                                NFS_Add_on_count=$(( $NFS_Add_on_count + $delta ))
+                                node_license+="    $bullet_char $delta LTU(s) of HPE Serviceguard for linux $lic_name"
+                                node_license+=$newline_char
+                            fi
+                        elif [[ $lic_name == "SAP-Add-on" ]]; then
+                            if [[ $node_SAP_Add_on_count -lt  $license_required ]]; then 
+                                delta=$(( $license_required - $node_SAP_Add_on_count ))
+                                SAP_Add_on_count=$(( $SAP_Add_on_count + $delta ))
+                                node_license+="    $bullet_char $delta LTU(s) of HPE Serviceguard for linux $lic_name"
+                                node_license+=$newline_char
+                            fi
+                        elif [[ $lic_name == "Oracle-Add-on" ]]; then
+                            if [[ $node_Oracle_Add_on_count -lt  $license_required ]]; then 
+                                delta=$(( $license_required - $node_Oracle_Add_on_count ))
+                                Oracle_Add_on_count=$(( $Oracle_Add_on_count + $delta ))
+                                node_license+="    $bullet_char $delta LTU(s) of HPE Serviceguard for linux $lic_name"
+                                node_license+=$newline_char
+                            fi
+                        elif [[ $lic_name == "MSSQL-Add-on" ]]; then
+                            if [[ $node_MSSQL_Add_on_count -lt  $license_required ]]; then 
+                                delta=$(( $license_required - $node_MSSQL_Add_on_count ))
+                                MSSQL_Add_on_count=$(( $MSSQL_Add_on_count + $delta ))
+                                node_license+="    $bullet_char $delta LTU(s) of HPE Serviceguard for linux $lic_name"
+                                node_license+=$newline_char
+                            fi
+                        fi
+                        total_license=$(( $total_license + $delta ))
+                    else    #sg version is < 15; calculate the total_license based on license_required per node
+                        node_license+="    $bullet_char $license_required LTU(s) of HPE Serviceguard for linux $lic_name"
+                        node_license+=$newline_char
+                        if [[ $lic_name == "NFS-Add-on" ]]; then
+                            NFS_Add_on_count=$(( $NFS_Add_on_count + $license_required ))
+                        elif [[ $lic_name == "SAP-Add-on" ]]; then
+                            SAP_Add_on_count=$(( $SAP_Add_on_count + $license_required ))
+                        elif [[ $lic_name == "Oracle-Add-on" ]]; then
+                            Oracle_Add_on_count=$(( $Oracle_Add_on_count + $license_required ))
+                        elif [[ $lic_name == "MSSQL-Add-on" ]]; then
+                            MSSQL_Add_on_count=$(( $MSSQL_Add_on_count + $license_required ))
+                        fi
+                        total_license=$(( $total_license + $license_required ))
+                    fi
                 fi
             done
         fi
         if [[ FlexStorage_flag -eq 1 ]]; then
-            echo "1 LTU(s) of HPE Serviceguard for linux Flex-Storage-Add-on"
-            total_license=$(( $total_license + 1 ))
+            if [[ $node_Flex_Storage_Add_on_count -lt 1 && sg15_flag -eq 1 ]]; then
+                node_license+="    $bullet_char 1 LTU(s) of HPE Serviceguard for linux Flex-Storage-Add-on"
+                node_license+=$newline_char
+            else    #sg version is < 15; calculate the total_license based on license_required per node
+                node_license+="    $bullet_char 1 LTU(s) of HPE Serviceguard for linux Flex-Storage-Add-on"
+                node_license+=$newline_char
+                total_license=$(( $total_license + 1 ))
+                Flex_Storage_Add_on_count=$(( $Flex_Storage_Add_on_count + 1 ))
+            fi
         fi
-        echo "Total number of license(s) required : $total_license"
     else
         echo "Cluster configured : yes. Workloads Detected: No "
         echo
-        echo "HPE Serviceguard for linux A.15.00.00 and above, requires following licenses"
-        echo "Foundational: $license_required LTU(s) of HPE Serviceguard for linux HA-E5"
-        total_license=$(( $total_license + $license_required ))
-        echo "Total number of license(s) required : $total_license"
+        if [[ $sg15_flag -eq 1 ]]; then
+            if [[ $node_HA_E5_count -lt $license_required ]]; then
+                #check if sufficient HA-DR-E7 licenses are present
+                if [[ $node_HA_DR_E7_count -ne 0 && $node_HA_DR_E7_count -lt $license_required ]]; then
+                    delta=$(( $license_required - $node_HA_DR_E7_count ))
+                else
+                    delta=$(( $license_required - $node_HA_E5_count ))
+                fi
+                total_license=$(( $total_license + $delta ))
+                HA_E5_count=$(( $HA_E5_count + $delta ))
+                node_license+="    $bullet_char Foundational: $delta LTU(s) of HPE Serviceguard for linux HA-E5"
+                node_license+=$newline_char
+            fi
+        else    #sg version is < 15; calculate the total_license based on license_required per node
+            total_license=$(( $total_license + $license_required ))
+            HA_E5_count=$(( $HA_E5_count + $license_required ))
+            node_license+="    $bullet_char Foundational: $license_required LTU(s) of HPE Serviceguard for linux HA-E5"
+            node_license+=$newline_char
+        fi
     fi
+    if [[ $sg15_flag -eq 1 ]]; then
+        echo "For upgrading node $node, requires following licenses"
+        if [[ $total_license -eq 0 ]]; then 
+            echo "No extra licenses are required for the current workloads deployed."
+        else
+            echo "Total number of license(s) required for $node: $total_license"
+            printf "$node_license"
+        fi
+    else 
+        echo "For upgrading node $node to HPE Serviceguard for linux A.15.00.00 and above, requires following licenses"
+        echo "Total number of license(s) required for $node: $total_license"
+        printf "$node_license"
+    fi
+    #calculate the total count of license required for cluster
+    cluster_license_count=$(( $cluster_license_count + $total_license ))
     echo
 done
+
+echo "Summary : $cluster_name "
+#Existing cluster's details
+echo "HPE Serviceguard version installed: $sgversion"
+echo "HPE Serviceguard for linux License(s) installed: "
+if [[ $exi_Advance_count -eq 0 && $exi_Base_count -eq 0 && $exi_Enterprise_count -eq 0 && \
+    $exi_Flex_Storage_Add_on_count -eq 0 && $exi_HA_DR_E7_count -eq 0 && \
+    $exi_HA_E5_count -eq 0 && $exi_Instant_on_count -eq 0 && \
+    $exi_MSSQL_Add_on_count -eq 0 && $exi_NFS_Add_on_count -eq 0 && \
+    $exi_Oracle_Add_on_count -eq 0 && $exi_SAP_Add_on_count -eq 0 ]]; then
+    echo "No valid license found"
+fi
+if [[ $exi_Base_count -ne 0 ]]; then
+    echo "$exi_Base_count LTU(s) of HPE Serviceguard for linux - Base"
+fi
+if [[ $exi_Advance_count -ne 0 ]]; then
+    echo "$exi_Advance_count LTU(s) of HPE Serviceguard for linux - Advance"
+fi
+if [[ $exi_Enterprise_count -ne 0 ]]; then
+    echo "$exi_Enterprise_count LTU(s) of HPE Serviceguard for linux - Enterprise"
+fi
+if [[ $exi_Instant_on_count -ne 0 ]]; then
+    echo "$exi_Instant_on_count LTU(s) of HPE Serviceguard for linux - Instant-On"
+fi
+if [[ $exi_HA_DR_E7_count -ne 0 ]]; then
+    echo "$exi_HA_DR_E7_count LTU(s) of HPE Serviceguard for linux - HA-DR-E7"
+fi
+if [[ $exi_HA_E5_count -ne 0 ]]; then
+    echo "$exi_HA_E5_count LTU(s) of HPE Serviceguard for linux - HA_E5"
+fi
+if [[ $exi_SAP_Add_on_count -ne 0 ]]; then 
+    echo "$exi_SAP_Add_on_count LTU(s) of HPE Serviceguard for linux - SAP-Add-on"
+fi
+if [[ $exi_NFS_Add_on_count -ne 0 ]]; then 
+    echo "$exi_NFS_Add_on_count LTU(s) of HPE Serviceguard for linux - NFS-Add-on"
+fi
+if [[ $exi_Oracle_Add_on_count -ne 0 ]]; then 
+    echo "$exi_Oracle_Add_on_count LTU(s) of HPE Serviceguard for linux - Oracle-Add-on"
+fi
+if [[ $exi_MSSQL_Add_on_count -ne 0 ]]; then 
+    echo "$exi_MSSQL_Add_on_count LTU(s) of HPE Serviceguard for linux - MSSQL-Add-on"
+fi
+if [[ $exi_Flex_Storage_Add_on_count -ne 0 ]]; then 
+    echo "$exi_Flex_Storage_Add_on_count LTU(s) of HPE Serviceguard for linux - Flex-Storage-Add-on"
+fi
+echo
+
+#requirements identified by cmmaplicense
+if [[ sg15_flag -eq 0 ]]; then
+    echo "For upgrading cluster $cluster_name to HPE Serviceguard for linux A.15.00.00 and above, requires following licenses"
+    echo "Total number of license(s) required: $cluster_license_count"
+else 
+    if [[ $cluster_license_count -eq 0 ]]; then 
+        echo "For upgrading cluster $cluster_name, requires following licenses"
+        echo "No extra licenses are required for the current workloads deployed."
+    else
+        echo "Total number of extra license(s) required: $cluster_license_count"
+    fi
+fi
+if [[ $HA_E5_count -ne 0 ]]; then
+    echo "    * $HA_E5_count LTU(s) of HPE Serviceguard for linux - HA_E5"
+fi
+if [[ $HA_DR_E7_count -ne 0 ]]; then
+    echo "    * $HA_DR_E7_count LTU(s) of HPE Serviceguard for linux - HA-DR-E7"
+fi
+if [[ $SAP_Add_on_count -ne 0 ]]; then 
+    echo "    * $SAP_Add_on_count LTU(s) of HPE Serviceguard for linux - SAP-Add-on"
+fi
+if [[ $NFS_Add_on_count -ne 0 ]]; then 
+    echo "    * $NFS_Add_on_count LTU(s) of HPE Serviceguard for linux - NFS-Add-on"
+fi
+if [[ $Oracle_Add_on_count -ne 0 ]]; then 
+    echo "    * $Oracle_Add_on_count LTU(s) of HPE Serviceguard for linux - Oracle-Add-on"
+fi
+if [[ $MSSQL_Add_on_count -ne 0 ]]; then 
+    echo "    * $MSSQL_Add_on_count LTU(s) of HPE Serviceguard for linux - MSSQL-Add-on"
+fi
+if [[ $Flex_Storage_Add_on_count -ne 0 ]]; then 
+    echo "    * $Flex_Storage_Add_on_count LTU(s) of HPE Serviceguard for linux - Flex-Storage-Add-on"
+fi
+if [[ $SAP_Add_on_count -ne 0 ]]; then 
+    echo "    * $SAP_Add_on_count LTU(s) of HPE Serviceguard for linux - SAP-Add-on"
+fi
+echo
