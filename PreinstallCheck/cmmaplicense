@@ -950,7 +950,4 @@ fi
 if [[ $Flex_Storage_Add_on_count -ne 0 ]]; then 
     echo "    * $Flex_Storage_Add_on_count LTU(s) of HPE Serviceguard for linux - Flex-Storage-Add-on"
 fi
-if [[ $SAP_Add_on_count -ne 0 ]]; then 
-    echo "    * $SAP_Add_on_count LTU(s) of HPE Serviceguard for linux - SAP-Add-on"
-fi
 echo
