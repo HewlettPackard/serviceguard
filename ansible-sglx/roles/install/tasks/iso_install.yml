@@ -16,6 +16,9 @@
           already installed use upgrade option in playbook" 
   when: sgver_result.rc == 0
 
+- set_fact:
+      iso_location: "{{ sglx_inst_upg_additional_params.iso_params.iso_location }}"
+
 - name: Mount the ISO on the node
   include_tasks: roles/common/tasks/sglx_mount_iso.yml
   vars:
@@ -32,6 +35,34 @@
                   already installed use upgrade option in playbook"
   when: sgver_result.rc == 0
 
+- name: Install Serviceguard software with flex-storage utility
+  shell: |
+      {{ mount_dir }}/cminstaller -d {{ mount_dir }} -w {{ sglx_add_on_inst_upg_params.sglx_addon }} -u flex-storage
+  environment:
+      SGMGR_ENV: "{{ sglx_sgmgr_password }}"
+      ACCEPT_EULA: "Y"
+  register: cminstaller_output
+  when:
+      - mount_result.rc == 0
+      - sglx_add_on_inst_upg_params.storage_flex_add_on.install_upgrade
+- name: Summarize installation | Success
+  debug:
+      msg: " Installation of Serviceguard on node
+             Success: \n {{ cminstaller_output.stdout_lines }}"
+  when:
+      - cminstaller_output.rc == 0
+      - sglx_add_on_inst_upg_params.storage_flex_add_on.install_upgrade
+  ignore_errors: true
+
+- name: Summarize installation | Failure
+  debug:
+      msg: " Installation of Serviceguard on node
+             Failed: \n {{ cminstaller_output.stdout_lines }}"
+  when:
+      - cminstaller_output.rc != 0
+      - sglx_add_on_inst_upg_params.storage_flex_add_on.install_upgrade
+  ignore_errors: true
+
 - name: Install Serviceguard software
   shell: |
       {{ mount_dir }}/cminstaller -d {{ mount_dir }} -w {{ sglx_add_on_inst_upg_params.sglx_addon }}
@@ -39,7 +70,9 @@
       SGMGR_ENV: "{{ sglx_sgmgr_password }}"
       ACCEPT_EULA: "Y"
   register: cminstaller_output
-  when: mount_result.rc == 0
+  when: 
+      - mount_result.rc == 0
+      - not sglx_add_on_inst_upg_params.storage_flex_add_on.install_upgrade
 
 - set_fact:
       cminstaller_output:
@@ -53,6 +86,7 @@
              Success: \n {{ cminstaller_output.stdout_lines }}"
   when:
       - cminstaller_output.rc == 0
+      - not sglx_add_on_inst_upg_params.storage_flex_add_on.install_upgrade
   ignore_errors: true 
 
 - name: Summarize installation | Failure
@@ -61,6 +95,7 @@
              Failed: \n {{ cminstaller_output.stdout_lines }}"
   when:
       - cminstaller_output.rc != 0
+      - not sglx_add_on_inst_upg_params.storage_flex_add_on.install_upgrade
   ignore_errors: true 
 
 - name: Unmount the ISO on the node

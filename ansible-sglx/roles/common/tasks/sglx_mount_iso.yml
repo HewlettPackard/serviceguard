@@ -8,23 +8,23 @@
 - name: Check and set if NFS is specified in the mount location
   set_fact:
       nfs_mount_path: True
-  when: sglx_inst_upg_additional_params.iso_params.iso_location is regex("^nfs://*")
+  when: iso_location is regex("^nfs://*")
   ignore_errors: true
 
 - name: Check and set if Local file path is specified in the mount location
   set_fact:
       local_mount_path: True
-  when: sglx_inst_upg_additional_params.iso_params.iso_location is regex("^file://*")
+  when: iso_location is regex("^file://*")
   ignore_errors: true
 
 - name: Check if the ISO parameters contain NFS location
   set_fact:
-      nfs_mount_dir: '{{ sglx_inst_upg_additional_params.iso_params.iso_location | 
+      nfs_mount_dir: '{{ iso_location | 
                         regex_replace("^nfs://","") | 
                         regex_replace("(.*)/(.*)","\1@\2") | 
                         regex_replace("(.*)@(.*)","\1/") | 
                         regex_replace("(.+?)/(.*)","\1:/\2") }}'
-      nfs_iso_name: '{{ sglx_inst_upg_additional_params.iso_params.iso_location | 
+      nfs_iso_name: '{{ iso_location | 
                         regex_replace("^nfs://","") | 
                         regex_replace("(.*)/(.*)","\1@\2") | 
                         regex_replace("(.*)@(.*)","\2") }}'
@@ -33,14 +33,14 @@
 
 - name: Check if the ISO parameters contain local node location
   set_fact:
-       dest_iso_path: '{{ sglx_inst_upg_additional_params.iso_params.iso_location | 
+       dest_iso_path: '{{ iso_location | 
                           regex_replace("^file://","/") }}'
   when: local_mount_path == True
   ignore_errors: true
 
 - name: Copy the ISO to nodes where Serviceguard is not installed
   synchronize:
-      src: "{{ sglx_inst_upg_additional_params.iso_params.iso_location }}"
+      src: "{{ iso_location }}"
       dest: "{{ dest_iso_path }}"
       rsync_timeout: 60
   register: iso_sync_op

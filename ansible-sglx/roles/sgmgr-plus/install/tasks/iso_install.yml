@@ -16,6 +16,9 @@
           is already installed use upgrade option in playbook" 
   when: sgver_result.rc == 0
 
+- set_fact:
+      iso_location: "{{ sglx_inst_upg_additional_params.iso_params.iso_location }}"
+
 - name: Mount the ISO on the node
   include_tasks: roles/common/tasks/sglx_mount_iso.yml
   vars:
