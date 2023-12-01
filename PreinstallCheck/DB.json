@@ -220,6 +220,12 @@
         }, 
         {
             "ProductVersion": "A.15.00.00"
+        },
+	{
+            "ProductVersion": "A.15.10.00"
+        },
+	{
+            "ProductVersion": "A.15.20.00"
         }
     ], 
     "Servers": [

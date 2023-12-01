@@ -21,6 +21,7 @@ import argparse
 import logging
 from subprocess import PIPE, Popen
 log_file = "/tmp/cminstaller.log"
+return_status=0
 
 logger = logging.getLogger()
 logger.setLevel(logging.DEBUG)
@@ -46,14 +47,14 @@ elif args.Summary:
 else:
     preinstall_log_option = True
 
-if args.parser:
+if args.parser or not any(vars(args).values()):
     preutils.execute_parser_functions()
 
 def main():
     try:
-        preutils.cleanup()
+        preutils.check_clone_status()
         nodes = preutils.get_config_data("validation_nodes")
-        
+
         local_node = preutils.get_hostName()
 
         for each_node in nodes:
@@ -82,9 +83,24 @@ def main():
             temp_list.append(output)
             logger.debug("Exiting check_port function on node " + each_node)
             for i in range(len(temp_list)):
-                preutils.print_detailed_summary(temp_list[i],preinstall_log_option)
-            print()
+                return_status = 0
+                return_code = preutils.print_detailed_summary(temp_list[i],preinstall_log_option)
+                if return_code == 1:
+                    return_status = 1
+        if return_status == 1:
+            print("INFO: Please fix the above errors before continuing Installation")
+            return 1
+        else:
+            return 0
+   
+        print()
     except Exception as ex:
         print("Exception in main function",str(ex))
-main()
+
+
+ret = main()
+if ret == 1:
+    os.system("rm -rf tmp.txt")
+    exit(1)
 os.system("rm -rf tmp.txt")
+exit(0)        

@@ -36,6 +36,8 @@ sles = []
 rhel = []
 distro_name = None
 distro_version = None
+validation_failure = False
+url = "https://github.com/HewlettPackard/serviceguard.git"
 
 def read_input_file():
     try:
@@ -89,87 +91,147 @@ def exit_onerror(msg):
        print("Exception in exit_onerror " + str(ex))
 
 def check_rpm():
-    global dir_path
-    cmd = "ls " + dir_path + "/PreconfigureCheck >/dev/null 2>&1"
-    ret = os.system(cmd)
-    if ret == 0:
-        os.system('rm -rf /tmp/PreinstallCheck >/dev/null 2>&1')
-        cmd2 = "mv " + dir_path + "/PreinstallCheck /tmp >/dev/null 2>&1"
-    else:
-        cmd2 = "mkdir -p " + dir_path + " >/dev/null 2>&1"
-        os.system(cmd2)
+    try:
+        global dir_path
+        cmd = "ls " + dir_path + "/PreconfigureCheck >/dev/null 2>&1"
+        ret = os.system(cmd)
+        if ret == 0:
+            os.system('rm -rf /tmp/PreinstallCheck >/dev/null 2>&1')
+            cmd2 = "mv " + dir_path + "/PreinstallCheck /tmp >/dev/null 2>&1"
+        else:
+            cmd2 = "mkdir -p " + dir_path + " >/dev/null 2>&1"
+            os.system(cmd2)
+    except Exception as ex:
+        print("Exception in check_rpm function" + str(ex))
 
 def copy_prevalidation_files():
-    global dir_path
-    file_path = os.getcwd()
-    cmd2 = "cp -r " + file_path + "/PreinstallCheck " + dir_path
-    link_flag = os.system(cmd2)
-    if not link_flag == 0:
-        log.log("ERROR: Failed to copy files")
+    try:
+        global dir_path
+        file_path = os.getcwd()
+        cmd2 = "cp -r " + file_path + "/PreinstallCheck " + dir_path
+        link_flag = os.system(cmd2)
+        if not link_flag == 0:
+            log.log("ERROR: Failed to copy files")
+    except Exception as ex:
+        print("Exception in copying prevalidation files" + str(ex))
 
 def cleanup():
     try:
-        if os.path.exists("/tmp/serviceguard/sglx"):
-            shutil.rmtree("/tmp/serviceguard/sglx")
-        if os.path.exists("/tmp/serviceguard/sglx_serviceguardmanager"):
-            shutil.rmtree("/tmp/serviceguard/sglx_serviceguardmanager")
+        cur_dir = os.getcwd()
+        os.chdir('/tmp')
+        dir_path = "serviceguard"
+        exclude_dir1 = "PreinstallCheck"
+        exclude_dir2 = ".git"
+        subdirs = [d for d in os.listdir(dir_path) if os.path.isdir(os.path.join(dir_path, d))]
+        subdirs = [d for d in subdirs if d != exclude_dir1 and d != exclude_dir2]
+        for subdir in subdirs:
+            shutil.rmtree(os.path.join(dir_path, subdir))
+        os.chdir(cur_dir)    
     except Exception as ex:
         print("Exception in cleanup",str(ex))
 
+
+def check_clone_status():
+    try:
+        clone_flag= get_config_data("git_clone")
+        if 'yes' in clone_flag:
+            git_cloning()
+    except Exception as ex:
+        print("Exception in check_clone_status", str(ex))
+         
+    
 def git_cloning():
-    global dir_path
-    git_present = os.system("git --version >/dev/null 2>&1")
-    if git_present == 0:
+    try:
+        global dir_path
+        cur_dir= os.getcwd()
+        git_present = os.system("git --version >/dev/null 2>&1") 
+        if git_present != 0:
+            logger.error("ERROR: Install git to continue")
+            return
         os.chdir('/tmp')
-        check_folder = os.system("ls serviceguard/PreinstallCheck >/dev/null 2>&1")
-        if not check_folder == 0:
-            install_git_repo = os.system("git clone https://github.com/HewlettPackard/serviceguard")
-            if install_git_repo == 0:
-                os.chdir('serviceguard/PreinstallCheck')
-                check_git_repo()
-            else:
-                log.log("ERROR: git repo specified does not exist")
-        else:
+        if os.system("ls serviceguard/PreinstallCheck >/dev/null 2>&1") == 0:
             git_update()
-            check_git_repo()
-    else:
-        log.log("ERROR: Install git to continue")
+            action = "Updation"
+        else:
+            install_git_repo = os.system("git clone "+ url)
+            if install_git_repo != 0:
+                print("Proceeding without latest update")
+                logger.error("ERROR: git repo specified does not exist")
+                os.chdir(cur_dir)
+                copy_prevalidation_files()
+                return
+            os.chdir('serviceguard/PreinstallCheck')
+            action = "Cloning"
+        flag = check_git_repo()
+        if not flag:
+            print(str(action) + " Successful")
+            logger.info(str(action) + " Successful")
+        else:
+            print(str(action)+ " Unsuccessful")
+            logger.info(str(action) + " Unsuccessful")
+        cleanup()
+        os.chdir(cur_dir)
+        
+    except Exception as ex:
+        print("Exception inside git_cloning function" + str(ex))
 
 def git_update():
-    os.chdir('serviceguard/PreinstallCheck')
-    git_update_flag = os.system("git pull origin >/dev/null 2>&1")
-    if not git_update_flag == 0:
-        log.log("ERROR: Failed to update git contents")
+    try:
+        os.chdir('serviceguard/PreinstallCheck')
+        git_update_flag = os.system("git pull origin >/dev/null 2>&1")
+        if git_update_flag:
+            logger.error("ERROR: Failed to update git contents")    
+    except Exception as ex:
+        print("Exception while updating" +str(ex))
 
 def check_git_repo():
-    file1 = os.path.exists("cmsgpreinstallcheck.py >/dev/null 2>&1")
-    file2 = os.path.exists("PreinstallUtils.py >/dev/null 2>&1")
-    file3 = os.path.exists("pre_install_check.config >/dev/null 2>&1")
-    file4 = os.path.exists("DB.json >/dev/null 2>&1")
-    if file1 == 0 and file2 == 0 and file3 == 0 and file4 == 0:
-        os.chdir('/tmp/serviceguard')
-        cmd = "cp -r PreinstallCheck " + dir_path + " >/dev/null 2>&1"
-        os.system(cmd)
-    else:
-        log.log("ERROR: Git repo contents are not correct")
+    try:
+        file1 = os.path.exists("cmsgpreinstallcheck.py")
+        file2 = os.path.exists("preinstallUtils.py")
+        file3 = os.path.exists("pre_install_check.config")
+        file4 = os.path.exists("DB.json")
+        if file1 and file2 and file3 and file4:
+            os.chdir('/tmp/serviceguard')
+            cmd = "cp -r PreinstallCheck " + dir_path + " >/dev/null 2>&1"
+            os.system(cmd)
+            return 0
+        else:
+            logger.error("ERROR: Git repo contents are not correct")
+            return 1
+    except Exception as ex:
+        print("Exception while checking git Repository "+ str(ex)) 
 
 def read_node_names(nodes):
-    global dir_path
-    nodes_str = ','.join(nodes)
-    exec_path = dir_path + "/PreinstallCheck"
-    os.chdir(exec_path)
-    update_node_names(nodes_str)
+    try:
+        global dir_path
+        nodes_str = ','.join(nodes)
+        exec_path = dir_path + "/PreinstallCheck"
+        os.chdir(exec_path)
+        update_node_names(nodes_str)
+    except Exception as ex:
+        print("Exception while reading node names" + str(ex))
 
 def update_node_names(nodes_str):
-    with open ("pre_install_check.config", "a") as file:
-        data = "validation_nodes=" + nodes_str
-        file.write(data)
+    try:
+        with open ("pre_install_check.config", "a") as file:
+            data = "validation_nodes=" + nodes_str
+            file.write(data)
+    except Exception as ex:
+        print("Exception while updating node names" + str(ex))
 
 def run_preinstall_check():
-    check_file = os.path.exists("cmsgpreinstallcheck.py >/dev/null 2>&1")
-    if check_file == 0:
-        cmd = "./cmsgpreinstallcheck.py -p"
-        os.system(cmd)
+    try:
+        check_file = os.path.exists("cmsgpreinstallcheck.py >/dev/null 2>&1")
+        if check_file == 0:
+            cmd = "./cmsgpreinstallcheck.py -p"
+            return_code = os.system(cmd)
+            if return_code != 0:
+                return 1
+            return 0
+        return 1
+    except Exception as ex:
+        print("Exception while preinstall check" + str(ex))
+
 
 def read_DB_file():
     try:
@@ -258,53 +320,68 @@ def serviceguard_os_list():
         print("Exception in serviceguard_os_list function",str(ex))
 
 def get_os(Filename):
-    line = None
-    content = None
-    distro_name = None
-    distro_version = None
-    os_name = None
-    if os.path.exists(Filename):
-        with open(Filename) as f:
-            for line in f:
-                content = line.split("=")
-                if 'NAME' in content:
-                    if 'Red Hat' in content[1] or 'CentOS' in content[1]:
-                        distro_name = 'RedHat'
-                    elif 'SLES' in content[1]:
-                        distro_name = 'SLES'
-                    elif 'Oracle' in content[1]:
-                        distro_name = 'Oracle_Linux'
-                if 'VERSION_ID' in content:
-                    distro_version = content[1].replace('"', '')
-                    distro_version = distro_version.rstrip().split('.')[0]
-    if distro_version is None:
-        fileName = "/etc/redhat-release";
-        if os.path.exists(fileName):
-            distro_name = 'RedHat'
-            with open("/etc/redhat-release") as f:
-                line = f.read()
-                line = line.split()
-                for i in range(0, len(line)):
-                    content = line[i]
-                    if content.lower() == 'release':
-                        if(i + 1 < len(line)):
-                            distro_version = line[i+1].strip().split('.')[0]
-                            break
-    if distro_version is None:
-        fileName = "/etc/SuSE-release";
-        if os.path.exists(fileName):
-            distro_name = 'SLES'
-            select_yum_or_zypper = "zypper"
-            with open("/etc/SuSE-release") as f:
+    try:
+        line = None
+        content = None
+        distro_name = None
+        distro_version = None
+        os_name = None
+        if os.path.exists(Filename):
+            with open(Filename) as f:
                 for line in f:
                     content = line.split("=")
-                    if 'VERSION' in str(content):
-                        distro_version = content[1].strip().rstrip()
-                        break
-    return distro_name, distro_version
+                    if 'NAME' in content:
+                        if 'Red Hat' in content[1] or 'CentOS' in content[1]:
+                            distro_name = 'RedHat'
+                        elif 'SLES' in content[1]:
+                            distro_name = 'SLES'
+                        elif 'Oracle' in content[1]:
+                            distro_name = 'Oracle_Linux'
+                    if 'VERSION_ID' in content:
+                        distro_version = content[1].replace('"', '')
+                        distro_version = distro_version.rstrip().split('.')[0]
+        if distro_version is None:
+            fileName = "/etc/redhat-release";
+            if os.path.exists(fileName):
+                distro_name = 'RedHat'
+                with open("/etc/redhat-release") as f:
+                    line = f.read()
+                    line = line.split()
+                    for i in range(0, len(line)):
+                        content = line[i]
+                        if content.lower() == 'release':
+                            if(i + 1 < len(line)):
+                                distro_version = line[i+1].strip().split('.')[0]
+                                break
+        if distro_version is None:
+            fileName = "/etc/SuSE-release";
+            if os.path.exists(fileName):
+                distro_name = 'SLES'
+                select_yum_or_zypper = "zypper"
+                with open("/etc/SuSE-release") as f:
+                    for line in f:
+                        content = line.split("=")
+                        if 'VERSION' in str(content):
+                            distro_version = content[1].strip().rstrip()
+                            break
+        return distro_name, distro_version
+    except Exception as ex:
+        print("Exception in get_os function" + str(ex))
 
-
-
+def is_container_environment(node,remote_node_flag):
+    try:
+        out, return_code = run_shell_command_on_nodes("ls /.dockerenv", remote_node_flag,node)
+        if return_code == 0:
+            return 0
+        out, return_code = run_shell_command_on_nodes("cat /proc/1/cgroup",remote_node_flag,node)
+        if any('docker' in line or 'kubepods' in line for line in out.splitlines()):
+            return 0
+        out, return_code = run_shell_command_on_nodes("cat /proc/self/mountinfo", remote_node_flag,node)
+        if any('docker' in line or 'containers' in line for line in out.splitlines()):
+            return 0
+        return 1
+    except Exception as ex:
+        print("Exception inside is_container_environment function: " + str(ex))
 
 def get_hostName():
     try:
@@ -326,19 +403,6 @@ def get_shortname(hostname):
             return name
     except Exception as ex:
         print("Exception in get_hostName " + str(ex))
-
-
-def get_config_data(key):
-    try:
-        if not key:
-            return None
-        with open('preconfig.json') as f:
-            data = json.load(f)
-        return data.get(key, "")
-
-    except Exception as ex:
-        print("Exception in get_config_data" + str(ex))
-
 
 def compare_remote_node_file(node,remote_node_flag,each_file_path):
     try:
@@ -387,27 +451,38 @@ def run_os_related_commands_on_shell(hostName):
         print("Exception in run_os_related_commands_on_shell " + str(ex))
 
 def print_detailed_summary(output,log_option):
-    for i in output:
-        preinstall_log_option = log_option
-        if preinstall_log_option == False:
-            filt_keys = ['test_case_name', 'overall_status']
-            res = [i[key] for key in filt_keys]
-            final = res[0] + " : " + res[1]
-            print(final)
-        else:
-            filt_keys = ['test_case_name', 'overall_status', 'result']
-            res = [i[key] for key in filt_keys]
-            final = res[0] + " : " + res[1]
-            print(final)
-            print()
-            for j in res[2]:
-                filt_keys1 = ['msg', 'msg_status']
-                res1 = [j[key] for key in filt_keys1]
-                res2 = res1[0]
-                for k in res2:
-                    final2 = res1[1] + " : " + k
-                    print(final2)
-            print()
+    try:
+        global validation_failure
+        for i in output:
+            preinstall_log_option = log_option
+            if preinstall_log_option == False:
+                filt_keys = ['test_case_name', 'overall_status']
+                res = [i[key] for key in filt_keys]
+                final = res[0] + " : " + res[1]
+                print(final)
+            else:
+                filt_keys = ['test_case_name', 'overall_status', 'result']
+                res = [i[key] for key in filt_keys]
+                final = res[0] + " : " + res[1]
+                print(final)
+                print()
+                for j in res[2]:
+                    filt_keys1 = ['msg', 'msg_status']
+                    res1 = [j[key] for key in filt_keys1]
+                    for i in res1:
+                        if(i == "ERROR"):
+                            validation_failure = True
+                    res2 = res1[0]
+                    for k in res2:
+                        final2 = res1[1] + " : " + k
+                        print(final2)
+                print()
+        if validation_failure == True:
+            return 1
+        return 0
+    except Exception as ex:
+        print("Exception while printing detailed summary" + str(ex))
+
 def get_config_data(key):
     try:
         if not key:
@@ -415,7 +490,6 @@ def get_config_data(key):
         with open('preconfig.json') as f:
             data = json.load(f)
         return data.get(key, "")
-
     except Exception as ex:
         print ("Exception in get_config_data" + str(ex))
 
@@ -501,12 +575,173 @@ def check_rpm_installed(node,remote_node_flag):
         sles12_rpms = ['pidentd','libjson-c2','xinetd','dmidecode','time']
         sles15_rpms = ['pidentd','libjson-c3','expect','dmidecode','time']
         user_rpms = get_config_data("rpms_to_check")
+        container_rpms= ['iproute','iputils','net-tools','openssh-clients','bind-utils']
+        is_container = is_container_environment(node,remote_node_flag)
+        if is_container == 0:
+             for rpm_name in container_rpms:
+                if rpm_name == "iproute":
+                    cmd = "rpm -qi " + str(rpm_name)
+                    out,return_code = run_shell_command_on_nodes(cmd,remote_node_flag,node)
+                    if return_code != 0:
+                        overall_status = False
+                        return_report[node]=False
+                        return_report["msg_status"]="WARNING"
+                        str1="rpm " + str(rpm_name) + " of version 4.0.0 or higher is required."
+                        logger.warning(str1)
+                        msg1.append(str1)
+                    else:
+                        tmp_file = open('tmp.txt', 'w')
+                        tmp_file.write(out)
+                        tmp_file.close()
+                        tmp_file = open('tmp.txt', 'r')
+                        for line in tmp_file:
+                            if line.startswith('Version'):
+                                a = line.split(':')
+                                b = a[1].split(".")
+                                if int(b[0]) == 4:
+                                    if not int(b[1]) >= 0:
+                                        overall_status = False
+                                        return_report[node]=False
+                                        return_report["msg_status"]="WARNING"
+                                        str1="rpm " + str(rpm_name) + " of version 4.0.0 or higher is required."
+                                        logger.warning(str1)
+                                        msg1.append(str1)
+                                elif not int(b[0]) > 4:
+                                    overall_status = False
+                                    return_report[node]=False
+                                    return_report["msg_status"]="WARNING"
+                                    str1="rpm " + str(rpm_name) + " of version 4.0.0 or higher is required."
+                                    logger.warning(str1)
+                                    msg1.append(str1)
+                        tmp_file.close()
+                elif rpm_name == "iputils":
+                    cmd = "rpm -qi " + str(rpm_name)
+                    out,return_code = run_shell_command_on_nodes(cmd,remote_node_flag,node)
+                    if return_code != 0:
+                        overall_status = False
+                        return_report[node]=False
+                        return_report["msg_status"]="WARNING"
+                        str1="rpm " + str(rpm_name) + " of version 20071127 or higher is required."
+                        logger.warning(str1)
+                        msg1.append(str1)
+                    else:
+                        tmp_file = open('tmp.txt', 'w')
+                        tmp_file.write(out)
+                        tmp_file.close()
+                        tmp_file = open('tmp.txt', 'r')
+                        for line in tmp_file:
+                            if line.startswith('Version'):
+                                a = line.split(':')
+                                if not int(a[1]) >=20071127 :
+                                    overall_status = False
+                                    return_report[node]=False
+                                    return_report["msg_status"]="WARNING"
+                                    str1="rpm " + str(rpm_name) + " of version 20071127 or higher is required."
+                                    logger.warning(str1)
+                                    msg1.append(str1)
+                        tmp_file.close()
+                elif rpm_name == "net-tools":
+                    cmd = "rpm -qi " + str(rpm_name)
+                    out,return_code = run_shell_command_on_nodes(cmd,remote_node_flag,node)
+                    if return_code != 0:
+                        overall_status = False
+                        return_report[node]=False
+                        return_report["msg_status"]="WARNING"
+                        str1="rpm " + str(rpm_name) + " of version 1.6 or higher is required."
+                        logger.warning(str1)
+                        msg1.append(str1)
+                    else:
+                        tmp_file = open('tmp.txt', 'w')
+                        tmp_file.write(out)
+                        tmp_file.close()
+                        tmp_file = open('tmp.txt', 'r')
+                        for line in tmp_file:
+                            if line.startswith('Version'):
+                                a = line.split(':')
+                                if not float(a[1]) >= 1.6:
+                                    overall_status = False
+                                    return_report[node]=False
+                                    return_report["msg_status"]="WARNING"
+                                    str1="rpm " + str(rpm_name) + " of version 1.6  or higher is required."
+                                    logger.warning(str1)
+                                    msg1.append(str1)
+                        tmp_file.close()
+                elif rpm_name == "bind-utils":
+                    cmd = "rpm -qi " + str(rpm_name)
+                    out,return_code = run_shell_command_on_nodes(cmd,remote_node_flag,node)
+                    if return_code != 0:
+                        overall_status = False
+                        return_report[node]=False
+                        return_report["msg_status"]="WARNING"
+                        str1="rpm " + str(rpm_name) + " of version 9.10.00 or higher is required."
+                        logger.warning(str1)
+                        msg1.append(str1)
+                    else:
+                        tmp_file = open('tmp.txt', 'w')
+                        tmp_file.write(out)
+                        tmp_file.close()
+                        tmp_file = open('tmp.txt', 'r')
+                        for line in tmp_file:
+                            if line.startswith('Version'):
+                                a = line.split(':')
+                                b = a[1].split(".")
+                                if int(b[0]) == 9:
+                                    if not int(b[1]) >= 10:
+                                        overall_status = False
+                                        return_report[node]=False
+                                        return_report["msg_status"]="WARNING"
+                                        str1="rpm " + str(rpm_name) + " of version 9.10.00 or higher is required."
+                                        logger.warning(str1)
+                                        msg1.append(str1)
+                                elif not int(b[0]) > 9:
+                                    overall_status = False
+                                    return_report[node]=False
+                                    return_report["msg_status"]="WARNING"
+                                    str1="rpm " + str(rpm_name) + " of version 9.10.00 or higher is required."
+                                    logger.warning(str1)
+                                    msg1.append(str1)
+                        tmp_file.close()
+                elif rpm_name == "openssh-clients":
+                    cmd = "rpm -qi " + str(rpm_name)
+                    out,return_code = run_shell_command_on_nodes(cmd,remote_node_flag,node)
+                    if return_code != 0:
+                        overall_status = False
+                        return_report[node]=False
+                        return_report["msg_status"]="WARNING"
+                        str1="rpm " + str(rpm_name) + " of version 4.0  or higher is required."
+                        logger.warning(str1)
+                        msg1.append(str1)
+                    else:
+                        tmp_file = open('tmp.txt', 'w')
+                        tmp_file.write(out)
+                        tmp_file.close()
+                        tmp_file = open('tmp.txt', 'r')
+                        for line in tmp_file:
+                            if line.startswith('Version'):
+                                a = line.split(':')
+                                b = a[1].split("p")
+                                if float(b[0]) == 4.0:
+                                    if not int(b[1]) >= 0:
+                                        overall_status = False
+                                        return_report[node]=False
+                                        return_report["msg_status"]="WARNING"
+                                        str1="rpm " + str(rpm_name) + " of version 4.0.0 or higher is required."
+                                        logger.warning(str1)
+                                        msg1.append(str1)
+                                elif not float(b[0]) > 4.0:
+                                    overall_status = False
+                                    return_report[node]=False
+                                    return_report["msg_status"]="WARNING"
+                                    str1="rpm " + str(rpm_name) + " of version 4.0.0 or higher is required."
+                                    logger.warning(str1)
+                                    msg1.append(str1)
+                        tmp_file.close()
         if distro_name == "RedHat" and int(distro_version) <= 7:
             overall_status = False
             return_report[node]=False
-            return_report["msg_status"]="WARNING"
+            return_report["msg_status"]="ERROR"
             str1="Distro version is unsupported to check rpms."
-            logger.warning(str1)
+            logger.error(str1)
             msg1.append(str1)
         elif distro_name == "RedHat" or distro_name == "Oracle_Linux":
             for rpm_name in common_rpms:
@@ -760,7 +995,7 @@ def check_rpm_installed(node,remote_node_flag):
                             if not out.startswith(str(rpm2)):
                                 cmd2 = "rpm -qa | grep " + str(rpm2)
                                 out2,return_code2 = run_shell_command_on_nodes(cmd2,remote_node_flag,node)
-                                if not out2.starswith(str(rpm2)):
+                                if not out2.startswith(str(rpm2)):
                                     overall_status = False
                                     return_report[node]=False
                                     return_report["msg_status"]="WARNING"
@@ -785,9 +1020,9 @@ def check_rpm_installed(node,remote_node_flag):
         if distro_name == "SLES" and int(distro_version) <= 11:
             overall_status = False
             return_report[node]=False
-            return_report["msg_status"]="WARNING"
+            return_report["msg_status"]="ERROR"
             str1="Distro version is invalid to check rpms."
-            logger.warning(str1)
+            logger.error(str1)
             msg1.append(str1)
         elif distro_name =="SLES" and int(distro_version) >= 12:
             for rpm_name in common_rpms:

@@ -1,6 +1,6 @@
 # (c) Copyright 2023 Hewlett Packard Enterprise Development LP
 # All rights reserved
-# version 2.5
+# version 2.6
 #!/bin/bash
 
 typeset -i cores_supported_per_license=2
@@ -125,13 +125,15 @@ function check_for_cluster
             return 1
         fi
         cmversion=`ssh $node cmversion 2> /dev/null`
+    else
+        cmversion=`cmversion 2> /dev/null`
     fi
     if [[ -z "$view" ]]; then
-        if [[ -z $node ]]; then
+        if [[ -z "$node" ]]; then
             node=$curr_node
             echo_n "Node: $curr_node"
-            echo_n "Current Serviceguard configuration on $curr_node"            
-            
+            echo_n "Current Serviceguard configuration on $curr_node"
+
             if ! [[ -z "$cmversion" ]]; then
                 echo_n "Serviceguard version installed: $cmversion"
             else
@@ -202,9 +204,15 @@ function check_for_cluster
             echo_f "node:$node|license_version:v15|license_details:required|license_type=HA-E5 or HA-DR-E7"
             echo_f "node:$node|license_version:v15|license_details:required|license_type:HA-E5 or HA-DR-E7|license_genre=Foundational"
             echo_f "node:$node|license_version:v15|license_details:required|license_type:HA-E5 or HA-DR-E7|license_count=$license_required"
-            
+
             #delete the file
             rm -f $tmpfile
+            if [[ -n "$cmversion" ]]; then
+                if [[ $cmversion =~ "12." ]]; then
+                    echo
+                    print_note
+                fi
+            fi
             return 0
         else #node name is passed
             ssh $node hostnamectl > $tmp_mapfile
@@ -266,12 +274,22 @@ function check_for_cluster
             echo_f "node:$node|license_version:v15|license_details:required|license_type:HA-E5 or HA-DR-E7|license_count=$license_required"
             #delete the file
             rm -f $tmpfile
+            if [[ -n "$cmversion" ]]; then
+                if [[ $cmversion =~ "12." ]]; then
+                    echo
+                    print_note
+                fi
+            fi
             return 0
         fi
     else
         if ! [[ -z "$node" ]]; then
             calc_license_req $node
             echo "Note: $node has a cluster, please run cmmaplicense on $node without -n option to get license details of all the nodes"
+            echo
+            if [[ $sg15_flag -ne 1 ]]; then
+                print_note
+            fi
         else
             return 1
         fi
@@ -470,7 +488,7 @@ function calc_license_req
     echo_n "Node: $node"
     echo_n "Current Serviceguard configuration on $node"
     curr_node=$(host=`hostname`; echo ${host%%.*})
-    if [[ sg_flag -eq 1 ]]; then
+    if [[ $sg_flag -eq 1 ]]; then
         if [[ $node == $curr_node ]]; then
             sgversion=`cmversion`
             license_installed=`cmgetlicense`
@@ -563,7 +581,7 @@ function calc_license_req
                     E7_flag=1
                     scale_out="yes"
                 fi
-                if [[ E7_flag -eq 0 ]]; then
+                if [[ $E7_flag -eq 0 ]]; then
                     E5_flag=1
                 fi
                 if ! [[ ${lic_list[@]} =~ "SAP-Add-on" ]]; then
@@ -583,7 +601,7 @@ function calc_license_req
                     wrkld_list+=( "Oracle" )
                 fi
 
-                if [[ E7_flag -eq 0 ]]; then
+                if [[ $E7_flag -eq 0 ]]; then
                     E5_flag=1
                 fi
                 if ! [[ ${lic_list[@]} =~ "Oracle-Add-on" ]]; then
@@ -615,7 +633,7 @@ function calc_license_req
                             rpo_list+=( "Dataguard" )
                         fi
                     fi
-                    if [[ E7_flag -eq 0 ]]; then     
+                    if [[ $E7_flag -eq 0 ]]; then
                         E5_flag=1
                     fi
                     if ! [[ ${lic_list[@]} =~ "Oracle-Add-on" ]]; then
@@ -636,7 +654,7 @@ function calc_license_req
                         rpo_list+=( "XDC" )
                     fi
                 fi
-                if [[ E7_flag -eq 0 ]]; then
+                if [[ $E7_flag -eq 0 ]]; then
                     E5_flag=1
                 fi
             fi
@@ -646,7 +664,7 @@ function calc_license_req
                 if ! [[ ${wrkld_list[@]} =~ "MSSQL" ]]; then
                     wrkld_list+=( "MSSQL" )
                 fi
-                if [[ E7_flag -eq 0 ]]; then
+                if [[ $E7_flag -eq 0 ]]; then
                     E5_flag=1
                 fi
                 if ! [[ ${lic_list[@]} =~ "MSSQL-Add-on" ]]; then
@@ -674,8 +692,7 @@ function calc_license_req
                     if ! [[ ${wrkld_list[@]} =~ "MSSQL" ]]; then
                         wrkld_list+=( "MSSQL" )
                     fi
-                    
-                    if [[ E7_flag -eq 0 ]]; then     
+                    if [[ $E7_flag -eq 0 ]]; then
                         E5_flag=1
                     fi
                     if ! [[ ${lic_list[@]} =~ "MSSQL-Add-on" ]]; then
@@ -689,7 +706,7 @@ function calc_license_req
                 if ! [[ ${wrkld_list[@]} =~ "DB2" ]]; then
                     wrkld_list+=( "DB2" )
                 fi
-                if [[ E7_flag -eq 0 ]]; then     
+                if [[ $E7_flag -eq 0 ]]; then
                     E5_flag=1
                 fi
             fi
@@ -699,7 +716,7 @@ function calc_license_req
                 if ! [[ ${wrkld_list[@]} =~ "Postgres" ]]; then
                     wrkld_list+=( "Postgres" )
                 fi
-                if [[ E7_flag -eq 0 ]]; then     
+                if [[ $E7_flag -eq 0 ]]; then
                     E5_flag=1
                 fi
             fi
@@ -709,7 +726,7 @@ function calc_license_req
                 if ! [[ ${wrkld_list[@]} =~ "Sybase" ]]; then
                     wrkld_list+=( "Sybase")
                 fi
-                if [[ E7_flag -eq 0 ]]; then     
+                if [[ $E7_flag -eq 0 ]]; then
                     E5_flag=1
                 fi
             fi
@@ -719,7 +736,7 @@ function calc_license_req
                 if ! [[ ${wrkld_list[@]} =~ "KVM" ]]; then
                     wrkld_list+=( "KVM" )
                 fi
-                if [[ E7_flag -eq 0 ]]; then     
+                if [[ $E7_flag -eq 0 ]]; then
                     E5_flag=1
                 fi
             fi
@@ -749,7 +766,7 @@ function calc_license_req
                             rpo_list=( "DRBD" )
                         fi
                     fi
-                    if [[ E7_flag -eq 0 ]]; then
+                    if [[ $E7_flag -eq 0 ]]; then
                         E5_flag=1
                     fi
                     FlexStorage_flag=1
@@ -768,7 +785,7 @@ function calc_license_req
                         rpo_list+=( "3PAR" )
                     fi
                 fi
-                if [[ E7_flag -eq 0 ]]; then
+                if [[ $E7_flag -eq 0 ]]; then
                     E5_flag=1
                 fi
             fi
@@ -785,7 +802,7 @@ function calc_license_req
                         rpo_list+=( "Primera" )
                     fi
                 fi
-                if [[ E7_flag -eq 0 ]]; then
+                if [[ $E7_flag -eq 0 ]]; then
                     E5_flag=1
                 fi
             fi
@@ -801,7 +818,7 @@ function calc_license_req
                         rpo_list+=( "SADR" )
                     fi
                 fi
-                if [[ E7_flag -eq 0 ]]; then
+                if [[ $E7_flag -eq 0 ]]; then
                     E5_flag=1
                 fi
             fi
@@ -811,7 +828,7 @@ function calc_license_req
                 if ! [[ ${wrkld_list[@]} =~ "XP" ]]; then
                     wrkld_list+=( "XP")
                 fi
-                if [[ E7_flag -eq 0 ]]; then
+                if [[ $E7_flag -eq 0 ]]; then
                     E5_flag=1
                 fi
             fi
@@ -836,7 +853,7 @@ function calc_license_req
                 if ! [[ ${wrkld_list[@]} =~ "NFS" ]]; then
                     wrkld_list+=( "NFS" )
                 fi
-                if [[ E7_flag -eq 0 ]]; then
+                if [[ $E7_flag -eq 0 ]]; then
                     E5_flag=1
                 fi
                 if ! [[ ${lic_list[@]} =~ "NFS-Add-on" ]]; then
@@ -847,7 +864,7 @@ function calc_license_req
     done
     total_license=0
     echo_n "Checking the node configuration..."
-    if [[ vm_flag -eq 1 ]]; then
+    if [[ $vm_flag -eq 1 ]]; then
         echo_n "Number of vCPU(s) : $vcpu"
         echo_f "node:$node|compute_type=vcpu"
         echo_f "node:$node|compute_type=vcpu|vcpus=$vcpu"
@@ -866,7 +883,7 @@ function calc_license_req
             echo_n -n $(echo ${multitarget_list[@]}) | tr ' ' ','
             echo_n ")"
         fi
-        if [[ pushbutton_flag -eq 1 ]]; then
+        if [[ $pushbutton_flag -eq 1 ]]; then
             echo_n "Push Button Recovery : Yes"
         fi
         if [[ ${#rpo_list[@]} -gt 0 ]]; then
@@ -893,7 +910,7 @@ function calc_license_req
         echo_n
         echo_f "node:$node|license_version=v15"
         echo_f "node:$node|license_version:v15|license_details=required"
-        if [[ E7_flag -eq 1 ]]; then
+        if [[ $E7_flag -eq 1 ]]; then
             if [[ $sg15_flag -eq 1 ]]; then
                 if [[ $node_HA_DR_E7_count -lt $license_required ]]; then
                     delta=$(( $license_required - $node_HA_DR_E7_count ))
@@ -984,8 +1001,8 @@ function calc_license_req
                 fi
             done
         fi
-        if [[ FlexStorage_flag -eq 1 ]]; then
-            if [[ $node_Flex_Storage_Add_on_count -lt 1 && sg15_flag -eq 1 ]]; then
+        if [[ $FlexStorage_flag -eq 1 ]]; then
+            if [[ $node_Flex_Storage_Add_on_count -lt 1 && $sg15_flag -eq 1 ]]; then
                 node_license+="    $bullet_char 1 LTU(s) of HPE Serviceguard for linux Flex-Storage-Add-on"
                 node_license+=$newline_char
             else    #sg version is < 15; calculate the total_license based on license_required per node
@@ -1048,6 +1065,16 @@ function calc_license_req
     echo_n
 }
 
+function print_note
+{
+    printf "********************************************************************************\n"
+    printf "* NOTE: When A.12.xx.xx is upgraded to A.15.20.00 and beyond, the current      *\n"
+    printf "* v12 licenses will automatically mapped to v15 licenses by the product.       *\n"
+    printf "* For further details, kindly refer the 'SGLX v12 to SGLX v15 Upgrade Program' *\n"
+    printf "* available at https://www.hpe.com/info/linux-serviceguard-docs.               *\n"
+    printf "********************************************************************************\n"
+}
+
 function print_summary
 {
     echo_n "Summary : $cluster_name "
@@ -1066,7 +1093,7 @@ function print_summary
     fi
     
     #requirements identified by cmmaplicense
-    if [[ sg15_flag -eq 0 ]]; then
+    if [[ $sg15_flag -eq 0 ]]; then
         echo_n "For upgrading cluster $cluster_name to HPE Serviceguard for linux A.15.00.00 and above, requires following licenses"
         echo_n "Total number of license(s) required: $cluster_license_count"
     else
@@ -1149,7 +1176,7 @@ while getopts ":hn:f:" option; do
             ;;
         n)
             if [[ $n_flag -eq 0 ]]; then
-                echo_n "cmmaplicense version: 2.5"
+                echo_n "cmmaplicense version: 2.6"
                 echo_n
             fi
             n_flag=1
@@ -1166,7 +1193,7 @@ while getopts ":hn:f:" option; do
             fline_flag=1
             # Redirect stdout to /dev/null
             echo_n() { :; }
-            echo_f() { printf "$1 \n"; }
+            echo_f() { printf "$1\n"; }
             ;;
         *)
             echo "Invalid Option"
@@ -1176,7 +1203,7 @@ while getopts ":hn:f:" option; do
 done
 shift $(( OPTIND - 1))
 
-if [[ n_flag -eq 1 ]]; then
+if [[ $n_flag -eq 1 ]]; then
     exit 1
 fi
 
@@ -1185,7 +1212,7 @@ if [[ $? -eq 0 ]]; then
     exit 1
 fi
 
-echo_n "cmmaplicense version: 2.5"
+echo_n "cmmaplicense version: 2.6"
 echo_n
 
 #get all the nodelist
@@ -1213,3 +1240,7 @@ do
 done
 
 print_summary
+
+if [[ $sg15_flag -ne 1 && $fline_flag -ne 1 ]]; then
+    print_note
+fi
