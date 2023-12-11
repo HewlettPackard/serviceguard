@@ -112,6 +112,10 @@ def copy_prevalidation_files():
         link_flag = os.system(cmd2)
         if not link_flag == 0:
             log.log("ERROR: Failed to copy files")
+        cmd2 = "chmod +x " + dir_path + "/PreinstallCheck/cmsgpreinstallcheck.py"
+        out = os.system(cmd2)
+        if out:
+            logger.error("ERROR: failed to update permissions")
     except Exception as ex:
         print("Exception in copying prevalidation files" + str(ex))
 
@@ -198,6 +202,10 @@ def check_git_repo():
         else:
             logger.error("ERROR: Git repo contents are not correct")
             return 1
+        cmd2 = "chmod +x " + dir_path + "/PreinstallCheck/cmsgpreinstallcheck.py"
+        out = os.system(cmd2)
+        if out:
+            logger.error("ERROR: failed to update permissions")
     except Exception as ex:
         print("Exception while checking git Repository "+ str(ex)) 
 
