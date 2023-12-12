@@ -198,14 +198,14 @@ def check_git_repo():
             os.chdir('/tmp/serviceguard')
             cmd = "cp -r PreinstallCheck " + dir_path + " >/dev/null 2>&1"
             os.system(cmd)
+            cmd2 = "chmod +x " + dir_path + "/PreinstallCheck/cmsgpreinstallcheck.py"
+            out = os.system(cmd2)
+            if out:
+                logger.error("ERROR: failed to update permissions")
             return 0
         else:
             logger.error("ERROR: Git repo contents are not correct")
             return 1
-        cmd2 = "chmod +x " + dir_path + "/PreinstallCheck/cmsgpreinstallcheck.py"
-        out = os.system(cmd2)
-        if out:
-            logger.error("ERROR: failed to update permissions")
     except Exception as ex:
         print("Exception while checking git Repository "+ str(ex)) 
 
