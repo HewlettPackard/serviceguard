@@ -1,6 +1,6 @@
-# (c) Copyright 2023 Hewlett Packard Enterprise Development LP
+# (c) Copyright 2023-2024 Hewlett Packard Enterprise Development LP
 # All rights reserved
-# version 2.6
+# version 2.7
 #!/bin/bash
 
 typeset -i cores_supported_per_license=2
@@ -8,6 +8,7 @@ typeset -i vcpus_supported_per_license=4
 typeset -i cores=0;
 typeset -i license_required=0;
 typeset -i sg_flag=0;
+typeset -i workload_flag=0;
 
 typeset -x newline_char=$'\n'
 typeset -x bullet_char="*"
@@ -48,6 +49,15 @@ typeset -i node_Premium_count=0
 
 n_flag=0
 cluster_license_count=0
+
+HA_DR_E7_count_arr=()
+HA_E5_count_arr=()
+SAP_Add_on_count_arr=()
+NFS_Add_on_count_arr=()
+Oracle_Add_on_count_arr=()
+MSSQL_Add_on_count_arr=()
+Flex_Storage_Add_on_count_arr=()
+nodelist_array=()
 
 #this code is reused from tools/cmcomputelicense of SGCORE
 #if there are any changes please modify in the other location as well
@@ -115,6 +125,7 @@ fi
 function check_for_cluster
 {
     node=$1
+    id_counter=1
     curr_node=$(host=`hostname`; echo ${host%%.*})
     if [[ ! -z "$node" && $node != $curr_node ]]; then
         view=`ssh $node cmviewcl -vf line -s config 2> /dev/null`
@@ -189,9 +200,20 @@ function check_for_cluster
             echo_n
             echo_n "For upgrading node $node to HPE Serviceguard for linux A.15.00.00 and above, requires following licenses"
             echo_n "Total number of license(s) required for $node: $license_required"
+            echo_n
+            printf "%-5s %-20s %-15s %-5s %-15s\n" "ID" "SGLX Cluster Name" "Node name" "Qty" "License Edition"
             if [[ $fline_flag -ne 1 ]]; then
                 printf "    * Foundational: $license_required LTU(s) of HPE Serviceguard for linux HA-E5 or HA-DR-E7"
                 echo
+                echo_n
+                echo_n "The final summary of number of licenses needed is presented in the table below:"
+                echo_n
+                printf "| %-5s | %-20s | %-15s | %-5s | %-20s |\n" "ID" "SGLX Cluster Name" "Node name" "Qty" "License Edition"
+                printf "| %-5s | %-20s | %-15s | %-5s | %-20s |\n" "$id_counter" "N/A" "$node" "$license_required" "HA-E5 or HA-DR-E7"
+                id_counter=$(( $id_counter + 1 ))
+                echo_n
+                echo_n
+
             fi
             echo_n "Note: Add-on license(s) might be required based on the workloads that will be deployed."
             echo_f "node:$node|license_version=NA"
@@ -257,9 +279,19 @@ function check_for_cluster
             echo_n
             echo_n "For upgrading node $node to HPE Serviceguard for linux A.15.00.00 and above, requires following licenses"
             echo_n "Total number of license(s) required for $node: $license_required"
+            echo_n
+            printf "%-5s %-20s %-15s %-5s %-15s\n" "ID" "SGLX Cluster Name" "Node name" "Qty" "License Edition"
             if [[ $fline_flag -ne 1 ]]; then
                 printf "    * Foundational: $license_required LTU(s) of HPE Serviceguard for linux HA-E5 or HA-DR-E7"
                 echo
+                echo_n
+                echo_n "The final summary of number of licenses needed is presented in the table below:"
+                echo_n
+                printf "| %-5s | %-20s | %-15s | %-5s | %-20s |\n" "ID" "SGLX Cluster Name" "Node name" "Qty" "License Edition"
+                printf "| %-5s | %-20s | %-15s | %-5s | %-20s |\n" "$id_counter" "N/A" "$node" "$license_required" "HA-E5 or HA-DR-E7"
+                id_counter=$(( $id_counter + 1 ))
+                echo_n
+                echo_n
             fi
             echo_n "Note: Add-on license(s) might be required based on the workloads that will be deployed."
             echo_f "node:$node|license_version=NA"
@@ -482,6 +514,7 @@ function print_lic_in_fline
 function calc_license_req
 {
     node=$1
+    node_iterator=$2
     vm_flag=0
     no_lic_flag=0
     node_license=""
@@ -525,9 +558,7 @@ function calc_license_req
     if [[ $? -ne 0 ]]; then
         continue;
     fi
-    
-    #flag to check if there are any workloads in a given node
-    workload_flag=0
+
     wrkld_list=()
     rpo_list=()
     multitarget_list=()
@@ -916,6 +947,7 @@ function calc_license_req
                     delta=$(( $license_required - $node_HA_DR_E7_count ))
                     node_license+="    $bullet_char Foundational: $delta LTU(s) of HPE Serviceguard for linux HA-DR-E7"
                     node_license+=$newline_char
+                    HA_DR_E7_count_arr[node_iterator]=$delta
                     total_license=$(( $total_license + $delta ))
                     HA_DR_E7_count=$(( $HA_DR_E7_count + $delta ))
                 fi
@@ -923,6 +955,7 @@ function calc_license_req
                 echo_n "For upgrading node $node to HPE Serviceguard for linux A.15.00.00 and above, requires following licenses"
                 node_license+="    $bullet_char Foundational: $license_required LTU(s) of HPE Serviceguard for linux HA-DR-E7"
                 node_license+=$newline_char
+                HA_DR_E7_count_arr[node_iterator]=$license_required
             fi
             print_curr_lic "required" "HA-DR-E7" "Foundational" $license_required
         else
@@ -933,6 +966,7 @@ function calc_license_req
                         delta=$(( $license_required - $node_HA_E5_count ))
                         node_license+="    $bullet_char Foundational: $delta LTU(s) of HPE Serviceguard for linux HA-E5"
                         node_license+=$newline_char
+                        HA_E5_count_arr[node_iterator]=$delta
                         total_license=$(( $total_license + $delta ))
                         HA_E5_count=$(( $HA_E5_count + $delta ))
                     fi
@@ -940,6 +974,7 @@ function calc_license_req
             else    #sg version is < 15; calculate the total_license based on license_required per node
             node_license+="    $bullet_char Foundational: $license_required LTU(s) of HPE Serviceguard for linux HA-E5"
                 node_license+=$newline_char
+                HA_E5_count_arr[node_iterator]=$license_required
                 total_license=$(( $total_license + $license_required ))
                 HA_E5_count=$(( $HA_E5_count + $license_required ))
             fi
@@ -958,6 +993,7 @@ function calc_license_req
                                 delta=$(( $license_required - $node_NFS_Add_on_count ))
                                 NFS_Add_on_count=$(( $NFS_Add_on_count + $delta ))
                                 node_license+="    $bullet_char $delta LTU(s) of HPE Serviceguard for linux $lic_name"
+                                NFS_Add_on_count_arr[node_iterator]=$delta
                                 node_license+=$newline_char
                             fi
                         elif [[ $lic_name == "SAP-Add-on" ]]; then
@@ -965,6 +1001,7 @@ function calc_license_req
                                 delta=$(( $license_required - $node_SAP_Add_on_count ))
                                 SAP_Add_on_count=$(( $SAP_Add_on_count + $delta ))
                                 node_license+="    $bullet_char $delta LTU(s) of HPE Serviceguard for linux $lic_name"
+                                SAP_Add_on_count_arr[node_iterator]=$delta
                                 node_license+=$newline_char
                             fi
                         elif [[ $lic_name == "Oracle-Add-on" ]]; then
@@ -972,6 +1009,7 @@ function calc_license_req
                                 delta=$(( $license_required - $node_Oracle_Add_on_count ))
                                 Oracle_Add_on_count=$(( $Oracle_Add_on_count + $delta ))
                                 node_license+="    $bullet_char $delta LTU(s) of HPE Serviceguard for linux $lic_name"
+                                Oracle_Add_on_count_arr[node_iterator]=$delta
                                 node_license+=$newline_char
                             fi
                         elif [[ $lic_name == "MSSQL-Add-on" ]]; then
@@ -979,6 +1017,7 @@ function calc_license_req
                                 delta=$(( $license_required - $node_MSSQL_Add_on_count ))
                                 MSSQL_Add_on_count=$(( $MSSQL_Add_on_count + $delta ))
                                 node_license+="    $bullet_char $delta LTU(s) of HPE Serviceguard for linux $lic_name"
+                                MSSQL_Add_on_count_arr[node_iterator]=$delta
                                 node_license+=$newline_char
                             fi
                         fi
@@ -987,12 +1026,16 @@ function calc_license_req
                         node_license+="    $bullet_char $license_required LTU(s) of HPE Serviceguard for linux $lic_name"
                         node_license+=$newline_char
                         if [[ $lic_name == "NFS-Add-on" ]]; then
+                            NFS_Add_on_count_arr[node_iterator]=$license_required
                             NFS_Add_on_count=$(( $NFS_Add_on_count + $license_required ))
                         elif [[ $lic_name == "SAP-Add-on" ]]; then
+                            SAP_Add_on_count_arr[node_iterator]=$license_required
                             SAP_Add_on_count=$(( $SAP_Add_on_count + $license_required ))
                         elif [[ $lic_name == "Oracle-Add-on" ]]; then
+                            Oracle_Add_on_count_arr[node_iterator]=$license_required
                             Oracle_Add_on_count=$(( $Oracle_Add_on_count + $license_required ))
                         elif [[ $lic_name == "MSSQL-Add-on" ]]; then
+                            MSSQL_Add_on_count_arr[node_iterator]=$license_required
                             MSSQL_Add_on_count=$(( $MSSQL_Add_on_count + $license_required ))
                         fi
                         total_license=$(( $total_license + $license_required ))
@@ -1005,10 +1048,12 @@ function calc_license_req
             if [[ $node_Flex_Storage_Add_on_count -lt 1 && $sg15_flag -eq 1 ]]; then
                 node_license+="    $bullet_char 1 LTU(s) of HPE Serviceguard for linux Flex-Storage-Add-on"
                 node_license+=$newline_char
+                Flex_Storage_Add_on_count_arr[node_iterator]=1
             else    #sg version is < 15; calculate the total_license based on license_required per node
                 node_license+="    $bullet_char 1 LTU(s) of HPE Serviceguard for linux Flex-Storage-Add-on"
                 node_license+=$newline_char
                 total_license=$(( $total_license + 1 ))
+                Flex_Storage_Add_on_count_arr[node_iterator]=1
                 Flex_Storage_Add_on_count=$(( $Flex_Storage_Add_on_count + 1 ))
             fi
             print_curr_lic "required" "Flex-Storage-Add-on" "Add-on" "1"
@@ -1033,12 +1078,14 @@ function calc_license_req
                 total_license=$(( $total_license + $delta ))
                 HA_E5_count=$(( $HA_E5_count + $delta ))
                 node_license+="    $bullet_char Foundational: $delta LTU(s) of HPE Serviceguard for linux HA-E5"
+                HA_E5_count_arr[node_iterator]=$license_required
                 node_license+=$newline_char
             fi
         else    #sg version is < 15; calculate the total_license based on license_required per node
             total_license=$(( $total_license + $license_required ))
             HA_E5_count=$(( $HA_E5_count + $license_required ))
             node_license+="    $bullet_char Foundational: $license_required LTU(s) of HPE Serviceguard for linux HA-E5"
+            HA_E5_count_arr[node_iterator]=$license_required
             node_license+=$newline_char
         fi
         print_curr_lic "required" "HA-E5" "Foundational" "$license_required"
@@ -1127,6 +1174,60 @@ function print_summary
             printf "    $bullet_char $Flex_Storage_Add_on_count LTU(s) of HPE Serviceguard for linux - Flex-Storage-Add-on\n"
         fi
         echo
+
+        echo_n
+        echo_n "The final summary of number of licenses needed is presented in the table below:"
+        echo_n
+        printf "| %-5s | %-20s | %-15s | %-5s | %-20s |\n" "ID" "SGLX Cluster Name" "Node name" "Qty" "License Edition"
+        nodelist=`echo "$view" | awk -F "[ :|=]" '$1 == "node" && $3 == "name"  {print $4}'`
+        nodelist_array=($nodelist)
+        i=0
+        id_counter=1
+        for node in "${nodelist_array[@]}";
+        do
+
+            if [ -n "${HA_DR_E7_count_arr[i]}" ]; then
+
+                printf "| %-5s | %-20s | %-15s | %-5s | %-20s |\n" "$id_counter" "$cluster_name" "${nodelist_array[i]}" "${HA_DR_E7_count_arr[i]}" "HA-DR-E7"
+                id_counter=$(( $id_counter + 1 ))
+
+            fi
+            if [ -n "${HA_E5_count_arr[i]}" ]; then
+
+                printf "| %-5s | %-20s | %-15s | %-5s | %-20s |\n" "$id_counter" "$cluster_name" "${nodelist_array[i]}" "${HA_E5_count_arr[i]}" "HA-E5"
+                id_counter=$(( $id_counter + 1 ))
+
+            fi
+            if [ -n "${SAP_Add_on_count_arr[i]}" ]; then
+               printf "| %-5s | %-20s | %-15s | %-5s | %-20s |\n" "$id_counter" "$cluster_name" "${nodelist_array[i]}" "${SAP_Add_on_count_arr[i]}" "SAP Add-on"
+                id_counter=$(( $id_counter + 1 ))
+
+            fi
+            if [ -n "${NFS_Add_on_count_arr[i]}" ]; then
+                printf "| %-5s | %-20s | %-15s | %-5s | %-20s |\n" "$id_counter" "$cluster_name" "${nodelist_array[i]}" "${NFS_Add_on_count_arr[i]}" "NFS Add-on"
+                id_counter=$(( $id_counter + 1 ))
+
+            fi
+            if [ -n "${Oracle_Add_on_count_arr[i]}" ]; then
+                printf "| %-5s | %-20s | %-15s | %-5s | %-20s |\n" "$id_counter" "$cluster_name" "${nodelist_array[i]}" "${Oracle_Add_on_count_arr[i]}" "Oracle Add-on"
+                id_counter=$(( $id_counter + 1 ))
+            fi
+            if [ -n "${MSSQL_Add_on_count_arr[i]}" ]; then
+               printf "| %-5s | %-20s | %-15s | %-5s | %-20s |\n" "$id_counter" "$cluster_name" "${nodelist_array[i]}" "${MSSQL_Add_on_count_arr[i]}" "MSSQL Add-on"
+                id_counter=$(( $id_counter + 1 ))
+            fi
+            if [ -n "${Flex_Storage_Add_on_count_arr[i]}" ]; then
+                printf "| %-5s | %-20s | %-15s | %-5s | %-20s |\n" "$id_counter" "$cluster_name" "${nodelist_array[i]}" "${Flex_Storage_Add_on_count_arr[i]}" "Flex-storage Add-on"
+                id_counter=$(( $id_counter + 1 ))
+            fi
+            i=$(( $i + 1 ))
+        done
+        echo_n
+        echo_n
+        if [[ $workload_flag -eq 0 ]]; then
+            echo_n "Note: This cluster does not include deployed SAP, Oracle, MSSQL or NFS workloads, which require an additional SGLX add-on license"
+            echo_n
+        fi
     fi
 }
 
@@ -1176,7 +1277,7 @@ while getopts ":hn:f:" option; do
             ;;
         n)
             if [[ $n_flag -eq 0 ]]; then
-                echo_n "cmmaplicense version: 2.6"
+                echo_n "cmmaplicense version: 2.7"
                 echo_n
             fi
             n_flag=1
@@ -1212,7 +1313,7 @@ if [[ $? -eq 0 ]]; then
     exit 1
 fi
 
-echo_n "cmmaplicense version: 2.6"
+echo_n "cmmaplicense version: 2.7"
 echo_n
 
 #get all the nodelist
@@ -1234,9 +1335,13 @@ do
 done
 
 echo_n "Serviceguard Cluster : $cluster_name"
+
+node_iterator=0
 for node in $nodelist
 do
-    calc_license_req $node
+    calc_license_req $node $node_iterator
+    node_iterator=$((node_iterator + 1))
+
 done
 
 print_summary
