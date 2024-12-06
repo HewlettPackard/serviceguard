@@ -1,6 +1,6 @@
 # (c) Copyright 2023-2024 Hewlett Packard Enterprise Development LP
 # All rights reserved
-# version 2.7
+# version 2.8
 #!/bin/bash
 
 typeset -i cores_supported_per_license=2
@@ -1122,6 +1122,16 @@ function print_note
     printf "********************************************************************************\n"
 }
 
+function print_info
+{
+    printf "If your system is running SGLX v12 Enterprise or Premium,HPE will automatically apply SGLX v15 HA DR E7 by default.\n"
+    printf "However, if the cmmaplicense determines that SGLX v15 HA E5 is sufficient for your current environment             \n"
+    printf "then you are only required to purchase SGLX v15 HA E5 before the expiration date,                                  \n"
+    printf "provided there are no changes to the system configuration.                                                         \n"
+    printf "\n"
+    
+}
+
 function print_summary
 {
     echo_n "Summary : $cluster_name "
@@ -1277,7 +1287,7 @@ while getopts ":hn:f:" option; do
             ;;
         n)
             if [[ $n_flag -eq 0 ]]; then
-                echo_n "cmmaplicense version: 2.7"
+                echo_n "cmmaplicense version: 2.8"
                 echo_n
             fi
             n_flag=1
@@ -1313,7 +1323,7 @@ if [[ $? -eq 0 ]]; then
     exit 1
 fi
 
-echo_n "cmmaplicense version: 2.7"
+echo_n "cmmaplicense version: 2.8"
 echo_n
 
 #get all the nodelist
@@ -1345,6 +1355,8 @@ do
 done
 
 print_summary
+
+print_info
 
 if [[ $sg15_flag -ne 1 && $fline_flag -ne 1 ]]; then
     print_note
