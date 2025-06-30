@@ -1,7 +1,11 @@
-# (c) Copyright 2023-2024 Hewlett Packard Enterprise Development LP
+
+# (c) Copyright 2023-2025 Hewlett Packard Enterprise Development LP
 # All rights reserved
-# version 2.8
+# version 2.9
 #!/bin/bash
+
+typeset -i node_e5_required=0
+typeset -i rec_required=0
 
 typeset -i cores_supported_per_license=2
 typeset -i vcpus_supported_per_license=4
@@ -648,7 +652,7 @@ function calc_license_req
                     fi
                     if ! [[ ${multitarget_list[@]} =~ "Dataguard" ]]; then
                         multitarget_list+=( "Dataguard" )
-                    fi 
+                    fi
                     E7_flag=1
                     if ! [[ ${lic_list[@]} =~ "Oracle-Add-on" ]]; then
                         lic_list+=( "Oracle-Add-on" )
@@ -771,7 +775,7 @@ function calc_license_req
                     E5_flag=1
                 fi
             fi
-            if [[ $module =~ "sgenss/rf_" ]]; then 
+            if [[ $module =~ "sgenss/rf_" ]]; then
                 node_names=`echo "$view" | awk -F "[ :|=]" '$1 == "package" && $2 == "'$pkg'" && $3 == "sgenss/rf_" && $5 == "sgenss/rf_"  {print $6}'`
                 num_node_names=( $node_names )
                 if [[ ${#num_node_names[@]} -gt 2 ]]; then
@@ -989,7 +993,7 @@ function calc_license_req
                         delta=0
                         #check if required licenses are already installed, else calculate the delta
                         if [[ $lic_name == "NFS-Add-on" ]]; then
-                            if [[ $node_NFS_Add_on_count -lt  $license_required ]]; then 
+                            if [[ $node_NFS_Add_on_count -lt  $license_required ]]; then
                                 delta=$(( $license_required - $node_NFS_Add_on_count ))
                                 NFS_Add_on_count=$(( $NFS_Add_on_count + $delta ))
                                 node_license+="    $bullet_char $delta LTU(s) of HPE Serviceguard for linux $lic_name"
@@ -997,7 +1001,7 @@ function calc_license_req
                                 node_license+=$newline_char
                             fi
                         elif [[ $lic_name == "SAP-Add-on" ]]; then
-                            if [[ $node_SAP_Add_on_count -lt  $license_required ]]; then 
+                            if [[ $node_SAP_Add_on_count -lt  $license_required ]]; then
                                 delta=$(( $license_required - $node_SAP_Add_on_count ))
                                 SAP_Add_on_count=$(( $SAP_Add_on_count + $delta ))
                                 node_license+="    $bullet_char $delta LTU(s) of HPE Serviceguard for linux $lic_name"
@@ -1005,7 +1009,7 @@ function calc_license_req
                                 node_license+=$newline_char
                             fi
                         elif [[ $lic_name == "Oracle-Add-on" ]]; then
-                            if [[ $node_Oracle_Add_on_count -lt  $license_required ]]; then 
+                            if [[ $node_Oracle_Add_on_count -lt  $license_required ]]; then
                                 delta=$(( $license_required - $node_Oracle_Add_on_count ))
                                 Oracle_Add_on_count=$(( $Oracle_Add_on_count + $delta ))
                                 node_license+="    $bullet_char $delta LTU(s) of HPE Serviceguard for linux $lic_name"
@@ -1013,7 +1017,7 @@ function calc_license_req
                                 node_license+=$newline_char
                             fi
                         elif [[ $lic_name == "MSSQL-Add-on" ]]; then
-                            if [[ $node_MSSQL_Add_on_count -lt  $license_required ]]; then 
+                            if [[ $node_MSSQL_Add_on_count -lt  $license_required ]]; then
                                 delta=$(( $license_required - $node_MSSQL_Add_on_count ))
                                 MSSQL_Add_on_count=$(( $MSSQL_Add_on_count + $delta ))
                                 node_license+="    $bullet_char $delta LTU(s) of HPE Serviceguard for linux $lic_name"
@@ -1070,8 +1074,11 @@ function calc_license_req
         if [[ $sg15_flag -eq 1 ]]; then
             if [[ $node_HA_E5_count -lt $license_required ]]; then
                 #check if sufficient HA-DR-E7 licenses are present
-                if [[ $node_HA_DR_E7_count -ne 0 && $node_HA_DR_E7_count -lt $license_required ]]; then
+		delta=0
+                if [[ $node_HA_DR_E7_count -ne 0 ]]; then
+		    if [[ $node_HA_DR_E7_count -lt $license_required ]]; then
                     delta=$(( $license_required - $node_HA_DR_E7_count ))
+		fi
                 else
                     delta=$(( $license_required - $node_HA_E5_count ))
                 fi
@@ -1080,6 +1087,7 @@ function calc_license_req
                 node_license+="    $bullet_char Foundational: $delta LTU(s) of HPE Serviceguard for linux HA-E5"
                 HA_E5_count_arr[node_iterator]=$license_required
                 node_license+=$newline_char
+                node_e5_required=1
             fi
         else    #sg version is < 15; calculate the total_license based on license_required per node
             total_license=$(( $total_license + $license_required ))
@@ -1100,6 +1108,46 @@ function calc_license_req
                 printf "$node_license"
             fi
         fi
+        if [[ $node_HA_DR_E7_count -ne 0 && $node_e5_required -eq 1 ]]; then
+            echo "-------------------------------------------------------------------------------------------"
+            rec_msg="          While HA-E5 licenses are sufficient for the current configuration.\n"
+            diff_e7_expiry=0
+            if [[ $HA_E5_count -le 0 && $node_e5_required -eq 1 ]]; then
+                local expiry_dates=($(cmgetlicense -vf line | grep "node:$node|license_type:HA-DR-E7|expiry_date=" | sed -n 's/.*expiry_date=\([^ ]*\).*/\1/p'))
+                if [ "${#expiry_dates[@]}" -gt 1 ]; then
+                    local ref_date="${expiry_dates[0]}"
+                    for date in "${expiry_dates[@]:1}"; do
+                        if [[ "$date" != "$ref_date" ]]; then
+                            diff_e7_expiry=1
+                            break
+                        fi
+                    done
+            fi
+            fi
+            if [[ $HA_E5_count -gt 0 || $diff_e7_expiry -eq 1 ]]; then
+                rec_msg+="          Reconciling HA-DR-E7 license to HA-E5 license is mandatory,\n"
+                rec_msg+="          if you wish to purchase/use HA-E5 licenses going forward.\n"
+                if [[ $HA_E5_count -gt 0 ]]; then
+                    rec_severity="CRITICAL"
+                    rec_msg+="          Serviceguard failover functionalities is affected because of HA-DR-E7 license insufficiency.\n"
+                else
+                    rec_severity="WARNING "
+                    rec_msg+="          when some of the active HA-DR-E7 licenses expire, Serviceguard failover functionalities will \n"
+                    rec_msg+="          be affected because of HA-DR-E7 license insufficiency.\n"
+                fi
+            else
+                rec_severity="INFO    "
+                rec_msg+="          Reconciling HA-DR-E7 license to HA-E5 license is not mandatory.\n"
+                rec_msg+="          As soon as all HA-DR-E7 licenses expire, HA-E5 will get activated.\n"
+                rec_msg+="          Please ignore HA-DR-E7 licenses expiry alerts, provided sufficient HA-E5 \n"
+                rec_msg+="          licenses are installed and there are no changes to the current configuration.\n"
+            fi
+            rec_msg+="Please refer below for more details.\n"
+            rec_msg+="-------------------------------------------------------------------------------------------\n"
+            echo "$rec_severity: Higher-precedence HA-DR-E7 licenses are active on the node $node,"
+            echo -e "$rec_msg"
+            rec_required=1
+        fi
     else
         echo_n "For upgrading node $node to HPE Serviceguard for linux A.15.00.00 and above, requires following licenses"
         echo_n "Total number of license(s) required for $node: $total_license"
@@ -1114,22 +1162,30 @@ function calc_license_req
 
 function print_note
 {
-    printf "********************************************************************************\n"
-    printf "* NOTE: When A.12.xx.xx is upgraded to A.15.20.00 and beyond, the current      *\n"
-    printf "* v12 licenses will automatically mapped to v15 licenses by the product.       *\n"
-    printf "* For further details, kindly refer the 'SGLX v12 to SGLX v15 Upgrade Program' *\n"
-    printf "* available at https://www.hpe.com/info/linux-serviceguard-docs.               *\n"
-    printf "********************************************************************************\n"
+
+    echo -e "*************************************************************************************"
+    echo -e "* NOTE:                                                                             *"
+    if [[ $rec_required -eq 1 ]]; then
+        echo -e "* Reconciliation is supported with HPE Serviceguard for linux A.15.40.00 and above. *"
+        echo -e "* To reconcile existing HA-DR-E7 licenses to HA-E5, please contact HPE suppport.    *"
+        echo -e "* To verify the installed HA-E5 license details when HA-DR-E7 licenses are active,  *"
+        echo -e "* you can run 'cmgetlicense -l all' command after upgrading to HPE Serviceguard for *"
+        echo -e "* linux A.15.40.00 and above.                                                       *"
+    fi
+    if [[ $sg15_flag -ne 1 ]]; then
+        echo -e "* For further details, kindly refer the 'SGLX v12 to SGLX v15 Upgrade Program'      *"
+        echo -e "* available at https://www.hpe.com/info/linux-serviceguard-docs.                    *"
+    fi
+    echo -e "*************************************************************************************"
 }
 
 function print_info
 {
-    printf "If your system is running SGLX v12 Enterprise or Premium,HPE will automatically apply SGLX v15 HA DR E7 by default.\n"
-    printf "However, if the cmmaplicense determines that SGLX v15 HA E5 is sufficient for your current environment             \n"
-    printf "then you are only required to purchase SGLX v15 HA E5 before the expiration date,                                  \n"
+    printf "If your system is running SGLX v12, HPE will automatically apply 60 days SGLX Instant-ON license by default.\n"
+    printf "You are required to purchase and install the required SGLX v15 licenses reported by cmmaplicense before the expiration date,                                  \n"
     printf "provided there are no changes to the system configuration.                                                         \n"
     printf "\n"
-    
+
 }
 
 function print_summary
@@ -1148,7 +1204,7 @@ function print_summary
     if [[ $fline_flag -ne 1 ]]; then
         print_lic_in_fline
     fi
-    
+
     #requirements identified by cmmaplicense
     if [[ $sg15_flag -eq 0 ]]; then
         echo_n "For upgrading cluster $cluster_name to HPE Serviceguard for linux A.15.00.00 and above, requires following licenses"
@@ -1287,7 +1343,7 @@ while getopts ":hn:f:" option; do
             ;;
         n)
             if [[ $n_flag -eq 0 ]]; then
-                echo_n "cmmaplicense version: 2.8"
+                echo_n "cmmaplicense version: 2.9"
                 echo_n
             fi
             n_flag=1
@@ -1323,7 +1379,7 @@ if [[ $? -eq 0 ]]; then
     exit 1
 fi
 
-echo_n "cmmaplicense version: 2.8"
+echo_n "cmmaplicense version: 2.9"
 echo_n
 
 #get all the nodelist
@@ -1356,8 +1412,10 @@ done
 
 print_summary
 
+if [[ $sg15_flag -ne 1 ]]; then
 print_info
+fi
 
-if [[ $sg15_flag -ne 1 && $fline_flag -ne 1 ]]; then
+if [[ ($sg15_flag -ne 1 && $fline_flag -ne 1) || $rec_required -eq 1 ]]; then
     print_note
 fi
