@@ -1,6 +1,6 @@
 # (c) Copyright 2023-2025 Hewlett Packard Enterprise Development LP
 # All rights reserved
-# version 2.9
+# version 2.10
 #!/bin/bash
 
 typeset -i node_e5_required=0
@@ -1061,6 +1061,9 @@ function calc_license_req
             fi
             print_curr_lic "required" "Flex-Storage-Add-on" "Add-on" "1"
         fi
+         if [[ $E5_flag -eq 1 ]]; then
+             node_e5_required=1
+         fi
     else
         echo_n "Cluster configured : yes. Workloads Detected: No "
         echo_n
@@ -1342,7 +1345,7 @@ while getopts ":hn:f:" option; do
             ;;
         n)
             if [[ $n_flag -eq 0 ]]; then
-                echo_n "cmmaplicense version: 2.9"
+                echo_n "cmmaplicense version: 2.10"
                 echo_n
             fi
             n_flag=1
@@ -1378,7 +1381,7 @@ if [[ $? -eq 0 ]]; then
     exit 1
 fi
 
-echo_n "cmmaplicense version: 2.9"
+echo_n "cmmaplicense version: 2.10"
 echo_n
 
 #get all the nodelist
